@@ -1,0 +1,140 @@
+<!--
+@license
+Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../paper-tabs/paper-tab.html">
+<link rel="import" href="../vertical-tabs/vertical-tabs.html">
+<link rel="import" href="../auth-methods/auth-methods.html">
+<!--
+`<authorization-panel>` The authorization panel used in the request panel
+
+### Example
+```
+<authorization-panel></authorization-panel>
+```
+
+### Styling
+`<authorization-panel>` provides the following custom properties and mixins for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--authorization-panel` | Mixin applied to the element | `{}`
+
+@group UI Elements
+@element authorization-panel
+@demo demo/index.html
+-->
+<dom-module id="authorization-panel">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply(--authorization-panel);
+    }
+    .content {
+      @apply(--layout-horizontal);
+      @apply(--layout-flex);
+      position: relative;
+    }
+
+    vertical-tabs {
+      width: 100%;
+    }
+
+    .enabled-marker {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-right: 12px;
+      border-radius: 50%;
+      background-color: transparent;
+      transition: all 0.4s cubic-bezier(0, 0, 0.56, 1.04);
+    }
+    .enabled-marker[enabled] {
+      background-color: var(--auth-enabled-marker-color, #48982A);
+    }
+    </style>
+    <div class="content">
+      <vertical-tabs selected="{{selected}}">
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuth)]]"></span>BASIC</paper-tab>
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuth)]]"></span>NTLM</paper-tab>
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuth)]]"></span>OAUTH 2</paper-tab>
+        <iron-pages content selected="{{selected}}">
+          <auth-method-basic></auth-method-basic>
+          <auth-method-ntlm></auth-method-ntlm>
+          <auth-method-oauth2></auth-method-oauth2>
+        </iron-pages>
+      </vertical-tabs>
+    </div>
+  </template>
+  <script>
+  Polymer({
+    is: 'authorization-panel',
+    properties: {
+      // Selected panel
+      selected: {
+        type: Number,
+        value: 0
+      },
+
+      enabledAuth: String
+    },
+
+    listeners: {
+      'authorization-enabled': '_onAuthEnabled',
+      'authorization-disabled': '_onAuthDisabled'
+    },
+
+    _onAuthEnabled: function(e) {
+      this._disableCurrentAuth();
+      e = Polymer.dom(e);
+      var target = e.rootTarget.nodeName.toLowerCase();
+      switch (target) {
+        case 'auth-method-basic': this.enabledAuth = 'basic'; break;
+        case 'auth-method-ntlm': this.enabledAuth = 'ntlm'; break;
+        case 'auth-method-oauth2': this.enabledAuth = 'oauth2'; break;
+      }
+    },
+
+    _onAuthDisabled: function() {
+      this.enabledAuth = '';
+    },
+
+    // Disable clurrently selected auth method.
+    _disableCurrentAuth: function() {
+      var current = this.enabledAuth;
+      if (!current) {
+        return;
+      }
+      var target;
+      switch (current) {
+        case 'basic': target = this.$$('auth-method-basic'); break;
+        case 'ntlm': target = this.$$('auth-method-ntlm'); break;
+        case 'oauth2': target = this.$$('auth-method-oauth2'); break;
+      }
+
+      if (!target) {
+        return;
+      }
+
+      target.enabled = false;
+    },
+
+    _isAuthEnabled: function(type, current) {
+      return type === current;
+    }
+  });
+  </script>
+</dom-module>
