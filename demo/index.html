@@ -29,6 +29,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       max-width: 600px;
     }
 
+    output {
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: block;
+      margin: 12px 0;
+    }
+
   </style>
 </head>
 <body unresolved>
@@ -37,6 +44,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <demo-snippet>
       <template>
         <authorization-panel></authorization-panel>
+        <output id="settings"></output>
+        <output id="state"></output>
+        <script>
+          var panel = document.querySelector('authorization-panel');
+          panel.addEventListener('authorization-settings-changed', function(e) {
+            var data = e.detail;
+            var output = document.querySelector('#settings');
+            if (!data.settings) {
+              output.innerHTML = '';
+            } else {
+              var txt = 'Authorization type: ' + data.type + '\n\n';
+              txt += JSON.stringify(data.settings, null, 2);
+              output.innerHTML = txt;
+            }
+          });
+          panel.addEventListener('authorization-type-enabled', function(e) {
+            var data = e.detail;
+            var output = document.querySelector('#state');
+            output.innerHTML += 'Enabled ' + data.type + ' authorization method\n';
+          });
+          panel.addEventListener('authorization-type-disabled', function(e) {
+            var data = e.detail;
+            var output = document.querySelector('#state');
+            output.innerHTML += 'Disabled ' + data.type + ' authorization method\n';
+          });
+        </script>
       </template>
     </demo-snippet>
   </div>

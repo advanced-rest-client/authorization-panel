@@ -18,7 +18,32 @@ the License.
 <link rel="import" href="../vertical-tabs/vertical-tabs.html">
 <link rel="import" href="../auth-methods/auth-methods.html">
 <!--
-`<authorization-panel>` The authorization panel used in the request panel
+`<authorization-panel>` The authorization panel used in the request panel.
+It is a set of forms that allow set up the authorization method for a HTTP request.
+
+It renders a set of forms. But it or it's children do not perform authorization.
+In case of `basic` method the app should insert the authorization header automatically when
+running the request.
+When enabled authorization type is `ntlm` then username, password and domain should be passed
+to transport (XHR, socket) and there perform the authorization.
+
+Oauth 2 form sends the `oauth2-token-requested` with the OAuth settings provided with the form.
+Any element / app can handle this event and perform authorization.
+ARC provides the `<oauth2-authorization>` element (from the `oauth-authorization` repo) that can
+be placed anywhere in the DOM (from current element where `authorization-panel` is attached up to
+the body) and perform OAuth athorization. However it can be done by any other element / app  or
+even server. See `<oauth2-authorization>` for detailed documentation.
+
+Oauth 1a is not currently supported. Though the form is ready and available, there's no
+authorization method in the ARC components set.
+
+## Events
+This element fires the `authorization-settings-changed` when any type of authorization
+is enabled and valid data has been provided by the user.
+
+This element also fires `authorization-type-enabled` and `authorization-type-disabled` events
+when type state changes.
+See demo for example usage.
 
 ### Example
 ```
@@ -68,9 +93,9 @@ Custom property | Description | Default
     </style>
     <div class="content">
       <vertical-tabs selected="{{selected}}">
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuth)]]"></span>BASIC</paper-tab>
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuth)]]"></span>NTLM</paper-tab>
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuth)]]"></span>OAUTH 2</paper-tab>
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuthType)]]"></span>BASIC</paper-tab>
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuthType)]]"></span>NTLM</paper-tab>
+        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuthType)]]"></span>OAUTH 2</paper-tab>
         <iron-pages content selected="{{selected}}">
           <auth-method-basic></auth-method-basic>
           <auth-method-ntlm></auth-method-ntlm>
@@ -82,58 +107,204 @@ Custom property | Description | Default
   <script>
   Polymer({
     is: 'authorization-panel',
+    /**
+     * Fired when auth type settings changed.
+     * It will fire when any of types is enabled (or at the moment the it's disabling) and
+     * any value of any property has changed.
+     *
+     * @event authorization-settings-changed
+     * @param {Object} settings Current auth settings. It depends on enabled `type`.
+     * @param {String} type Enabled auth type. For example `basic`, `ntlm` or `oauth2`.
+     */
+    /**
+     * Fired when the authorization type has been enabled in the UI. Listen for
+     * `authorization-settings-changed` event to get current auth settings.
+     *
+     * @event authorization-type-enabled
+     * @param {String} type Enabled auth type
+     */
+    /**
+     * Fired when the authorization type has been disabled in the UI.
+     *
+     * @event authorization-type-disabled
+     * @param {String} type Disabled auth type
+     */
     properties: {
-      // Selected panel
+      // Selected panel with auth method.
       selected: {
         type: Number,
         value: 0
       },
+      // Currently enabled auth type. Can be one at the time.
+      enabledAuthType: {
+        type: String,
+        notify: true
+      },
+      /**
+       * Current settings of enabled auth type.
+       * Can be `undefined` if the user hasn't filled all required fields in the form.
+       */
+      enabledSettings: {
+        type: Object,
+        readOnly: true,
+        notify: true
+      }
+    },
 
-      enabledAuth: String
+    observers: [
+      '_enabledAuthTypeChanged(enabledAuthType)',
+      '_authSettingsChanged(enabledSettings.*)'
+    ],
+    /**
+     * Gets settings for clurrently enabled aoth method. Null if none is enabled.
+     */
+    get settings() {
+      var current = this.enabledAuthType;
+      if (!current) {
+        return null;
+      }
+      var element = this.getElementForType(current);
+      if (!element) {
+        return null;
+      }
+      return element.settings;
     },
 
     listeners: {
       'authorization-enabled': '_onAuthEnabled',
-      'authorization-disabled': '_onAuthDisabled'
+      'authorization-disabled': '_onAuthDisabled',
+      'auth-settings-changed': '_authSettingsHandler'
+    },
+
+    _enabledAuthTypeChanged: function() {
+      var current = this.enabledAuthType;
+      if (!current) {
+        return this._setEnabledSettings(undefined);
+      }
+      var element = this.getElementForType(current);
+      if (!element) {
+        return this._setEnabledSettings(undefined);
+      }
+
+      if (element.validate !== undefined && !element.validate(true)) {
+        return this._setEnabledSettings(undefined);
+      }
+
+      this._setEnabledSettings(element.settings);
     },
 
     _onAuthEnabled: function(e) {
-      this._disableCurrentAuth();
       e = Polymer.dom(e);
-      var target = e.rootTarget.nodeName.toLowerCase();
-      switch (target) {
-        case 'auth-method-basic': this.enabledAuth = 'basic'; break;
-        case 'auth-method-ntlm': this.enabledAuth = 'ntlm'; break;
-        case 'auth-method-oauth2': this.enabledAuth = 'oauth2'; break;
+      if (e.rootTarget === this) {
+        return;
       }
+
+      this._disableCurrentAuth();
+      var type = this.getTypeForElement(e.rootTarget);
+      if (!type) {
+        throw new TypeError('Event source couldn\'t be recognized as an auth form.');
+      }
+      this.enabledAuthType = type;
+      this.fire('authorization-type-enabled', {
+        type: type
+      });
     },
 
-    _onAuthDisabled: function() {
-      this.enabledAuth = '';
+    _onAuthDisabled: function(e) {
+      e = Polymer.dom(e);
+      if (e.rootTarget === this) {
+        return;
+      }
+      var type = this.getTypeForElement(e.rootTarget);
+
+      if (this.enabledAuthType !== type) {
+        return;
+      }
+
+      this.enabledAuthType = '';
+      this._setEnabledSettings(undefined);
+      this.fire('authorization-type-disabled', {
+        type: type
+      });
     },
 
     // Disable clurrently selected auth method.
     _disableCurrentAuth: function() {
-      var current = this.enabledAuth;
+      var current = this.enabledAuthType;
       if (!current) {
         return;
       }
-      var target;
-      switch (current) {
-        case 'basic': target = this.$$('auth-method-basic'); break;
-        case 'ntlm': target = this.$$('auth-method-ntlm'); break;
-        case 'oauth2': target = this.$$('auth-method-oauth2'); break;
-      }
-
+      var target = this.getElementForType(current);
       if (!target) {
         return;
       }
-
       target.enabled = false;
+      this.enabledAuthType = '';
+      this._setEnabledSettings(undefined);
     },
 
     _isAuthEnabled: function(type, current) {
       return type === current;
+    },
+    /**
+     * Returns an element that represent a form of a given type.
+     *
+     * @param {String} type Type of auth method. For example `oauth2`
+     * @return {HTMLElement|null} A child element for given type or null if not found.
+     */
+    getElementForType: function(type) {
+      switch (type) {
+        case 'basic': return this.$$('auth-method-basic');
+        case 'ntlm': return this.$$('auth-method-ntlm');
+        case 'oauth2': return this.$$('auth-method-oauth2');
+      }
+      return null;
+    },
+    /**
+     * Maps the (lower case) name of the element to the auth type.
+     *
+     * @param {String|HTMLElement} Lowercase name of the element of the element itself.
+     * @return {String|null} Auth type name or null if the mapping is unknown.
+     */
+    getTypeForElement: function(element) {
+      if (element instanceof HTMLElement) {
+        element = element.nodeName.toLowerCase();
+      }
+      if (typeof element !== 'string') {
+        throw new TypeError('Passed element is either string or HTMLElement');
+      }
+      switch (element) {
+        case 'auth-method-basic': return 'basic';
+        case 'auth-method-ntlm': return 'ntlm';
+        case 'auth-method-oauth2': return 'oauth2';
+      }
+      return null;
+    },
+
+    _authSettingsHandler: function(e, detail) {
+      if (!this.enabledAuthType) {
+        this._setEnabledSettings(undefined);
+        return;
+      }
+
+      e = Polymer.dom(e);
+      var type = this.getTypeForElement(e.rootTarget);
+      if (!type) {
+        throw new TypeError('Event source couldn\'t be recognized as an auth form.');
+      }
+
+      if (type !== this.enabledAuthType) {
+        // Only for currently enabled type
+        return;
+      }
+      this._setEnabledSettings(detail);
+    },
+
+    _authSettingsChanged: function() {
+      this.fire('authorization-settings-changed', {
+        settings: this.enabledSettings,
+        type: this.enabledAuthType
+      });
     }
   });
   </script>
