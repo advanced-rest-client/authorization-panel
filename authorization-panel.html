@@ -93,13 +93,13 @@ Custom property | Description | Default
     </style>
     <div class="content">
       <vertical-tabs selected="{{selected}}">
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuthType)]]"></span>BASIC</paper-tab>
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuthType)]]"></span>NTLM</paper-tab>
-        <paper-tab><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuthType)]]"></span>OAUTH 2</paper-tab>
+        <paper-tab data-type="basic"><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuthType)]]"></span>BASIC</paper-tab>
+        <paper-tab data-type="ntlm"><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuthType)]]"></span>NTLM</paper-tab>
+        <paper-tab data-type="oauth2"><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuthType)]]"></span>OAUTH 2</paper-tab>
         <iron-pages content selected="{{selected}}">
-          <auth-method-basic></auth-method-basic>
-          <auth-method-ntlm></auth-method-ntlm>
-          <auth-method-oauth2></auth-method-oauth2>
+          <auth-method-basic data-type="basic" raml-settings="[[_computeSettings(securedBy, 'Basic Authentication')]]"></auth-method-basic>
+          <auth-method-ntlm data-type="ntlm" raml-settings="[[_computeSettings(securedBy, '???')]]"></auth-method-ntlm>
+          <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
         </iron-pages>
       </vertical-tabs>
     </div>
@@ -148,7 +148,20 @@ Custom property | Description | Default
         type: Object,
         readOnly: true,
         notify: true
-      }
+      },
+      /**
+       * A definition of the RAML `securedBy` node of the method. description.
+       * If set it will limit number of panels to show only those which are
+       * defined in the RAML spec and provide the fill data.
+       */
+      securedBy: {
+        type: Object,
+        observer: '_securedByChanged'
+      },
+      /**
+       * The OAuth2 redirect URL to be set in the OAuth2 form pane.
+       */
+      redirectUrl: String
     },
 
     observers: [
@@ -299,12 +312,102 @@ Custom property | Description | Default
       }
       this._setEnabledSettings(detail);
     },
-
+    // Fires the `authorization-settings-changed` event when something change
     _authSettingsChanged: function() {
       this.fire('authorization-settings-changed', {
         settings: this.enabledSettings,
         type: this.enabledAuthType
       });
+    },
+    /**
+     * A handler called when the `securedBy` property changes.
+     * It sets up the tabs by hidding the ones not defined in the
+     * RAML spec.
+     */
+    _securedByChanged: function(secured) {
+      var state = {
+        oauth1: false,
+        oauth2: false,
+        basic: false,
+        ntlm: false,
+      };
+      if (!secured || !secured.length) {
+        // If no RAML then show all.
+        for (var _key in state) {
+          state[_key] = true;
+        }
+        return this._updateTabs(state);
+      }
+      secured.forEach(function(data) {
+        switch (data.type) {
+          case 'OAuth 1.0': state.oauth1 = true; break;
+          case 'OAuth 2.0': state.oauth2 = true; break;
+          case 'Basic Authentication': state.basic = true; break;
+          case 'Digest Authentication': break;
+          case 'Pass Through': break;
+          default:
+            console.warn('Unsupported auth method', data);
+        }
+      });
+      this._updateTabs(state);
+    },
+    /**
+     * Updates tabs visibility when RAML definition change.
+     *
+     * @param {Object} state A map where keys are auth types and values is
+     * the boolean value of the state. True for show the tab.
+     */
+    _updateTabs: function(state) {
+      if (!state) {
+        return;
+      }
+      var _selectedKey;
+      var supported = ['basic','ntlm','oauth2'];
+      for (var _key in state) {
+        var nodes = Polymer.dom(this.root).querySelectorAll('[data-type="' +
+          _key + '"]');
+        if (!nodes) {
+          continue;
+        }
+        var _state = state[_key];
+        if (_state && !_selectedKey && supported.indexOf(_key) !== -1) {
+          _selectedKey = _key;
+        }
+        for (var i = 0, len = nodes.length; i < len; i++) {
+          if (!_state && !nodes[i].hasAttribute('hidden')) {
+            nodes[i].setAttribute('hidden', true);
+          } else if (_state && nodes[i].hasAttribute('hidden')) {
+            nodes[i].removeAttribute('hidden');
+          }
+        }
+      }
+      var tabs = this.$$('vertical-tabs');
+      tabs.notifyResize();
+      if (_selectedKey) {
+        switch (_selectedKey) {
+          case 'basic': this.selected = 0; break;
+          case 'ntlm': this.selected = 1; break;
+          case 'oauth2': this.selected = 2; break;
+        }
+      }
+    },
+    /**
+     * Computes settings for the auth panel if RAML's `securedBy`
+     * property is set and the `type` matches one of the defined types.
+     *
+     * @param {Array} secured The `securedBy` value.
+     * @param {String} type RAML's one of predefined authorization types.
+     * @return {Object|undefined} A scheme definition object if `type` matches.
+     */
+    _computeSettings: function(secured, type) {
+      if (!secured || !secured.length || !type) {
+        return undefined;
+      }
+      for (var i = 0, len = secured.length; i < len; i++) {
+        if (secured[i].type === type) {
+          return secured[i];
+        }
+      }
     }
   });
   </script>
