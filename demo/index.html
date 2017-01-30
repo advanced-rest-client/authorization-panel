@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../oauth-authorization/oauth2-authorization.html">
 
   <link rel="import" href="../authorization-panel.html">
 
@@ -44,10 +45,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <demo-snippet>
       <template>
         <authorization-panel></authorization-panel>
+        <oauth2-authorization></oauth2-authorization>
+
         <output id="settings"></output>
         <output id="state"></output>
         <script>
+          var redirectUrl = location.href.replace(/authorization-panel\/demo\/(index\.html)?/,
+            'oauth-authorization/oauth-popup.html');
+
           var panel = document.querySelector('authorization-panel');
+          panel.redirectUrl = redirectUrl;
           panel.addEventListener('authorization-settings-changed', function(e) {
             var data = e.detail;
             var output = document.querySelector('#settings');

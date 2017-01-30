@@ -17,6 +17,7 @@ the License.
 <link rel="import" href="../paper-tabs/paper-tab.html">
 <link rel="import" href="../vertical-tabs/vertical-tabs.html">
 <link rel="import" href="../auth-methods/auth-methods.html">
+
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -95,10 +96,12 @@ Custom property | Description | Default
       <vertical-tabs selected="{{selected}}">
         <paper-tab data-type="basic"><span class="enabled-marker" enabled$="[[_isAuthEnabled('basic', enabledAuthType)]]"></span>BASIC</paper-tab>
         <paper-tab data-type="ntlm"><span class="enabled-marker" enabled$="[[_isAuthEnabled('ntlm', enabledAuthType)]]"></span>NTLM</paper-tab>
+        <!-- <paper-tab data-type="oauth1"><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth1', enabledAuthType)]]"></span>OAUTH 1</paper-tab> -->
         <paper-tab data-type="oauth2"><span class="enabled-marker" enabled$="[[_isAuthEnabled('oauth2', enabledAuthType)]]"></span>OAUTH 2</paper-tab>
         <iron-pages content selected="{{selected}}">
           <auth-method-basic data-type="basic" raml-settings="[[_computeSettings(securedBy, 'Basic Authentication')]]"></auth-method-basic>
           <auth-method-ntlm data-type="ntlm" raml-settings="[[_computeSettings(securedBy, '???')]]"></auth-method-ntlm>
+          <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
           <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
         </iron-pages>
       </vertical-tabs>
@@ -161,7 +164,21 @@ Custom property | Description | Default
       /**
        * The OAuth2 redirect URL to be set in the OAuth2 form pane.
        */
-      redirectUrl: String
+      redirectUrl: String,
+      /**
+       * If true, then the RAML data is set (the `securedBy` property) but
+       * methods described in the file does not fit those supported by this
+       * element. In this case, to prevent displaying empty widget,
+       * the element displays all possible auth forms. Though, authors can hide
+       * this element from the view so they should use this property to be
+       * aware of this condition.
+       */
+      noRamlSelected: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        notify: true
+      }
     },
 
     observers: [
@@ -325,19 +342,22 @@ Custom property | Description | Default
      * RAML spec.
      */
     _securedByChanged: function(secured) {
+      this._setNoRamlSelected(false);
       var state = {
         oauth1: false,
         oauth2: false,
         basic: false,
         ntlm: false,
       };
+      var _key;
       if (!secured || !secured.length) {
         // If no RAML then show all.
-        for (var _key in state) {
+        for (_key in state) {
           state[_key] = true;
         }
         return this._updateTabs(state);
       }
+
       secured.forEach(function(data) {
         switch (data.type) {
           case 'OAuth 1.0': state.oauth1 = true; break;
@@ -349,6 +369,23 @@ Custom property | Description | Default
             console.warn('Unsupported auth method', data);
         }
       });
+      // Check if any tab is selected.
+      // If not, then set element's `noRamlSelected` to true and display
+      // all tabs.
+      var hasTabs = false;
+      for (_key in state) {
+        if (state[_key]) {
+          hasTabs = true;
+          break;
+        }
+      }
+
+      if (!hasTabs) {
+        for (_key in state) {
+          state[_key] = true;
+        }
+        this._setNoRamlSelected(true);
+      }
       this._updateTabs(state);
     },
     /**
