@@ -18,11 +18,12 @@
   },
   "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0",
-    "vertical-tabs": "advanced-rest-client/vertical-tabs#^1.0.1",
-    "paper-tabs": "PolymerElements/paper-tabs#^1.7.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
     "iron-pages": "PolymerElements/iron-pages#^1.0.8",
-    "auth-methods": "advanced-rest-client/auth-methods#^1.0.0"
+    "auth-methods": "advanced-rest-client/auth-methods#^1.0.0",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.1"
   },
   "devDependencies": {
     "iron-component-page": "polymerelements/iron-component-page#1.0.0",
@@ -32,7 +33,8 @@
     "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0",
     "test-fixture": "PolymerElements/test-fixture#^1.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "oauth-authorization": "advanced-rest-client/oauth-authorization#^0.1.6"
+    "oauth-authorization": "advanced-rest-client/oauth-authorization#^0.1.6",
+    "arc-demo-helpers": "advanced-rest-client/arc-demo-helpers#^1.0.10"
   },
   "ignore": [
     "**/.*",
