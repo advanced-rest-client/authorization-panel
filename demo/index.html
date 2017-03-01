@@ -68,16 +68,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           });
 
-          panel.addEventListener('authorization-type-enabled', function(e) {
-            var data = e.detail;
+          panel.addEventListener('authorization-type-changed', function(e) {
+            var type = e.detail.type;
             var output = document.querySelector('#state');
-            output.innerHTML += 'Enabled ' + data.type + ' authorization method\n';
-          });
-
-          panel.addEventListener('authorization-type-disabled', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#state');
-            output.innerHTML += 'Disabled ' + data.type + ' authorization method\n';
+            output.innerHTML += 'Selected ' + type + ' authorization method\n';
           });
         </script>
       </template>

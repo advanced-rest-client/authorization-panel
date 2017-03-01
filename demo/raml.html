@@ -50,55 +50,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <raml-demo-page selected-object="{{selected}}" is-method="{{isMethod}}">
       <h1>Authorization panel</h1>
       <div main>
-        <template is="dom-if" if="[[isMethod]]">
-          <authorization-panel secured-by="[[selected.securedBy]]"></authorization-panel>
-          <oauth2-authorization></oauth2-authorization>
+        <authorization-panel redirect-url="[[redirectUrl]]" secured-by="[[selected.securedBy]]"></authorization-panel>
+        <oauth2-authorization></oauth2-authorization>
 
-          <output id="settings"></output>
-          <output id="state"></output>
-        </template>
-        <p hidden$="[[isMethod]]">Select a method with authorization settings</p>
+        <output id="settings">[[settings]]</output>
+        <output id="state">[[state]]</output>
       </div>
     </template>
   </raml-demo-page>
+  <script>
+  (function(app) {
+    app.redirectUrl = location.href.replace(/authorization-panel\/demo\/(raml\.html)?/,
+      'oauth-authorization/oauth-popup.html');
+    app.settings = '';
+    app.state = '';
+    window.addEventListener('authorization-settings-changed', function(e) {
+      var data = e.detail;
+      if (!data.settings) {
+        app.settings = '';
+      } else {
+        var txt = 'Authorization type: ' + data.type + '\n\n';
+        txt += JSON.stringify(data.settings, null, 2);
+        app.settings = txt;
+      }
+    });
 
-  <!-- <div class="vertical-section-container centered">
-    <h3>The `authorization-panel`</h3>
-    <demo-snippet>
-      <template>
+    window.addEventListener('authorization-type-changed', function(e) {
+      var type = e.detail.type;
+      app.state += 'Selected ' + type + ' authorization method\n';
+    });
 
-        <script>
-          var redirectUrl = location.href.replace(/authorization-panel\/demo\/(index\.html)?/,
-            'oauth-authorization/oauth-popup.html');
-
-          var panel = document.querySelector('authorization-panel');
-          panel.redirectUrl = redirectUrl;
-          panel.addEventListener('authorization-settings-changed', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#settings');
-            if (!data.settings) {
-              output.innerHTML = '';
-            } else {
-              var txt = 'Authorization type: ' + data.type + '\n\n';
-              txt += JSON.stringify(data.settings, null, 2);
-              output.innerHTML = txt;
-            }
-          });
-
-          panel.addEventListener('authorization-type-enabled', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#state');
-            output.innerHTML += 'Enabled ' + data.type + ' authorization method\n';
-          });
-
-          panel.addEventListener('authorization-type-disabled', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#state');
-            output.innerHTML += 'Disabled ' + data.type + ' authorization method\n';
-          });
-        </script>
-      </template>
-    </demo-snippet>
-  </div> -->
+  })(document.querySelector('#app'));
+  </script>
 </body>
 </html>
