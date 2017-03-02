@@ -20,11 +20,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../../oauth-authorization/oauth2-authorization.html">
 
   <link rel="import" href="../authorization-panel.html">
 
   <style is="custom-style" include="demo-pages-shared-styles">
+
+    :root {
+      --arc-font-body1: {
+        @apply(--paper-font-body1);
+      }
+      --accent-color: #FF5040;
+    }
 
     .vertical-section-container {
       max-width: 600px;
@@ -35,6 +43,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       word-break: break-all;
       display: block;
       margin: 12px 0;
+    }
+
+    #settings {
+      margin-top: 40px;
     }
 
   </style>
@@ -68,16 +80,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           });
 
-          panel.addEventListener('authorization-type-enabled', function(e) {
-            var data = e.detail;
+          panel.addEventListener('authorization-type-changed', function(e) {
+            var type = e.detail.type;
             var output = document.querySelector('#state');
-            output.innerHTML += 'Enabled ' + data.type + ' authorization method\n';
-          });
-
-          panel.addEventListener('authorization-type-disabled', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#state');
-            output.innerHTML += 'Disabled ' + data.type + ' authorization method\n';
+            output.innerHTML += 'Selected ' + type + ' authorization method\n';
           });
         </script>
       </template>

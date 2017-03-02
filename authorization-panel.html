@@ -18,6 +18,8 @@ the License.
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../auth-methods/auth-methods.html">
+<link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -34,6 +36,13 @@ ARC provides the `<oauth2-authorization>` element (from the `oauth-authorization
 be placed anywhere in the DOM (from current element where `authorization-panel` is attached up to
 the body) and perform OAuth athorization. However it can be done by any other element / app  or
 even server. See `<oauth2-authorization>` for detailed documentation.
+
+Note: OAuth 2.0 server flow probably will not work in regular browser environment because
+main providers aren't setting CORS headers and therefore the request will be canceled by the
+browser.
+To make it work, handle the `oauth2-token-requested` fired from the inside of this element.
+If it's browser flow type (implicit) then the `oauth2-authorization` element can be used.
+If other type, then cancel the event and use server to handle token exchange.
 
 Oauth 1a is not currently supported. Though the form is ready and available, there's no
 authorization method in the ARC components set.
@@ -70,19 +79,97 @@ Custom property | Description | Default
       @apply(--authorization-panel);
     }
 
-    .content {
+    #container {
       position: relative;
     }
+
+    .stepper {
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+      padding: 12px 0;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .stepper.active {
+      pointer-events: all;
+      cursor: pointer;
+    }
+
+    .step {
+      display: inline-block;
+      background-color: var(--stepper-step-number-background-color, #3D8099);
+      color: var(--stepper-step-number-color, #fff);
+      font-size: 14px;
+      @apply(--layout-center-center);
+      @apply(--layout-horizontal);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+
+    .step-header {
+      position: relative;
+    }
+
+    .step-title {
+      @apply(--arc-font-body1);
+      display: block;
+      color: var(--stepper-step-title-color, #3D8099);
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .step-selection {
+      @apply(--arc-font-body1);
+      color: var(--stepper-step-selection-label-color, rgba(0, 0, 0, 0.54));
+      position: absolute;
+      bottom: -16px;
+    }
+
+    paper-ripple {
+      color: var(--stepper-step-title-color, #3D8099);
+    }
+
+    .step-content {
+      @apply(--layout-horizontal);
+      margin-bottom: 12px;
+      min-height: 32px;
+    }
+
+    .line {
+      width: 11px;
+      border-right: 1px var(--stepper-line-color, rgba(0, 0, 0, 0.12)) solid;
+      margin-right: 24px;
+    }
     </style>
-    <div class="content">
-      <paper-dropdown-menu label="Authorization method">
-        <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
-          <template is="dom-repeat" items="[[authMethods]]">
-            <paper-item data-type="[[item.id]]">[[item.name]]</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
-      <iron-pages content selected="[[selected]]" attr-for-selected="data-type">
+    <div id="container">
+      <div class="row">
+        <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
+          <span class="step">1</span>
+          <span class="step-header">
+            <span class="step-title">Select authorization method</span>
+            <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
+          </span>
+          <paper-ripple></paper-ripple>
+        </div>
+        <div class="step-content">
+          <div class="line"></div>
+          <iron-collapse opened="[[!isSelected]]">
+            <div class="content">
+              <paper-dropdown-menu label="Authorization method">
+                <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
+                  <template is="dom-repeat" items="[[authMethods]]">
+                    <paper-item data-type="[[item.id]]">[[item.name]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+            </div>
+          </iron-collapse>
+        </div>
+      </div>
+      <iron-pages content selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
         <auth-method-basic data-type="basic" raml-settings="[[_computeSettings(securedBy, 'Basic Authentication')]]"></auth-method-basic>
         <auth-method-ntlm data-type="ntlm"></auth-method-ntlm>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
@@ -105,6 +192,8 @@ Custom property | Description | Default
      */
     /**
      * Fired when the authorization type changed.
+     * Note that the `settings` property may not be updated at the moment of of
+     * firing the event.
      *
      * @event authorization-type-changed
      * @param {String} type Current auth type
@@ -113,7 +202,14 @@ Custom property | Description | Default
       // Selected authorization type. E.g. `basic`, `oauth2` etc.
       selected: {
         type: Number,
-        value: 0
+        value: 0,
+        notify: true
+      },
+      // Computed value. True when selection has been made.
+      isSelected: {
+        type: Boolean,
+        value: false,
+        computed: '_computeIsSelected(selected)'
       },
       /**
        * Current settings of enabled auth type.
@@ -175,7 +271,8 @@ Custom property | Description | Default
     },
 
     observers: [
-      '_authSettingsChanged(settings.*)'
+      '_authSettingsChanged(settings.*)',
+      '_selectedChanged(selected)'
     ],
 
     ready: function() {
@@ -184,66 +281,17 @@ Custom property | Description | Default
       }
     },
 
-    /**
-     * Gets settings for clurrently enabled auth method. Null if none is enabled.
-     */
-    get _settings() {
-      var current = this.selected;
-      if (!current) {
-        return null;
-      }
-      var element = this.getElementForType(current);
-      if (!element) {
-        return null;
-      }
-      return element.settings;
-    },
-
     listeners: {
       'auth-settings-changed': '_authSettingsHandler'
     },
 
-    /**
-     * Returns an element that represent a form of a given type.
-     *
-     * @param {String} type Type of auth method. For example `oauth2`
-     * @return {HTMLElement|null} A child element for given type or null if not found.
-     */
-    getElementForType: function(type) {
-      switch (type) {
-        case 'basic': return this.$$('auth-method-basic');
-        case 'ntlm': return this.$$('auth-method-ntlm');
-        case 'oauth2': return this.$$('auth-method-oauth2');
-      }
-      return null;
-    },
-    /**
-     * Maps the (lower case) name of the element to the auth type.
-     *
-     * @param {String|HTMLElement} Lowercase name of the element of the element itself.
-     * @return {String|null} Auth type name or null if the mapping is unknown.
-     */
-    getTypeForElement: function(element) {
-      if (element instanceof HTMLElement) {
-        element = element.nodeName.toLowerCase();
-      }
-      if (typeof element !== 'string') {
-        throw new TypeError('Passed element is either string or HTMLElement');
-      }
-      switch (element) {
-        case 'auth-method-basic': return 'basic';
-        case 'auth-method-ntlm': return 'ntlm';
-        case 'auth-method-oauth2': return 'oauth2';
-      }
-      return null;
-    },
-
     _authSettingsHandler: function(e) {
       if (!this.selected) {
-        return this._setEnabledSettings(undefined);
+        return this._setSettings(undefined);
       }
-      this.set('settings', e.detail);
+      this._setSettings(e.detail);
     },
+
     // Fires the `authorization-settings-changed` event when something change
     _authSettingsChanged: function() {
       this.fire('authorization-settings-changed', {
@@ -251,81 +299,95 @@ Custom property | Description | Default
         type: this.selected
       });
     },
+
+    /**
+     * Fires the `authorization-type-changed` event when the selection change.
+     */
+    _selectedChanged: function(selected) {
+      this._setSettings(undefined);
+      this.fire('authorization-type-changed', {
+        type: selected
+      });
+    },
+
     /**
      * A handler called when the `securedBy` property changes.
      * It sets up the list of available auth methods
      */
     _securedByChanged: function(secured) {
-      this._setNoRamlSelected(false);
+      if (!secured || !secured.length) {
+        // If no RAML then show them all.
+        return this._updateMethodsSelection();
+      }
+
       var state = {
         oauth1: false,
         oauth2: false,
         basic: false,
         ntlm: false,
       };
-      var _key;
-      if (!secured || !secured.length) {
-        // If no RAML then show all.
-        for (_key in state) {
-          state[_key] = true;
-        }
-        return this._updateMethodsSelection(state);
-      }
 
-      secured.forEach(function(data) {
-        switch (data.type) {
+      for (var i = 0, len = secured.length; i < len; i++) {
+        switch (secured[i].type) {
           case 'OAuth 1.0': state.oauth1 = true; break;
           case 'OAuth 2.0': state.oauth2 = true; break;
           case 'Basic Authentication': state.basic = true; break;
           case 'Digest Authentication': break;
           case 'Pass Through': break;
           default:
-            console.warn('Unsupported auth method', data);
+            console.warn('Unsupported auth method', secured[i]);
         }
-      });
-      // Check if any tab is selected.
-      // If not, then set element's `noRamlSelected` to true and display
-      // all tabs.
-      var hasTabs = false;
-      for (_key in state) {
-        if (state[_key]) {
-          hasTabs = true;
-          break;
-        }
-      }
-
-      if (!hasTabs) {
-        for (_key in state) {
-          state[_key] = true;
-        }
-        this._setNoRamlSelected(true);
       }
       this._updateMethodsSelection(state);
     },
     /**
-     * Updates tabs visibility when RAML definition change.
+     * Updates number of possible type selection when RAML definition change.
      *
      * @param {Object} state A map where keys are auth types and values is
-     * the boolean value of the state. True for show the tab.
+     * the boolean value of the state. True for show the auth option in the
+     * selector.
      */
     _updateMethodsSelection: function(state) {
+      // makes a copy of the array. Otherwise `this._availableAuthMethods`
+      // may change
+      var available = this._availableAuthMethods.map(function(item) {
+        return item;
+      });
       if (!state) {
+        this.set('authMethods', available);
         return;
       }
-      for (let key in state) {
+      for (var key in state) {
         if (!state[key]) {
           delete state[key];
         }
       }
-      var available = this._availableAuthMethods;
+
       var allowedKeys = Object.keys(state);
-      for (var i = available.length - 1; i >= 0; i--) {
+      var i;
+      for (i = available.length - 1; i >= 0; i--) {
         if (allowedKeys.indexOf(available[i].id) === -1) {
           available.splice(i, 1);
         }
       }
 
       this.set('authMethods', available);
+      // check if current selection is still available
+      var current = this.selected;
+      var hasCurrent = false;
+      for (i = available.length - 1; i >= 0; i--) {
+        if (available[i].id === current) {
+          hasCurrent = true;
+          break;
+        }
+      }
+      if (!hasCurrent) {
+        if (available && available[0]) {
+          this.set('selected', available[0].id);
+        } else {
+          this.set('selected', '');
+        }
+      }
     },
     /**
      * Computes settings for the auth panel if RAML's `securedBy`
@@ -344,6 +406,32 @@ Custom property | Description | Default
           return secured[i];
         }
       }
+    },
+
+    _computeIsSelected: function(selected) {
+      return !!selected;
+    },
+
+    _computeSelectedLabel: function(selected) {
+      switch (selected) {
+        case 'basic': return 'Basic';
+        case 'oauth2': return 'OAuth 2.0';
+        case 'oauth1': return 'OAuth 1.0';
+        case 'ntlm': return 'NTLM';
+        default: return selected;
+      }
+    },
+
+    _computeStepperClass: function(isSelected) {
+      var cls = 'stepper';
+      if (isSelected) {
+        cls += ' active';
+      }
+      return cls;
+    },
+
+    _clearCelection: function() {
+      this.set('selected', undefined);
     }
   });
   </script>

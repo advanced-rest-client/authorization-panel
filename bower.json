@@ -20,10 +20,13 @@
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
     "iron-pages": "PolymerElements/iron-pages#^1.0.8",
-    "auth-methods": "advanced-rest-client/auth-methods#^1.0.0",
+    "auth-methods": "advanced-rest-client/auth-methods#^2.0.0",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.0",
     "paper-listbox": "PolymerElements/paper-listbox#^1.1.2",
-    "paper-item": "PolymerElements/paper-item#^1.2.1"
+    "paper-item": "PolymerElements/paper-item#^1.2.1",
+    "iron-collapse": "PolymerElements/iron-collapse#^1.3.0",
+    "paper-ripple": "PolymerElements/paper-ripple#^1.0.10",
+    "paper-tooltip": "PolymerElements/paper-tooltip#^1.1.3"
   },
   "devDependencies": {
     "iron-component-page": "polymerelements/iron-component-page#1.0.0",
@@ -44,5 +47,5 @@
     "test",
     "tasks"
   ],
-  "version": "0.1.3"
+  "version": "0.5.0"
 }
