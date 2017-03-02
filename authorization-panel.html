@@ -37,6 +37,13 @@ be placed anywhere in the DOM (from current element where `authorization-panel` 
 the body) and perform OAuth athorization. However it can be done by any other element / app  or
 even server. See `<oauth2-authorization>` for detailed documentation.
 
+Note: OAuth 2.0 server flow probably will not work in regular browser environment because
+main providers aren't setting CORS headers and therefore the request will be canceled by the
+browser.
+To make it work, handle the `oauth2-token-requested` fired from the inside of this element.
+If it's browser flow type (implicit) then the `oauth2-authorization` element can be used.
+If other type, then cancel the event and use server to handle token exchange.
+
 Oauth 1a is not currently supported. Though the form is ready and available, there's no
 authorization method in the ARC components set.
 
@@ -280,7 +287,7 @@ Custom property | Description | Default
 
     _authSettingsHandler: function(e) {
       if (!this.selected) {
-        return this._setEnabledSettings(undefined);
+        return this._setSettings(undefined);
       }
       this._setSettings(e.detail);
     },
@@ -375,7 +382,11 @@ Custom property | Description | Default
         }
       }
       if (!hasCurrent) {
-        this.set('selected', undefined);
+        if (available && available[0]) {
+          this.set('selected', available[0].id);
+        } else {
+          this.set('selected', '');
+        }
       }
     },
     /**
