@@ -18,6 +18,13 @@ be placed anywhere in the DOM (from current element where `authorization-panel` 
 the body) and perform OAuth athorization. However it can be done by any other element / app  or
 even server. See `<oauth2-authorization>` for detailed documentation.
 
+Note: OAuth 2.0 server flow probably will not work in regular browser environment because
+main providers aren't setting CORS headers and therefore the request will be canceled by the
+browser.
+To make it work, handle the `oauth2-token-requested` fired from the inside of this element.
+If it's browser flow type (implicit) then the `oauth2-authorization` element can be used.
+If other type, then cancel the event and use server to handle token exchange.
+
 Oauth 1a is not currently supported. Though the form is ready and available, there's no
 authorization method in the ARC components set.
 
@@ -46,7 +53,6 @@ Custom property | Description | Default
 ### Events
 | Name | Description | Params |
 | --- | --- | --- |
-| authorization-settings-changed | Fired when auth type settings changed. It will fire when any of types is enabled (or at the moment the it's disabling) and any value of any property has changed. | settings **Object** - Current auth settings. It depends on enabled `type`. |
+| authorization-settings-changed | Fired when auth settings change.  It will be fired when any of types is currently selected and any value of any property has changed. | settings **Object** - Current auth settings. It depends on enabled `type`. |
 type **String** - Enabled auth type. For example `basic`, `ntlm` or `oauth2`. |
-| authorization-type-disabled | Fired when the authorization type has been disabled in the UI. | type **String** - Disabled auth type |
-| authorization-type-enabled | Fired when the authorization type has been enabled in the UI. Listen for `authorization-settings-changed` event to get current auth settings. | type **String** - Enabled auth type |
+| authorization-type-changed | Fired when the authorization type changed. Note that the `settings` property may not be updated at the moment of of firing the event. | type **String** - Current auth type |
