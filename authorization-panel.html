@@ -47,14 +47,6 @@ If other type, then cancel the event and use server to handle token exchange.
 Oauth 1a is not currently supported. Though the form is ready and available, there's no
 authorization method in the ARC components set.
 
-## Events
-This element fires the `authorization-settings-changed` when any type of authorization
-is enabled and valid data has been provided by the user.
-
-This element also fires `authorization-type-enabled` and `authorization-type-disabled` events
-when type state changes.
-See demo for example usage.
-
 ### Example
 ```
 <authorization-panel></authorization-panel>
@@ -201,8 +193,7 @@ Custom property | Description | Default
     properties: {
       // Selected authorization type. E.g. `basic`, `oauth2` etc.
       selected: {
-        type: Number,
-        value: 0,
+        type: String,
         notify: true
       },
       // Computed value. True when selection has been made.
@@ -267,11 +258,23 @@ Custom property | Description | Default
             'name': 'Oauth 2.0'
           }];
         }
+      },
+      /**
+       * Computed value. True if the authorization form is filled witl all required data.
+       * For basic only login is required for the form to be valid. In case of OAuth 2 panel
+       * validation is more complex.
+       * Check auth methods panels documentation for more info.
+       */
+      valid: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        computed: '_checkAuthorizationReady(settings.valid, selected)'
       }
     },
 
     observers: [
-      '_authSettingsChanged(settings.*)',
+      '_authSettingsChanged(selected, settings.*)',
       '_selectedChanged(selected)'
     ],
 
@@ -279,23 +282,48 @@ Custom property | Description | Default
       if (!this.authMethods) {
         this.set('authMethods', this._availableAuthMethods);
       }
+      this._updateValidationState();
     },
 
     listeners: {
       'auth-settings-changed': '_authSettingsHandler'
     },
+    /**
+     * Updates validation state for the selected form.
+     * When element is initializing and RAML's `securedBy` property is set
+     * during the initialization time, events with settings are fired before the form
+     * is ready.
+     */
+    _updateValidationState: function() {
+      this.debounce('check-validation-state', function() {
+        if (!this.selected || !this.settings) {
+          return;
+        }
+        var panel = this.$$('[data-type="' + this.selected + '"]');
+        if (!panel) {
+          console.warn('The auth panel for %s not set', this.selected);
+          return;
+        }
+        this.set('settings.valid', panel.validate());
+      }, 200);
+    },
 
     _authSettingsHandler: function(e) {
-      if (!this.selected) {
-        return this._setSettings(undefined);
-      }
       this._setSettings(e.detail);
     },
 
     // Fires the `authorization-settings-changed` event when something change
-    _authSettingsChanged: function() {
+    _authSettingsChanged: function(selected, record) {
+      if (!selected || !record || !record.base) {
+        return;
+      }
+      var set = record.base;
+      if (set.type !== selected) {
+        return;
+      }
       this.fire('authorization-settings-changed', {
-        settings: this.settings,
+        settings: set.settings,
+        valid: set.valid,
         type: this.selected
       });
     },
@@ -304,7 +332,6 @@ Custom property | Description | Default
      * Fires the `authorization-type-changed` event when the selection change.
      */
     _selectedChanged: function(selected) {
-      this._setSettings(undefined);
       this.fire('authorization-type-changed', {
         type: selected
       });
@@ -339,6 +366,7 @@ Custom property | Description | Default
         }
       }
       this._updateMethodsSelection(state);
+      this._updateValidationState();
     },
     /**
      * Updates number of possible type selection when RAML definition change.
@@ -432,6 +460,13 @@ Custom property | Description | Default
 
     _clearCelection: function() {
       this.set('selected', undefined);
+    },
+
+    _checkAuthorizationReady: function(formValid, selected) {
+      if (!selected || !formValid) {
+        return false;
+      }
+      return true;
     }
   });
   </script>
