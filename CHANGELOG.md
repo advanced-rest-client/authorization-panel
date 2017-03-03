@@ -1,3 +1,13 @@
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.1...v0.5.3) (2017-03-03)
+
+
+### Update
+
+* Added new API to describe validation state. Also fixed an issue with accepting data from the auth panels when applying RAML configuration ([17300ecacaf7cf0ec5885083dbcbe8d53d051076](https://github.com/advanced-rest-client/authorization-panel/commit/17300ecacaf7cf0ec5885083dbcbe8d53d051076))
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.1...v0.5.2) (2017-03-03)
 
