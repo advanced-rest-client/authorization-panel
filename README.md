@@ -28,14 +28,6 @@ If other type, then cancel the event and use server to handle token exchange.
 Oauth 1a is not currently supported. Though the form is ready and available, there's no
 authorization method in the ARC components set.
 
-## Events
-This element fires the `authorization-settings-changed` when any type of authorization
-is enabled and valid data has been provided by the user.
-
-This element also fires `authorization-type-enabled` and `authorization-type-disabled` events
-when type state changes.
-See demo for example usage.
-
 ### Example
 ```
 <authorization-panel></authorization-panel>
