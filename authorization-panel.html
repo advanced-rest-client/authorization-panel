@@ -161,9 +161,9 @@ Custom property | Description | Default
           </iron-collapse>
         </div>
       </div>
-      <iron-pages content selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
-        <auth-method-basic data-type="basic" raml-settings="[[_computeSettings(securedBy, 'Basic Authentication')]]"></auth-method-basic>
-        <auth-method-ntlm data-type="ntlm"></auth-method-ntlm>
+      <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
+        <auth-method-basic data-type="basic"></auth-method-basic>
+        <auth-method-digest data-type="digest"></auth-method-digest>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
         <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
       </iron-pages>
@@ -189,6 +189,22 @@ Custom property | Description | Default
      *
      * @event authorization-type-changed
      * @param {String} type Current auth type
+     */
+    /**
+     * Fired when the request header changed and all listeners should update
+     * header value.
+     *
+     * @event request-header-changed
+     * @param {String} name
+     * @param {String} value
+     */
+    /**
+     * Fired when the query param changed and all listeners should update
+     * parameters / URL value.
+     *
+     * @event query-parameter-changed
+     * @param {String} name
+     * @param {String} value
      */
     properties: {
       // Selected authorization type. E.g. `basic`, `oauth2` etc.
@@ -250,9 +266,12 @@ Custom property | Description | Default
           return [{
             'id': 'basic',
             'name': 'Basic authorization'
-          }, {
+          }, /*{
             'id': 'ntlm',
             'name': 'NTLM'
+          },*/ {
+            'id': 'digest',
+            'name': 'Digest Authentication'
           }, {
             'id': 'oauth2',
             'name': 'Oauth 2.0'
@@ -286,7 +305,8 @@ Custom property | Description | Default
     },
 
     listeners: {
-      'auth-settings-changed': '_authSettingsHandler'
+      'auth-settings-changed': '_authSettingsHandler',
+      'authorization-settings-changed': '_onAuthSettingsChanged'
     },
     /**
      * Updates validation state for the selected form.
@@ -318,12 +338,30 @@ Custom property | Description | Default
         return;
       }
       var set = record.base;
-      if (set.type !== selected) {
+      this._notifySettings(set, selected);
+    },
+    /**
+     * Notifies settings change if currently selected method is the same as
+     * `settings.type`.
+     *
+     * @param {Object} settings Authorization settings to notify.
+     * @param {String} selected Currently selected method name.
+     * @return {CustomEvent} The event fired to the listeners.
+     */
+    _notifySettings: function(settings, selected) {
+      if (!settings) {
+        return this.fire('authorization-settings-changed', {
+          settings: undefined,
+          valid: false,
+          type: selected
+        });
+      }
+      if (settings.type !== selected) {
         return;
       }
-      this.fire('authorization-settings-changed', {
-        settings: set.settings,
-        valid: set.valid,
+      return this.fire('authorization-settings-changed', {
+        settings: settings.settings,
+        valid: settings.valid,
         type: this.selected
       });
     },
@@ -335,6 +373,9 @@ Custom property | Description | Default
       this.fire('authorization-type-changed', {
         type: selected
       });
+      var settings = this._readCurrentSettings();
+      this._setSettings(settings);
+      this._notifySettings(settings, this.selected);
     },
 
     /**
@@ -352,14 +393,18 @@ Custom property | Description | Default
         oauth2: false,
         basic: false,
         ntlm: false,
+        digest: false
       };
 
       for (var i = 0, len = secured.length; i < len; i++) {
+        if (typeof secured[i] === 'string') {
+          continue;
+        }
         switch (secured[i].type) {
           case 'OAuth 1.0': state.oauth1 = true; break;
           case 'OAuth 2.0': state.oauth2 = true; break;
           case 'Basic Authentication': state.basic = true; break;
-          case 'Digest Authentication': break;
+          case 'Digest Authentication': state.digest = true; break;
           case 'Pass Through': break;
           default:
             console.warn('Unsupported auth method', secured[i]);
@@ -467,6 +512,162 @@ Custom property | Description | Default
         return false;
       }
       return true;
+    },
+
+    /**
+     * Forces element to read settings from currently selected element.
+     *
+     * @return {Object|undefined} Settings object or undefined.
+     */
+    _readCurrentSettings: function() {
+      if (!this.selected) {
+        return;
+      }
+      var panel = this.$$('[data-type="' + this.selected + '"]');
+      if (!panel) {
+        console.warn('The auth panel for %s not set', this.selected);
+        return;
+      }
+      var settings = panel.settings;
+      var validationResult = panel.validate();
+      var detail = {
+        settings: settings,
+        type: this.selected,
+        valid: validationResult
+      };
+      return detail;
+    },
+
+    /**
+     * The function will determine if current settings are valid for selected
+     * method. If they are it will send a header / query parameter change
+     * request event so the corresponding editors update their values.
+     *
+     * It will determine if either headers or query parameters should
+     * be updated from RAML spec or from default behavior for given method.
+     */
+    _onAuthSettingsChanged: function(e) {
+      var settings = e.detail;
+      if (!settings) {
+        return;
+      }
+      var type = settings.type;
+      var method = this._getSecuredMethod(type);
+      switch (type) {
+        case 'basic': this._handleBasicSettings(settings); break;
+        case 'oauth2': this._handleOauth2Settings(settings, method); break;
+        case 'digest': this._handleDigestSettings(settings); break;
+        default:
+          console.warn('Unsupported auth method', type);
+      }
+    },
+
+    /**
+     * Handles the case when basic settings changed.
+     *
+     * @param {Object} settings Basic auth settings object
+     */
+    _handleBasicSettings: function(settings) {
+      settings = settings || {};
+      var value = settings.hash ? '' : 'Basic ' + settings.hash;
+      this.fire('request-header-changed', {
+        name: 'authorization',
+        value: value
+      });
+    },
+    /**
+     * Handles the case when OAuth2 settings changed.
+     *
+     * @param {Object} settings Oauth2 auth settings object
+     * @param {Object?} secureMethod If set, it's RAML's auth definition.
+     * If this parameter is not defined then default behavior will be to
+     * notify listeners to set Authorization header with Bearer token.
+     */
+    _handleOauth2Settings: function(settings, secureMethod) {
+      settings = settings || {};
+      var token = settings.tokenValue;
+      var transportType = 'header';
+      var paramName = 'authorization';
+      if (secureMethod) {
+        if (secureMethod.describedBy) {
+          var desc = secureMethod.describedBy;
+          if (desc.headers && desc.headers.length) {
+            paramName = desc.headers[0].name;
+          } else if (desc.queryParameters && desc.queryParameters.length) {
+            paramName = desc.queryParameters[0].name;
+            transportType = 'query-parameter';
+          }
+        }
+      }
+
+      if (transportType === 'header') {
+        this.fire('request-header-changed', {
+          name: paramName,
+          value: token ? 'Bearer ' + token : ''
+        });
+      } else if (transportType === 'query-parameter') {
+        this.fire('query-parameter-changed', {
+          name: paramName,
+          value: token ? token : ''
+        });
+      }
+    },
+    /**
+     * Handles the case when digest auth method settings changed.
+     *
+     * @param {Object} settings Digest auth method settings object
+     * It can be either username and password (that will be passed to
+     * transport method) then this function do nothing or list of Authorization
+     * header parameters.
+     */
+    _handleDigestSettings: function(settings) {
+      if (!settings.valid) {
+        return this.fire('request-header-changed', {
+          name: 'authorization',
+          value: ''
+        });
+      }
+      if (!settings.settings) {
+        return;
+      }
+      var data = settings.settings;
+      if (data.username && data.password) {
+        return;
+      }
+      var value = 'Digest ';
+      var names = Object.getOwnPropertyNames(data);
+      names.forEach(function(name) {
+        value += name + '="' +  data[name] + '", ';
+      });
+      value = value.substr(0, value.length - 2);
+      this.fire('request-header-changed', {
+        name: 'authorization',
+        value: value
+      });
+    },
+    /**
+     * Gets selected security scheme for selected type.
+     *
+     * @param {String} type One of `basic`, `oauth1`, `oauth2`
+     * @return {Object} Corresponding security scheme for given type or undefined if not found.
+     */
+    _getSecuredMethod: function(type) {
+      var securedBy = this.securedBy;
+      if (!securedBy || !securedBy.length) {
+        return;
+      }
+      var securityMethodsMapping = {
+        'OAuth 1.0': 'oauth1',
+        'OAuth 2.0': 'oauth2',
+        'Basic Authentication': 'basic',
+        'Digest Authentication': 'digest',
+        'Pass Through': 'passthrough'
+      };
+      for (var i = 0, len = securedBy.length; i < len; i++) {
+        if (securityMethodsMapping[securedBy[i].type] === type) {
+          return securedBy[i];
+        }
+      }
     }
   });
   </script>
