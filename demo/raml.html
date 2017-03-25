@@ -54,7 +54,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <raml-demo-page selected-object="{{selected}}" is-method="{{isMethod}}">
       <h1>Authorization panel</h1>
       <div main>
-        <authorization-panel redirect-url="[[redirectUrl]]" secured-by="[[selected.securedBy]]"></authorization-panel>
+        <authorization-panel redirect-url="[[redirectUrl]]" secured-by="[[selected.securedBy]]" on-selected-changed="_selectedChanged"></authorization-panel>
         <oauth2-authorization></oauth2-authorization>
 
         <output id="settings">[[settings]]</output>
@@ -68,6 +68,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'oauth-authorization/oauth-popup.html');
     app.settings = '';
     app.state = '';
+    app._selectedChanged = function(e) {
+      if (e.detail.value === 'digest') {
+        app.fire('url-value-changed', {
+          value: 'https://api.domain.com/endpoint'
+        });
+        app.fire('http-method-changed', {
+          value: 'GET'
+        });
+      }
+    };
     window.addEventListener('authorization-settings-changed', function(e) {
       var data = e.detail;
       if (!data.settings) {
