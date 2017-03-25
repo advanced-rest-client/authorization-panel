@@ -81,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     window.addEventListener('authorization-type-changed', function(e) {
       var type = e.detail.type;
-      app.state += 'Selected ' + type + ' authorization method\n';
+      app.state = 'Selected ' + type + ' authorization method\n';
     });
 
   })(document.querySelector('#app'));

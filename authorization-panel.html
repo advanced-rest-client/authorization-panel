@@ -161,7 +161,7 @@ Custom property | Description | Default
           </iron-collapse>
         </div>
       </div>
-      <iron-pages content selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
+      <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
         <auth-method-basic data-type="basic" raml-settings="[[_computeSettings(securedBy, 'Basic Authentication')]]"></auth-method-basic>
         <auth-method-ntlm data-type="ntlm"></auth-method-ntlm>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
@@ -318,12 +318,30 @@ Custom property | Description | Default
         return;
       }
       var set = record.base;
-      if (set.type !== selected) {
+      this._notifySettings(set, selected);
+    },
+    /**
+     * Notifies settings change if currently selected method is the same as
+     * `settings.type`.
+     *
+     * @param {Object} settings Authorization settings to notify.
+     * @param {String} selected Currently selected method name.
+     * @return {CustomEvent} The event fired to the listeners.
+     */
+    _notifySettings: function(settings, selected) {
+      if (!settings) {
+        return this.fire('authorization-settings-changed', {
+          settings: undefined,
+          valid: false,
+          type: selected
+        });
+      }
+      if (settings.type !== selected) {
         return;
       }
-      this.fire('authorization-settings-changed', {
-        settings: set.settings,
-        valid: set.valid,
+      return this.fire('authorization-settings-changed', {
+        settings: settings.settings,
+        valid: settings.valid,
         type: this.selected
       });
     },
@@ -335,6 +353,9 @@ Custom property | Description | Default
       this.fire('authorization-type-changed', {
         type: selected
       });
+      var settings = this._readCurrentSettings();
+      this._setSettings(settings);
+      this._notifySettings(settings, this.selected);
     },
 
     /**
@@ -467,6 +488,30 @@ Custom property | Description | Default
         return false;
       }
       return true;
+    },
+
+    /**
+     * Forces element to read settings from currently selected element.
+     *
+     * @return {Object|undefined} Settings object or undefined.
+     */
+    _readCurrentSettings: function() {
+      if (!this.selected) {
+        return;
+      }
+      var panel = this.$$('[data-type="' + this.selected + '"]');
+      if (!panel) {
+        console.warn('The auth panel for %s not set', this.selected);
+        return;
+      }
+      var settings = panel.settings;
+      var validationResult = panel.validate();
+      var detail = {
+        settings: settings,
+        type: this.selected,
+        valid: validationResult
+      };
+      return detail;
     }
   });
   </script>
