@@ -1,3 +1,14 @@
+<a name="0.5.4"></a>
+## [0.5.4](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.1...v0.5.4) (2017-03-25)
+
+
+### Update
+
+* Added new API to describe validation state. Also fixed an issue with accepting data from the auth panels when applying RAML configuration ([17300ecacaf7cf0ec5885083dbcbe8d53d051076](https://github.com/advanced-rest-client/authorization-panel/commit/17300ecacaf7cf0ec5885083dbcbe8d53d051076))
+* Now the element will fire the authorization-settings-changed event when settings are not set ([b5d53e796a62ca8eb7808480e617c6df282453eb](https://github.com/advanced-rest-client/authorization-panel/commit/b5d53e796a62ca8eb7808480e617c6df282453eb))
+
+
+
 <a name="0.5.3"></a>
 ## [0.5.3](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.1...v0.5.3) (2017-03-03)
 
