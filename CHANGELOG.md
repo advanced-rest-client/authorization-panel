@@ -1,3 +1,9 @@
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.4...v0.5.5) (2017-03-27)
+
+
+
+
 <a name="0.5.4"></a>
 ## [0.5.4](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.1...v0.5.4) (2017-03-25)
 
