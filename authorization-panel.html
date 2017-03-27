@@ -195,16 +195,16 @@ Custom property | Description | Default
      * header value.
      *
      * @event request-header-changed
-     * @param {String} name
-     * @param {String} value
+     * @param {String} name Name of the header that has changed
+     * @param {String} value Header new value
      */
     /**
      * Fired when the query param changed and all listeners should update
      * parameters / URL value.
      *
      * @event query-parameter-changed
-     * @param {String} name
-     * @param {String} value
+     * @param {String} name Name of the header that has changed
+     * @param {String} value Header new value
      */
     properties: {
       // Selected authorization type. E.g. `basic`, `oauth2` etc.
@@ -217,6 +217,13 @@ Custom property | Description | Default
         type: Boolean,
         value: false,
         computed: '_computeIsSelected(selected)'
+      },
+      // If true then according to the API spec authorization is required.
+      isRequired: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        notify: true
       },
       /**
        * Current settings of enabled auth type.
@@ -242,7 +249,7 @@ Custom property | Description | Default
       redirectUrl: String,
       /**
        * If true, then the RAML data is set (the `securedBy` property) but
-       * methods described in the file does not fit those supported by this
+       * methods described in the API spec does not fit those supported by this
        * element. In this case, to prevent displaying empty widget,
        * the element displays all possible auth forms. Though, authors can hide
        * this element from the view so they should use this property to be
@@ -279,16 +286,16 @@ Custom property | Description | Default
         }
       },
       /**
-       * Computed value. True if the authorization form is filled witl all required data.
+       * Computed value. True if the authorization form is filled with all required data.
        * For basic only login is required for the form to be valid. In case of OAuth 2 panel
        * validation is more complex.
        * Check auth methods panels documentation for more info.
        */
       valid: {
         type: Boolean,
-        value: false,
+        value: true,
         notify: true,
-        computed: '_checkAuthorizationReady(settings.valid, selected)'
+        computed: '_checkAuthorizationReady(settings.valid, selected, required)'
       }
     },
 
@@ -329,6 +336,9 @@ Custom property | Description | Default
     },
 
     _authSettingsHandler: function(e) {
+      if (e.detail.type !== this.selected) {
+        return;
+      }
       this._setSettings(e.detail);
     },
 
@@ -385,6 +395,7 @@ Custom property | Description | Default
     _securedByChanged: function(secured) {
       if (!secured || !secured.length) {
         // If no RAML then show them all.
+        this._setIsRequired(false);
         return this._updateMethodsSelection();
       }
 
@@ -412,6 +423,14 @@ Custom property | Description | Default
       }
       this._updateMethodsSelection(state);
       this._updateValidationState();
+      var required = false;
+      for (var key in state) {
+        if (state[key]) {
+          required = true;
+          break;
+        }
+      }
+      this._setIsRequired(required);
     },
     /**
      * Updates number of possible type selection when RAML definition change.
@@ -507,7 +526,10 @@ Custom property | Description | Default
       this.set('selected', undefined);
     },
 
-    _checkAuthorizationReady: function(formValid, selected) {
+    _checkAuthorizationReady: function(formValid, selected, required) {
+      if (!required) {
+        return true;
+      }
       if (!selected || !formValid) {
         return false;
       }
