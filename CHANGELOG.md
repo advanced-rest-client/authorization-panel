@@ -1,3 +1,14 @@
+<a name="0.5.6"></a>
+## [0.5.6](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.4...v0.5.6) (2017-03-27)
+
+
+### Update
+
+* Added events to control headers and URI parameters ([abc302d966e4e3fd154fd8177e7f711531e63211](https://github.com/advanced-rest-client/authorization-panel/commit/abc302d966e4e3fd154fd8177e7f711531e63211))
+* Added tests for element ([41c00151e8e7fd07aa4c341a29e515aff216d5f0](https://github.com/advanced-rest-client/authorization-panel/commit/41c00151e8e7fd07aa4c341a29e515aff216d5f0))
+
+
+
 <a name="0.5.5"></a>
 ## [0.5.5](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.4...v0.5.5) (2017-03-27)
 
