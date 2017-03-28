@@ -591,7 +591,8 @@ Custom property | Description | Default
      */
     _handleBasicSettings: function(settings) {
       settings = settings || {};
-      var value = settings.hash ? '' : 'Basic ' + settings.hash;
+      var value = (settings.settings && settings.settings.hash) ?
+        'Basic ' + settings.settings.hash : '';
       this.fire('request-header-changed', {
         name: 'authorization',
         value: value
@@ -607,6 +608,7 @@ Custom property | Description | Default
      */
     _handleOauth2Settings: function(settings, secureMethod) {
       settings = settings || {};
+      settings = settings.settings || {};
       var token = settings.tokenValue;
       var transportType = 'header';
       var paramName = 'authorization';
