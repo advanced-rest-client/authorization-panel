@@ -591,7 +591,8 @@ Custom property | Description | Default
      */
     _handleBasicSettings: function(settings) {
       settings = settings || {};
-      var value = settings.hash ? '' : 'Basic ' + settings.settings.hash;
+      var value = (settings.settings && settings.settings.hash) ?
+        'Basic ' + settings.settings.hash : '';
       this.fire('request-header-changed', {
         name: 'authorization',
         value: value
