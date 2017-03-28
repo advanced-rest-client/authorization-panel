@@ -1,6 +1,6 @@
 {
   "name": "authorization-panel",
-  "version": "0.5.3",
+  "version": "0.5.7",
   "license": "Apache-2.0 OR CC-BY-4.0",
   "description": "The authorization panel used in the request panel",
   "devDependencies": {
@@ -18,7 +18,7 @@
     "serve": "node_modules/.bin/polymer serve",
     "lint": "node_modules/.bin/polymer lint authorization-panel.html",
     "test-sauce": "node_modules/.bin/polymer test --plugin sauce --job-name \"authorization-panel:local-test\"",
-    "test": "exit 0",
+    "test": "node_modules/.bin/polymer test",
     "deps": "npm install --quiet && bower install --quiet",
     "update-deps": "npm update --quiet && bower update --quiet"
   },

@@ -25,25 +25,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <test-fixture id="basic">
       <template>
-        <authorization-panel></authorization-panel>
+        <authorization-panel selected="basic"></authorization-panel>
       </template>
     </test-fixture>
 
     <script>
-    /* global fixture, assert */
-    suite('basic', function() {
+    /* global fixture, assert, sinon */
+    suite('basic-auth-method', function() {
       var element;
       setup(function() {
         element = fixture('basic');
       });
 
-      test('`settings` should be undefined', function() {
-        assert.isUndefined(element.settings);
-      });
-
-      test('No `selected` by default', function() {
-        assert.isUndefined(element.selected, 'selected is undefined');
-        assert.isFalse(element.isSelected, 'isSelected is false');
+      test('`isSelected` is true', function() {
+        assert.isTrue(element.isSelected);
       });
 
       test('Displays all available methods', function() {
@@ -58,13 +53,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isTrue(element.valid);
       });
 
-      test('`noRamlSelected` should be false', function() {
-        assert.isFalse(element.noRamlSelected);
-      });
-
-      test('Should select basic method', function() {
-        element.selected = 'basic';
-        assert.isTrue(element.isSelected);
+      test('Should fire `request-header-changed` event', function() {
+        var basicPanel = Polymer.dom(element.root).querySelector('auth-method-basic');
+        var spy = sinon.stub();
+        element.addEventListener('request-header-changed', spy);
+        basicPanel.username = 'test';
+        assert.isTrue(spy.calledOnce);
       });
 
     });
