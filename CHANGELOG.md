@@ -1,3 +1,14 @@
+<a name="0.5.9"></a>
+## [0.5.9](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.7...v0.5.9) (2017-03-28)
+
+
+### Fix
+
+* Fixed settings change handler for basic and OAuth2 methods - now it has correct access to settings object ([722c872434467da8d0c59fbb8a4b0465c22f69e5](https://github.com/advanced-rest-client/authorization-panel/commit/722c872434467da8d0c59fbb8a4b0465c22f69e5))
+* Fixed settings change handler for basic and OAuth2 methods - now it has correct access to settings object ([4007e11131486a7a1b7e006c04887f139ae425cc](https://github.com/advanced-rest-client/authorization-panel/commit/4007e11131486a7a1b7e006c04887f139ae425cc))
+
+
+
 <a name="0.5.8"></a>
 ## [0.5.8](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.7...v0.5.8) (2017-03-28)
 
