@@ -1,3 +1,13 @@
+<a name="0.5.11"></a>
+## [0.5.11](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.9...v0.5.11) (2017-04-10)
+
+
+### Docs
+
+* Updated documentation for the elment. [skip-ci] ([caad00ae8d4cd76a35239219eb851a57574c933a](https://github.com/advanced-rest-client/authorization-panel/commit/caad00ae8d4cd76a35239219eb851a57574c933a))
+
+
+
 <a name="0.5.10"></a>
 ## [0.5.10](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.9...v0.5.10) (2017-04-10)
 
