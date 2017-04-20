@@ -19,7 +19,7 @@ the License.
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../auth-methods/auth-methods.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
-<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../anypoint-styles/dropdown-menu.html">
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -118,6 +118,7 @@ Custom property | Description | Default
 -->
 <dom-module id="authorization-panel">
   <template>
+    <style include="anypoint-dropdown-menu-styles"></style>
     <style>
     :host {
       display: block;
@@ -198,13 +199,12 @@ Custom property | Description | Default
             <span class="step-title">Select authorization method</span>
             <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
           </span>
-          <paper-ripple></paper-ripple>
         </div>
         <div class="step-content">
           <div class="line"></div>
           <iron-collapse opened="[[!isSelected]]">
             <div class="content">
-              <paper-dropdown-menu label="Authorization method">
+              <paper-dropdown-menu label="Authorization method" class="anypoint-dropdown-menu">
                 <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
                   <template is="dom-repeat" items="[[authMethods]]">
                     <paper-item data-type="[[item.id]]">[[item.name]]</paper-item>
