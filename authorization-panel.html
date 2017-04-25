@@ -20,6 +20,8 @@ the License.
 <link rel="import" href="../auth-methods/auth-methods.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../anypoint-icons/anypoint-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -189,13 +191,24 @@ Custom property | Description | Default
       border-right: 1px var(--stepper-line-color, rgba(0, 0, 0, 0.12)) solid;
       margin-right: 24px;
     }
+
+    .edit-icon {
+      visibility: hidden;
+    }
+
+    .active .step-header:hover .edit-icon {
+      visibility: visible;
+    }
     </style>
     <div id="container">
       <div class="row" hidden$="[[noSelector]]">
         <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
           <span class="step">1</span>
           <span class="step-header">
-            <span class="step-title">Select authorization method</span>
+            <span class="step-title">
+              Select authorization method
+              <iron-icon icon="anypoint:edit" class="edit-icon"></iron-icon>
+            </span>
             <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
           </span>
           <paper-ripple></paper-ripple>
