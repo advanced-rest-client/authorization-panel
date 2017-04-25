@@ -191,7 +191,7 @@ Custom property | Description | Default
     }
     </style>
     <div id="container">
-      <div class="row">
+      <div class="row" hidden$="[[noSelector]]">
         <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
           <span class="step">1</span>
           <span class="step-header">
@@ -216,10 +216,10 @@ Custom property | Description | Default
         </div>
       </div>
       <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
-        <auth-method-basic data-type="basic"></auth-method-basic>
-        <auth-method-digest data-type="digest"></auth-method-digest>
+        <auth-method-basic data-type="basic" no-selector="[[noSelector]]"></auth-method-basic>
+        <auth-method-digest data-type="digest" no-selector="[[noSelector]]"></auth-method-digest>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
-        <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
+        <auth-method-oauth2 data-type="oauth2" no-selector="[[noSelector]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
       </iron-pages>
     </div>
   </template>
@@ -316,7 +316,7 @@ Custom property | Description | Default
         notify: true
       },
 
-      // The auth methods to display in the ath method selector.
+      // The auth methods to display in the auth method selector.
       authMethods: {
         type: Array
       },
@@ -350,6 +350,12 @@ Custom property | Description | Default
         value: true,
         notify: true,
         computed: '_checkAuthorizationReady(settings.valid, selected, required)'
+      },
+      /**
+       * If true then the auth method selector will be hidden (no steps will be visible)
+       */
+      noSelector: {
+        type: Boolean
       }
     },
 
@@ -534,6 +540,7 @@ Custom property | Description | Default
           this.set('selected', '');
         }
       }
+      this.set('noSelector', available.length === 1);
     },
     /**
      * Computes settings for the auth panel if RAML's `securedBy`
