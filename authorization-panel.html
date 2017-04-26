@@ -20,6 +20,8 @@ the License.
 <link rel="import" href="../auth-methods/auth-methods.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../anypoint-styles/dropdown-menu.html">
+<link rel="import" href="../anypoint-icons/anypoint-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -174,10 +176,6 @@ Custom property | Description | Default
       bottom: -16px;
     }
 
-    paper-ripple {
-      color: var(--stepper-step-title-color, #3D8099);
-    }
-
     .step-content {
       @apply(--layout-horizontal);
       @apply(--arc-font-body1);
@@ -190,13 +188,24 @@ Custom property | Description | Default
       border-right: 1px var(--stepper-line-color, rgba(0, 0, 0, 0.12)) solid;
       margin-right: 24px;
     }
+
+    .edit-icon {
+      visibility: hidden;
+    }
+
+    .active .step-header:hover .edit-icon {
+      visibility: visible;
+    }
     </style>
     <div id="container">
-      <div class="row">
+      <div class="row" hidden$="[[noSelector]]">
         <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
           <span class="step">1</span>
           <span class="step-header">
-            <span class="step-title">Select authorization method</span>
+            <span class="step-title">
+              Select authorization method
+              <iron-icon icon="anypoint:edit" class="edit-icon"></iron-icon>
+            </span>
             <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
           </span>
         </div>
@@ -216,10 +225,10 @@ Custom property | Description | Default
         </div>
       </div>
       <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
-        <auth-method-basic data-type="basic"></auth-method-basic>
-        <auth-method-digest data-type="digest"></auth-method-digest>
+        <auth-method-basic data-type="basic" no-stepper="[[noSelector]]"></auth-method-basic>
+        <auth-method-digest data-type="digest" no-stepper="[[noSelector]]"></auth-method-digest>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
-        <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
+        <auth-method-oauth2 data-type="oauth2" no-stepper="[[noSelector]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
       </iron-pages>
     </div>
   </template>
@@ -316,7 +325,7 @@ Custom property | Description | Default
         notify: true
       },
 
-      // The auth methods to display in the ath method selector.
+      // The auth methods to display in the auth method selector.
       authMethods: {
         type: Array
       },
@@ -350,6 +359,12 @@ Custom property | Description | Default
         value: true,
         notify: true,
         computed: '_checkAuthorizationReady(settings.valid, selected, required)'
+      },
+      /**
+       * If true then the auth method selector will be hidden (no steps will be visible)
+       */
+      noSelector: {
+        type: Boolean
       }
     },
 
@@ -534,6 +549,7 @@ Custom property | Description | Default
           this.set('selected', '');
         }
       }
+      this.set('noSelector', available.length === 1);
     },
     /**
      * Computes settings for the auth panel if RAML's `securedBy`
