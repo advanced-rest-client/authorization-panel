@@ -1,3 +1,19 @@
+<a name="0.5.12"></a>
+## [0.5.12](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.11...v0.5.12) (2017-04-27)
+
+
+### New
+
+* Added support for RAML's custom security schemes ([2831bff2d5a97e7a07f6a87265495a1401730842](https://github.com/advanced-rest-client/authorization-panel/commit/2831bff2d5a97e7a07f6a87265495a1401730842))
+
+### Update
+
+* Added edit icon when hovering selected title ([2c674f83d0a5072f5b86f4f3be9955b95b81d25b](https://github.com/advanced-rest-client/authorization-panel/commit/2c674f83d0a5072f5b86f4f3be9955b95b81d25b))
+* added test cases for RAML and for noSelector ([da8a46bba26b2cd15bf056c59c530e54a1bdb5dc](https://github.com/advanced-rest-client/authorization-panel/commit/da8a46bba26b2cd15bf056c59c530e54a1bdb5dc))
+* Updated auth methods property name to no-stepper ([f4abf2b6ccff6012755fa292a33deab63d938c61](https://github.com/advanced-rest-client/authorization-panel/commit/f4abf2b6ccff6012755fa292a33deab63d938c61))
+
+
+
 <a name="0.5.11"></a>
 ## [0.5.11](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.9...v0.5.11) (2017-04-10)
 
