@@ -20,6 +20,8 @@ the License.
 <link rel="import" href="../auth-methods/auth-methods.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../anypoint-icons/anypoint-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <!--
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -189,13 +191,24 @@ Custom property | Description | Default
       border-right: 1px var(--stepper-line-color, rgba(0, 0, 0, 0.12)) solid;
       margin-right: 24px;
     }
+
+    .edit-icon {
+      visibility: hidden;
+    }
+
+    .active .step-header:hover .edit-icon {
+      visibility: visible;
+    }
     </style>
     <div id="container">
-      <div class="row">
+      <div class="row" hidden$="[[noSelector]]">
         <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
           <span class="step">1</span>
           <span class="step-header">
-            <span class="step-title">Select authorization method</span>
+            <span class="step-title">
+              Select authorization method
+              <iron-icon icon="anypoint:edit" class="edit-icon"></iron-icon>
+            </span>
             <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
           </span>
           <paper-ripple></paper-ripple>
@@ -216,10 +229,13 @@ Custom property | Description | Default
         </div>
       </div>
       <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]">
-        <auth-method-basic data-type="basic"></auth-method-basic>
-        <auth-method-digest data-type="digest"></auth-method-digest>
+        <auth-method-basic data-type="basic" no-stepper="[[noSelector]]"></auth-method-basic>
+        <auth-method-digest data-type="digest" no-stepper="[[noSelector]]"></auth-method-digest>
         <!-- <auth-method-oauth1 data-type="ntlm" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]"></auth-method-oauth1> -->
-        <auth-method-oauth2 data-type="oauth2" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
+        <auth-method-oauth2 data-type="oauth2" no-stepper="[[noSelector]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]"></auth-method-oauth2>
+        <template is="dom-repeat" items="[[customSchemes]]">
+          <auth-method-custom data-type$="[[item]]" no-stepper="[[noSelector]]" raml-settings="[[_computeSettings(securedBy, item)]]"></auth-method-custom>
+        </template>
       </iron-pages>
     </div>
   </template>
@@ -316,7 +332,7 @@ Custom property | Description | Default
         notify: true
       },
 
-      // The auth methods to display in the ath method selector.
+      // The auth methods to display in the auth method selector.
       authMethods: {
         type: Array
       },
@@ -350,7 +366,15 @@ Custom property | Description | Default
         value: true,
         notify: true,
         computed: '_checkAuthorizationReady(settings.valid, selected, required)'
-      }
+      },
+      /**
+       * If true then the auth method selector will be hidden (no steps will be visible)
+       */
+      noSelector: {
+        type: Boolean
+      },
+      // List of currently available custom security schemes
+      customSchemes: Array
     },
 
     observers: [
@@ -458,7 +482,9 @@ Custom property | Description | Default
         oauth2: false,
         basic: false,
         ntlm: false,
-        digest: false
+        digest: false,
+        custom: false,
+        customNames: []
       };
 
       for (var i = 0, len = secured.length; i < len; i++) {
@@ -471,6 +497,10 @@ Custom property | Description | Default
           case 'Basic Authentication': state.basic = true; break;
           case 'Digest Authentication': state.digest = true; break;
           case 'Pass Through': break;
+          case 'x-custom':
+            state.custom = true;
+            state.customNames.push(secured[i].name);
+          break;
           default:
             console.warn('Unsupported auth method', secured[i]);
         }
@@ -516,6 +546,18 @@ Custom property | Description | Default
           available.splice(i, 1);
         }
       }
+      this.customSchemes = undefined;
+      if (state.custom) {
+        var ids = [];
+        state.customNames.forEach(function(name) {
+          available.push({
+            'id': name,
+            'name': name
+          });
+          ids.push(name);
+        });
+        this.customSchemes = ids;
+      }
 
       this.set('authMethods', available);
       // check if current selection is still available
@@ -534,6 +576,7 @@ Custom property | Description | Default
           this.set('selected', '');
         }
       }
+      this.set('noSelector', available.length === 1);
     },
     /**
      * Computes settings for the auth panel if RAML's `securedBy`
@@ -548,7 +591,7 @@ Custom property | Description | Default
         return undefined;
       }
       for (var i = 0, len = secured.length; i < len; i++) {
-        if (secured[i].type === type) {
+        if (secured[i].type === type || secured[i].name === type) {
           return secured[i];
         }
       }
@@ -564,6 +607,7 @@ Custom property | Description | Default
         case 'oauth2': return 'OAuth 2.0';
         case 'oauth1': return 'OAuth 1.0';
         case 'ntlm': return 'NTLM';
+        case 'custom': return 'x-custom';
         default: return selected;
       }
     },
@@ -628,11 +672,15 @@ Custom property | Description | Default
         return;
       }
       var type = settings.type;
+      if (!type) {
+        return;
+      }
       var method = this._getSecuredMethod(type);
       switch (type) {
         case 'basic': this._handleBasicSettings(settings); break;
         case 'oauth2': this._handleOauth2Settings(settings, method); break;
         case 'digest': this._handleDigestSettings(settings); break;
+        case 'x-custom': /* Auth panel updates headers and query parameters by its own. */ break;
         default:
           console.warn('Unsupported auth method', type);
       }
