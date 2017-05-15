@@ -486,7 +486,9 @@ Custom property | Description | Default
         custom: false,
         customNames: []
       };
-
+      // When one of `secured` antries is null, then no authorization
+      // is possible among having an authorization.
+      var forceNoRequired = false;
       for (var i = 0, len = secured.length; i < len; i++) {
         if (typeof secured[i] === 'string') {
           continue;
@@ -502,16 +504,22 @@ Custom property | Description | Default
             state.customNames.push(secured[i].name);
           break;
           default:
-            console.warn('Unsupported auth method', secured[i]);
+            if (!secured[i]) {
+              forceNoRequired = true;
+            } else {
+              console.warn('Unsupported auth method', secured[i]);
+            }
         }
       }
       this._updateMethodsSelection(state);
       this._updateValidationState();
       var required = false;
-      for (var key in state) {
-        if (state[key]) {
-          required = true;
-          break;
+      if (!forceNoRequired) {
+        for (var key in state) {
+          if (state[key]) {
+            required = true;
+            break;
+          }
         }
       }
       this._setIsRequired(required);
@@ -591,7 +599,7 @@ Custom property | Description | Default
         return undefined;
       }
       for (var i = 0, len = secured.length; i < len; i++) {
-        if (secured[i].type === type || secured[i].name === type) {
+        if (secured[i] && secured[i].type === type || secured[i].name === type) {
           return secured[i];
         }
       }
@@ -680,8 +688,11 @@ Custom property | Description | Default
         case 'basic': this._handleBasicSettings(settings); break;
         case 'oauth2': this._handleOauth2Settings(settings, method); break;
         case 'digest': this._handleDigestSettings(settings); break;
-        case 'x-custom': /* Auth panel updates headers and query parameters by its own. */ break;
         default:
+          if (type && type.indexOf('x-') === 0) {
+            /* Auth panel updates headers and query parameters by its own. */
+            return;
+          }
           console.warn('Unsupported auth method', type);
       }
     },
