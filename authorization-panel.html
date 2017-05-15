@@ -484,13 +484,19 @@ Custom property | Description | Default
         ntlm: false,
         digest: false,
         custom: false,
-        customNames: []
+        customData: []
       };
       // When one of `secured` antries is null, then no authorization
       // is possible among having an authorization.
       var forceNoRequired = false;
       for (var i = 0, len = secured.length; i < len; i++) {
+        // has unexpanded data, use raml-json-enhance!
         if (typeof secured[i] === 'string') {
+          continue;
+        }
+
+        if (!secured[i]) {
+          forceNoRequired = true;
           continue;
         }
         switch (secured[i].type) {
@@ -499,13 +505,13 @@ Custom property | Description | Default
           case 'Basic Authentication': state.basic = true; break;
           case 'Digest Authentication': state.digest = true; break;
           case 'Pass Through': break;
-          case 'x-custom':
-            state.custom = true;
-            state.customNames.push(secured[i].name);
-          break;
           default:
-            if (!secured[i]) {
-              forceNoRequired = true;
+            if (secured[i].type && secured[i].type.indexOf('x-') === 0) {
+              state.custom = true;
+              state.customData.push({
+                name: secured[i].name,
+                type: secured[i].type
+              });
             } else {
               console.warn('Unsupported auth method', secured[i]);
             }
@@ -557,12 +563,12 @@ Custom property | Description | Default
       this.customSchemes = undefined;
       if (state.custom) {
         var ids = [];
-        state.customNames.forEach(function(name) {
+        state.customData.forEach(function(data) {
           available.push({
-            'id': name,
-            'name': name
+            'id': data.type,
+            'name': data.name
           });
-          ids.push(name);
+          ids.push(data.type);
         });
         this.customSchemes = ids;
       }
@@ -599,7 +605,7 @@ Custom property | Description | Default
         return undefined;
       }
       for (var i = 0, len = secured.length; i < len; i++) {
-        if (secured[i] && secured[i].type === type || secured[i].name === type) {
+        if (secured[i] && (secured[i].type === type || secured[i].name === type)) {
           return secured[i];
         }
       }
@@ -653,7 +659,7 @@ Custom property | Description | Default
       }
       var panel = this.$$('[data-type="' + this.selected + '"]');
       if (!panel) {
-        console.warn('The auth panel for %s not set', this.selected);
+        // Custom scheme can be unavailable yet.
         return;
       }
       var settings = panel.settings;
