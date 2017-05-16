@@ -1,3 +1,17 @@
+<a name="0.5.13"></a>
+## [0.5.13](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.12...v0.5.13) (2017-05-16)
+
+
+### Fix
+
+* Fixed issues with recognizing custom methods. Also fixed an issue where the empty method caused an error ([53a44b5df778e371133af73a9e016b768374627c](https://github.com/advanced-rest-client/authorization-panel/commit/53a44b5df778e371133af73a9e016b768374627c))
+
+### Update
+
+* updated how the isRequired property is set. Now if the array of security schemes contains empty entry than - as defined in the spec - authorization is optional ([199411c882dcd75e5626481e37633ec57c6f8d59](https://github.com/advanced-rest-client/authorization-panel/commit/199411c882dcd75e5626481e37633ec57c6f8d59))
+
+
+
 <a name="0.5.12"></a>
 ## [0.5.12](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.11...v0.5.12) (2017-04-27)
 
