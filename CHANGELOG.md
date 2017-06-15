@@ -1,3 +1,13 @@
+<a name="0.5.14"></a>
+## [0.5.14](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.13...v0.5.14) (2017-06-15)
+
+
+### Update
+
+* Removed reference to anypoint styling ([01e7def7594f50d44d62565d7a2d40c889979a99](https://github.com/advanced-rest-client/authorization-panel/commit/01e7def7594f50d44d62565d7a2d40c889979a99))
+
+
+
 <a name="0.5.13"></a>
 ## [0.5.13](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.12...v0.5.13) (2017-05-16)
 
