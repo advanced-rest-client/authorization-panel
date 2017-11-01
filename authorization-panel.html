@@ -447,7 +447,7 @@ Custom property | Description | Default
         this.set('settings.valid', true);
         return;
       }
-      var panel = this.$$('[data-type="' + this.selected + '"]');
+      var panel = this.$$('iron-pages [data-type="' + this.selected + '"]');
       if (!panel) {
         console.warn('The auth panel for %s not set', this.selected);
         return;
@@ -744,7 +744,7 @@ Custom property | Description | Default
       if (!this.selected || this.selected === 'none') {
         return;
       }
-      var panel = this.$$('[data-type="' + this.selected + '"]');
+      var panel = this.$$('iron-pages [data-type="' + this.selected + '"]');
       if (!panel) {
         // Custom scheme can be unavailable yet.
         return;
