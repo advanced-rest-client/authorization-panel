@@ -1,3 +1,24 @@
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.13...0.6.1) (2017-11-01)
+
+
+### Breaking
+
+* Redesign of the element to work with new auth methods api ([d16581f5b8e85b4dd7e3445a8c1a03045555ceaf](https://github.com/advanced-rest-client/authorization-panel/commit/d16581f5b8e85b4dd7e3445a8c1a03045555ceaf))
+
+### Fix
+
+* Fixed linter errors. ([6f8eda5b1b8985217180cbaf8fa3d9ff49c80d35](https://github.com/advanced-rest-client/authorization-panel/commit/6f8eda5b1b8985217180cbaf8fa3d9ff49c80d35))
+* Fixed selection of panel by adding valid selector path ([1d76399760b346732f964271110b6de941e6716c](https://github.com/advanced-rest-client/authorization-panel/commit/1d76399760b346732f964271110b6de941e6716c))
+
+### Update
+
+* Removed reference to anypoint styling ([01e7def7594f50d44d62565d7a2d40c889979a99](https://github.com/advanced-rest-client/authorization-panel/commit/01e7def7594f50d44d62565d7a2d40c889979a99))
+* Updated demo pages ([6e92e8e72b8ff688dc3308d54d15d2f86717bacf](https://github.com/advanced-rest-client/authorization-panel/commit/6e92e8e72b8ff688dc3308d54d15d2f86717bacf))
+* updated tests configuration. ([9490210ad2d97dc5143f8612eacbab3b3654b05e](https://github.com/advanced-rest-client/authorization-panel/commit/9490210ad2d97dc5143f8612eacbab3b3654b05e))
+
+
+
 <a name="0.5.14"></a>
 ## [0.5.14](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.13...v0.5.14) (2017-06-15)
 

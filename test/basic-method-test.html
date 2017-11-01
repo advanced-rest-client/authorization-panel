@@ -17,8 +17,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
@@ -30,27 +28,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert, sinon */
-    suite('basic-auth-method', function() {
+    /* global fixture, assert, sinon, TestHelpers */
+    suite('basic-auth-method-test', function() {
       var element;
       setup(function() {
         element = fixture('basic');
-      });
-
-      test('`isSelected` is true', function() {
-        assert.isTrue(element.isSelected);
+        element.selected = 'basic';
+        TestHelpers.forceXIfStamp(element);
       });
 
       test('Displays all available methods', function() {
-        assert.deepEqual(element.authMethods, element._availableAuthMethods);
+        assert.deepEqual(element.authMethods, element.supportedMethods);
       });
 
-      test('Should not be required', function() {
-        assert.isFalse(element.isRequired);
+      test('Is not required', function() {
+        assert.isFalse(element.authRequired);
       });
 
-      test('Should be valid', function() {
-        assert.isTrue(element.valid);
+      test('Panel is invaild when data are not provided', function(done) {
+        element.addEventListener('authorization-settings-changed', function clb(e) {
+          element.removeEventListener('authorization-settings-changed', clb);
+          assert.isFalse(e.detail.valid);
+          done();
+        });
       });
 
       test('Should fire `request-header-changed` event', function() {

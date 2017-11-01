@@ -100,7 +100,7 @@ Custom property | Description | Default
 | --- | --- | --- |
 | authorization-settings-changed | Fired when auth settings change.  It will be fired when any of types is currently selected and any value of any property has changed. | settings **Object** - Current auth settings. It depends on enabled `type`. |
 type **String** - Enabled auth type. For example `basic`, `ntlm` or `oauth2`. |
-| authorization-type-changed | Fired when the authorization type changed. Note that the `settings` property may not be updated at the moment of of firing the event. | type **String** - Current auth type |
+| authorization-type-changed | Fired when the authorization type changed. Note that the `settings` property may not be updated at the moment of of firing the event.  This event is cancelable. If handler cancels the event the operation is stopped and selection is set to previous value. | type **String** - Current auth type |
 | query-parameter-changed | Fired when the query param changed and all listeners should update parameters / URL value. | name **String** - Name of the header that has changed |
 value **String** - Header new value |
 | request-header-changed | Fired when the request header changed and all listeners should update header value. | name **String** - Name of the header that has changed |
