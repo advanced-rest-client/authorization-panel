@@ -57,6 +57,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           parsedRaml = raml;
           done();
         });
+        baseUrl = baseUrl.replace('test', 'demo');
         parser.loadApi(baseUrl + 'test.raml')
         .then(function(data) {
           enhancer.json = data.json.specification;
@@ -70,16 +71,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         element = fixture('basic');
       });
 
-      test('`isRequired` computed to true', function() {
+      test('authRequired is computed', function() {
         element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
         TestHelpers.forceXIfStamp(element);
-        assert.isTrue(element.isRequired);
-      });
-
-      test('`noSelector` computed to true', function() {
-        element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
-        TestHelpers.forceXIfStamp(element);
-        assert.isTrue(element.noSelector);
+        assert.isTrue(element.authRequired);
       });
 
       test('`authMethods` contains one element for basic auth method', function() {
@@ -95,6 +90,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.equal(element.authMethods.length, 2);
         assert.equal(element.authMethods[0].id, 'basic');
         assert.equal(element.authMethods[1].id, 'digest');
+      });
+
+      test('Renders custom schemes', function() {
+        element.securedBy = parsedRaml.resources[5].methods[0].securedBy;
+        TestHelpers.forceXIfStamp(element);
+        assert.equal(element.authMethods.length, 2);
+        assert.equal(element.authMethods[1].id, 'x-custom');
+        var custom = element.$$('auth-method-custom');
+        assert.ok(custom);
+      });
+
+      test('Allows no authorization', function() {
+        element.securedBy = parsedRaml.resources[5].methods[0].securedBy;
+        TestHelpers.forceXIfStamp(element);
+        assert.equal(element.authMethods.length, 2);
+        assert.equal(element.authMethods[0].id, 'none');
       });
     });
     </script>

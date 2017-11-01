@@ -17,7 +17,7 @@
   "mocha": true,
   "globals": {
     "Polymer": true,
-    "fetch": true,
-    "Headers": true
+    "Headers": true,
+    "ArcBehaviors": true
   }
 }

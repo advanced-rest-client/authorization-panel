@@ -17,8 +17,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
@@ -29,15 +27,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="noSelector">
+      <template>
+        <authorization-panel no-selector></authorization-panel>
+      </template>
+    </test-fixture>
+
     <script>
-    /* global fixture, assert */
+    /* global fixture, assert, TestHelpers, MockInteractions */
     suite('basic', function() {
       var element;
       setup(function() {
         element = fixture('basic');
       });
 
-      test('`settings` should be undefined', function() {
+      test('`settings` is undefined', function() {
         assert.isUndefined(element.settings);
       });
 
@@ -47,30 +51,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Displays all available methods', function() {
-        assert.deepEqual(element.authMethods, element._availableAuthMethods);
+        assert.deepEqual(element.authMethods, element.supportedMethods);
       });
 
       test('Should not be required', function() {
-        assert.isFalse(element.isRequired);
+        assert.isFalse(element.authRequired);
       });
 
       test('Should be valid', function() {
-        assert.isTrue(element.valid);
+        assert.isTrue(element.authValid);
       });
 
-      test('`noRamlSelected` should be false', function() {
-        assert.isFalse(element.noRamlSelected);
-      });
-
-      test('Should select basic method', function() {
+      test('isSelected is computed', function() {
         element.selected = 'basic';
         assert.isTrue(element.isSelected);
       });
 
-      test('`noSelector` should be undefined', function() {
-        assert.isUndefined(element.noSelector);
+      test('noSelector is false by default', function() {
+        assert.isFalse(element.noSelector);
       });
 
+      test('tap on selection title clears the selection', function() {
+        element.selected = 'basic';
+        TestHelpers.forceXIfStamp(element);
+        var stepper = element.$$('.stepper');
+        MockInteractions.tap(stepper);
+        assert.equal(element.selected, '');
+      });
+    });
+
+    suite('Steps', function() {
+      var element;
+      setup(function() {
+        element = fixture('noSelector');
+      });
+
+      test('Steps are not rendered for noSelector', function() {
+        var stepper = element.$$('.stepper');
+        assert.notOk(stepper);
+      });
+
+      test('Steps are rendered without noSelector', function() {
+        element.noSelector = false;
+        TestHelpers.forceXIfStamp(element);
+        var stepper = element.$$('.stepper');
+        assert.ok(stepper);
+      });
     });
     </script>
 
