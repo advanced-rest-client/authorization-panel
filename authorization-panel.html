@@ -239,7 +239,7 @@ Custom property | Description | Default
           </paper-listbox>
         </paper-dropdown-menu>
       </template>
-      <iron-pages selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]" selected-attribute="opened">
+      <iron-pages id="authPanelSelector" selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]" selected-attribute="opened">
         <div data-type="none"></div>
         <auth-method-basic events-target="[[eventsTarget]]" data-type="basic" no-stepper="[[noSelector]]" attr-for-opened="opened"></auth-method-basic>
         <auth-method-digest events-target="[[eventsTarget]]" data-type="digest" no-stepper="[[noSelector]]" attr-for-opened="opened"></auth-method-digest>
@@ -447,7 +447,7 @@ Custom property | Description | Default
         this.set('settings.valid', true);
         return;
       }
-      var panel = this.$$('iron-pages [data-type="' + this.selected + '"]');
+      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
       if (!panel) {
         console.warn('The auth panel for %s not set', this.selected);
         return;
@@ -744,7 +744,7 @@ Custom property | Description | Default
       if (!this.selected || this.selected === 'none') {
         return;
       }
-      var panel = this.$$('iron-pages [data-type="' + this.selected + '"]');
+      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
       if (!panel) {
         // Custom scheme can be unavailable yet.
         return;
