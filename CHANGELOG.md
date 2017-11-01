@@ -1,3 +1,21 @@
+<a name="0.6.2"></a>
+## [0.6.2](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.1...0.6.2) (2017-11-01)
+
+
+### Fix
+
+* Adding ID attribute to iron pages for more adjusted selection ([70d8fb65ad8140fbef1541b6d2c77233d3185f14](https://github.com/advanced-rest-client/authorization-panel/commit/70d8fb65ad8140fbef1541b6d2c77233d3185f14))
+
+### New
+
+* Added forceTokenAuthorization function to authorize tokens ([81f089469f20a3d9138b64a0f97d3a44121f6dcf](https://github.com/advanced-rest-client/authorization-panel/commit/81f089469f20a3d9138b64a0f97d3a44121f6dcf))
+
+### Update
+
+* Removing debug output. ([ba951243ab2f33a67f8d420bbdfd0ed9afe86750](https://github.com/advanced-rest-client/authorization-panel/commit/ba951243ab2f33a67f8d420bbdfd0ed9afe86750))
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/advanced-rest-client/authorization-panel/compare/0.5.13...0.6.1) (2017-11-01)
 
