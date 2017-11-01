@@ -914,6 +914,20 @@ Custom property | Description | Default
           return method;
         }
       }
+    },
+    /**
+     * If selected authorization type is `oauth1` or `oauth2` it calls
+     * `authorize()` function of selected panel.
+     * If other method is selected it does nothing.
+     */
+    forceTokenAuthorization: function() {
+      var type = this.selectd;
+      if (['oauth1','oauth2'].indexOf(type) === -1) {
+        console.warn('forceTokenAuthorization can be only called for OAuth types');
+        return;
+      }
+      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
+      panel.authorize();
     }
   });
   </script>
