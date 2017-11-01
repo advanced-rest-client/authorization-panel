@@ -222,7 +222,7 @@ Custom property | Description | Default
               <paper-dropdown-menu label="Authorization method">
                 <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
                   <template is="dom-repeat" items="[[authMethods]]">
-                    <paper-item data-type="[[item.id]]">[[item.name]]</paper-item>
+                    <paper-item data-type$="[[item.id]]">[[item.name]]</paper-item>
                   </template>
                 </paper-listbox>
               </paper-dropdown-menu>
@@ -234,7 +234,7 @@ Custom property | Description | Default
         <paper-dropdown-menu label="Authorization method">
           <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
             <template is="dom-repeat" items="[[authMethods]]">
-              <paper-item data-type="[[item.id]]">[[item.name]]</paper-item>
+              <paper-item data-type$="[[item.id]]">[[item.name]]</paper-item>
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
