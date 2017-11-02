@@ -1,7 +1,7 @@
 {
   "name": "authorization-panel",
   "description": "The authorization panel used in the request panel",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "authors": [
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],

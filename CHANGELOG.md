@@ -1,3 +1,13 @@
+<a name="0.6.3"></a>
+## [0.6.3](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.2...0.6.3) (2017-11-02)
+
+
+### Fix
+
+* Fixed custom schemes ([7271511700ddaec13add9462229729a3050fa447](https://github.com/advanced-rest-client/authorization-panel/commit/7271511700ddaec13add9462229729a3050fa447))
+
+
+
 <a name="0.6.2"></a>
 ## [0.6.2](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.1...0.6.2) (2017-11-01)
 
