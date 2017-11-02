@@ -1,3 +1,9 @@
+<a name="0.6.4"></a>
+## [0.6.4](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.3...0.6.4) (2017-11-02)
+
+
+
+
 <a name="0.6.3"></a>
 ## [0.6.3](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.2...0.6.3) (2017-11-02)
 
