@@ -994,7 +994,7 @@ Custom property | Description | Default
      * If other method is selected it does nothing.
      */
     forceTokenAuthorization: function() {
-      var type = this.selectd;
+      var type = this.selected;
       if (['oauth1','oauth2'].indexOf(type) === -1) {
         console.warn('forceTokenAuthorization can be only called for OAuth types');
         return;

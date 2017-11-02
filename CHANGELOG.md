@@ -1,3 +1,13 @@
+<a name="0.6.5"></a>
+## [0.6.5](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.4...0.6.5) (2017-11-02)
+
+
+### Fix
+
+* Fixed variable name. ([09af1f43686eca80729c275acd63c9e4cb9dce6b](https://github.com/advanced-rest-client/authorization-panel/commit/09af1f43686eca80729c275acd63c9e4cb9dce6b))
+
+
+
 <a name="0.6.4"></a>
 ## [0.6.4](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.3...0.6.4) (2017-11-02)
 
