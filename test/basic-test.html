@@ -27,9 +27,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
-    <test-fixture id="noSelector">
+    <test-fixture id="noSteps">
       <template>
-        <authorization-panel no-selector></authorization-panel>
+        <authorization-panel no-steps></authorization-panel>
       </template>
     </test-fixture>
 
@@ -67,8 +67,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isTrue(element.isSelected);
       });
 
-      test('noSelector is false by default', function() {
-        assert.isFalse(element.noSelector);
+      test('noSteps is false by default', function() {
+        assert.isFalse(element.noSteps);
       });
 
       test('tap on selection title clears the selection', function() {
@@ -83,16 +83,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     suite('Steps', function() {
       var element;
       setup(function() {
-        element = fixture('noSelector');
+        element = fixture('noSteps');
+        TestHelpers.forceXIfStamp(element);
       });
 
-      test('Steps are not rendered for noSelector', function() {
+      test('Steps are not rendered for noSteps', function() {
         var stepper = element.$$('.stepper');
         assert.notOk(stepper);
       });
 
-      test('Steps are rendered without noSelector', function() {
-        element.noSelector = false;
+      test('Steps are rendered without noSteps', function() {
+        element.noSteps = false;
         TestHelpers.forceXIfStamp(element);
         var stepper = element.$$('.stepper');
         assert.ok(stepper);
