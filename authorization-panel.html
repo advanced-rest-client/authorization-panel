@@ -125,7 +125,7 @@ Custom property | Description | Default
     <style>
     :host {
       display: block;
-      @apply(--authorization-panel);
+      @apply --authorization-panel;
     }
 
     #container {
@@ -133,8 +133,8 @@ Custom property | Description | Default
     }
 
     .stepper {
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
+      @apply --layout-horizontal;
+      @apply --layout-center;
       padding: 12px 0;
       position: relative;
       pointer-events: none;
@@ -145,13 +145,25 @@ Custom property | Description | Default
       cursor: pointer;
     }
 
+    .stepper.disabled {
+      pointer-events: none !important;
+    }
+
+    .edit-icon {
+      visibility: hidden;
+    }
+
+    .active:not(.disabled) .step-header:hover .edit-icon {
+      visibility: visible;
+    }
+
     .step {
       display: inline-block;
       background-color: var(--stepper-step-number-background-color, #3D8099);
       color: var(--stepper-step-number-color, #fff);
       font-size: 14px;
-      @apply(--layout-center-center);
-      @apply(--layout-horizontal);
+      @apply --layout-center-center;
+      @apply --layout-horizontal;
       width: 24px;
       height: 24px;
       border-radius: 50%;
@@ -160,10 +172,11 @@ Custom property | Description | Default
 
     .step-header {
       position: relative;
+      @apply --layout-flex;
     }
 
     .step-title {
-      @apply(--arc-font-body1);
+      @apply --arc-font-body1;
       display: block;
       color: var(--stepper-step-title-color, #3D8099);
       font-size: 16px;
@@ -171,7 +184,7 @@ Custom property | Description | Default
     }
 
     .step-selection {
-      @apply(--arc-font-body1);
+      @apply --arc-font-body1;
       color: var(--stepper-step-selection-label-color, rgba(0, 0, 0, 0.54));
       position: absolute;
       bottom: -16px;
@@ -182,8 +195,8 @@ Custom property | Description | Default
     }
 
     .step-content {
-      @apply(--layout-horizontal);
-      @apply(--arc-font-body1);
+      @apply --layout-horizontal;
+      @apply --arc-font-body1;
       margin-bottom: 12px;
       min-height: 32px;
     }
@@ -194,26 +207,22 @@ Custom property | Description | Default
       margin-right: 24px;
     }
 
-    .edit-icon {
-      visibility: hidden;
-    }
-
-    .active .step-header:hover .edit-icon {
-      visibility: visible;
+    .method-title {
+      @apply --arc-font-subhead;
     }
     </style>
     <div id="container">
-      <template is="dom-if" if="[[!noSelector]]">
-        <div class$="[[_computeStepperClass(isSelected)]]" on-tap="_clearCelection">
+      <template is="dom-if" if="[[!noSteps]]">
+        <div class$="[[_computeStepperClass(isSelected, renderSelector)]]" on-tap="_clearCelection">
           <span class="step">1</span>
           <span class="step-header">
             <span class="step-title">
-              Select authorization method
+              Authorization method
               <iron-icon icon="arc:edit" class="edit-icon"></iron-icon>
             </span>
             <span class="step-selection" hidden$="[[!isSelected]]">[[_computeSelectedLabel(selected)]]</span>
           </span>
-          <paper-ripple></paper-ripple>
+          <paper-ripple noink="[[noink]]"></paper-ripple>
         </div>
         <div class="step-content">
           <div class="line"></div>
@@ -230,24 +239,29 @@ Custom property | Description | Default
           </iron-collapse>
         </div>
       </template>
-      <template is="dom-if" if="[[noSelector]]">
-        <paper-dropdown-menu label="Authorization method">
-          <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
-            <template is="dom-repeat" items="[[authMethods]]">
-              <paper-item data-type$="[[item.id]]">[[item.name]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
+      <template is="dom-if" if="[[noSteps]]">
+        <template is="dom-if" if="[[renderSelector]]">
+          <paper-dropdown-menu label="Authorization method">
+            <paper-listbox class="dropdown-content" selected="{{selected}}" attr-for-selected="data-type">
+              <template is="dom-repeat" items="[[authMethods]]">
+                <paper-item data-type$="[[item.id]]">[[item.name]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </template>
+        <template is="dom-if" if="[[!renderSelector]]">
+          <h4 class="method-title">[[_computeSelectedLabel(selected)]]</h4>
+        </template>
       </template>
       <iron-pages id="authPanelSelector" selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]" selected-attribute="opened">
         <div data-type="none"></div>
-        <auth-method-basic events-target="[[eventsTarget]]" data-type="basic" no-stepper="[[noSelector]]" attr-for-opened="opened"></auth-method-basic>
-        <auth-method-digest events-target="[[eventsTarget]]" data-type="digest" no-stepper="[[noSelector]]" attr-for-opened="opened"></auth-method-digest>
-        <auth-method-oauth1 events-target="[[eventsTarget]]" data-type="oauth1" no-stepper="[[noSelector]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]" attr-for-opened="opened"></auth-method-oauth1>
-        <auth-method-oauth2 events-target="[[eventsTarget]]" data-type="oauth2" no-stepper="[[noSelector]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]" attr-for-opened="opened"></auth-method-oauth2>
-        <auth-method-ntlm events-target="[[eventsTarget]]" data-type="ntlm" no-stepper="[[noSelector]]" attr-for-opened="opened"></auth-method-ntlm>
+        <auth-method-basic events-target="[[eventsTarget]]" data-type="basic" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-basic>
+        <auth-method-digest events-target="[[eventsTarget]]" data-type="digest" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-digest>
+        <auth-method-oauth1 events-target="[[eventsTarget]]" data-type="oauth1" no-stepper="[[noSteps]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]" attr-for-opened="opened"></auth-method-oauth1>
+        <auth-method-oauth2 events-target="[[eventsTarget]]" data-type="oauth2" no-stepper="[[noSteps]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]" attr-for-opened="opened"></auth-method-oauth2>
+        <auth-method-ntlm events-target="[[eventsTarget]]" data-type="ntlm" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-ntlm>
         <template is="dom-repeat" items="[[customSchemes]]">
-          <auth-method-custom events-target="[[eventsTarget]]" data-type$="[[item]]" no-stepper="[[noSelector]]" raml-settings="[[_computeSettings(securedBy, item)]]" attr-for-opened="opened"></auth-method-custom>
+          <auth-method-custom events-target="[[eventsTarget]]" data-type$="[[item]]" no-stepper="[[noSteps]]" raml-settings="[[_computeSettings(securedBy, item)]]" attr-for-opened="opened"></auth-method-custom>
         </template>
       </iron-pages>
     </div>
@@ -376,10 +390,9 @@ Custom property | Description | Default
        */
       authMethods: Array,
       /**
-       * If true then the auth method selector will be hidden
-       * (steps are not visible).
+       * If true then the numbered steps aren't rendered.
        */
-      noSelector: {
+      noSteps: {
         type: Boolean,
         value: false
       },
@@ -387,7 +400,17 @@ Custom property | Description | Default
        * List of currently available custom security schemes declared in
        * the RAML API spec file.
        */
-      customSchemes: Array
+      customSchemes: Array,
+      /**
+       * Computed value. If true then type selector is not rendered.
+       */
+      renderSelector: {
+        type: Boolean,
+        value: true,
+        readOnly: true
+      },
+      // If true then the ripple effect on step title is disabled.
+      noink: Boolean
     },
 
     /**
@@ -462,7 +485,11 @@ Custom property | Description | Default
     },
 
     _authSettingsHandler: function(e) {
-      if (e.detail.type !== this.selected) {
+      var type = e.detail.type;
+      if (type === 'x-custom') {
+        type = e.detail.name;
+      }
+      if (type !== this.selected) {
         return;
       }
       this._setSettings(e.detail);
@@ -492,7 +519,11 @@ Custom property | Description | Default
           type: selected
         });
       }
-      if (settings.type !== selected) {
+      var type = settings.type;
+      if (type === 'x-custom') {
+        type = settings.name;
+      }
+      if (type !== selected) {
         return;
       }
       return this.fire('authorization-settings-changed', {
@@ -632,15 +663,28 @@ Custom property | Description | Default
         var ids = [];
         state.customData.forEach(function(data) {
           available.push({
-            'id': data.type,
-            'name': data.name
+            id: data.name,
+            name: data.name,
+            isCustom: true
           });
-          ids.push(data.type);
+          ids.push(data.name);
         });
         this.customSchemes = ids;
       }
       this.set('authMethods', available);
       this._ensureSelection();
+      this._manageSelectorSate(available);
+    },
+    /**
+     * Sets `renderSelector` property depending on number of allowed
+     * authorization methods. Sets value to `true` only if there's more than
+     * one authorization method available.
+     *
+     * @param {Array} authMethods Available authorization methods.
+     */
+    _manageSelectorSate: function(authMethods) {
+      var state = !!(authMethods && authMethods.length && authMethods.length > 1);
+      this._setRenderSelector(state);
     },
     /**
      * Ensures that authorization method is selected.
@@ -692,24 +736,52 @@ Custom property | Description | Default
     _computeSelectedLabel: function(selected) {
       switch (selected) {
         case 'none': return 'No authorization';
-        case 'basic': return 'Basic';
-        case 'oauth2': return 'OAuth 2.0';
-        case 'oauth1': return 'OAuth 1.0';
-        case 'ntlm': return 'NTLM';
-        case 'custom': return 'x-custom';
-        default: return selected;
+        case 'basic': return 'Basic authorization';
+        case 'digest': return 'Digest authorization';
+        case 'oauth2': return 'OAuth 2.0 authorization';
+        case 'oauth1': return 'OAuth 1.0 authorization';
+        case 'ntlm': return 'NTLM authorization';
+        default:
+          var cMethod = this._findCustomMethod(selected);
+          if (cMethod) {
+            return 'Custom authorization ' + cMethod.name;
+          }
+          return selected;
       }
     },
+    /**
+     * [description]
+     * @param {[type]} name [description]
+     * @return {[type]} [description]
+     */
+    _findCustomMethod: function(name) {
+      var am = this.authMethods;
+      if (!name || !am || !am.length) {
+        return;
+      }
+      for (var i = 0, len = am.length; i < len; i++) {
+        if (am[i].isCustom && am[i].name === name) {
+          return am[i];
+        }
+      }
+    },
+
     // Computes class name for stepper depending on selection.
-    _computeStepperClass: function(isSelected) {
+    _computeStepperClass: function(isSelected, renderSelector) {
       var cls = 'stepper';
       if (isSelected) {
         cls += ' active';
+      }
+      if (!renderSelector) {
+        cls += ' disabled';
       }
       return cls;
     },
     // Resets `selected` property.
     _clearCelection: function() {
+      if (!this.renderSelector) {
+        return;
+      }
       this.set('selected', '');
     },
     /**
@@ -784,7 +856,8 @@ Custom property | Description | Default
         case 'digest': this._handleDigestSettings(settings); break;
         case 'ntlm': break;
         default:
-          if (type && type.indexOf('x-') === 0) {
+          var cMethod = this._findCustomMethod(type);
+          if (cMethod) {
             /* Auth panel updates headers and query parameters by its own. */
             return;
           }

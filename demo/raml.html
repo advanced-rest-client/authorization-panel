@@ -22,42 +22,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../oauth-authorization/oauth1-authorization.html">
   <link rel="import" href="../authorization-panel.html">
 
-  <style>
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
+  <style is="custom-style">
+  :root {
+    --arc-font-common-base: {
       font-family: 'Roboto', 'Noto', sans-serif;
       -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      font-size: 14px;
+    };
+
+    --arc-font-subhead: {
+      @apply --arc-font-common-base;
       font-weight: 400;
-      line-height: 20px;
-    }
+      font-size: 16px;
+      line-height: 24px;
+    };
 
-    output {
-      white-space: pre-wrap;
-      word-break: break-all;
-      display: block;
-      margin: 12px 0;
-    }
+  }
 
-    #settings {
-      margin-top: 40px;
-    }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
 
+  output {
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: block;
+    margin: 12px 0;
+  }
+
+  #settings {
+    margin-top: 40px;
+  }
   </style>
 </head>
 <body unresolved>
   <template is="dom-bind" id="app">
     <raml-demo-page selected-object="{{selected}}" is-method="{{isMethod}}">
       <paper-item data-url$="[[testRaml]]">Test case with RAML 1.0</paper-item>
-      <paper-item main-menu class="checkable-menu"><paper-item-body>No steps</paper-item-body><paper-checkbox checked="{{noSelector}}"></paper-checkbox></paper-item>
+      <paper-item main-menu class="checkable-menu"><paper-item-body>No steps</paper-item-body><paper-checkbox checked="{{noSteps}}"></paper-checkbox></paper-item>
 
       <h1>Authorization panel</h1>
       <div main>
-        <authorization-panel no-selector="[[noSelector]]" redirect-url="[[redirectUrl]]" secured-by="[[selected.securedBy]]" on-selected-changed="_selectedChanged" auth-required="{{authRequired}}" auth-valid="{{authValid}}"></authorization-panel>
+        <authorization-panel no-steps="[[noSteps]]" redirect-url="[[redirectUrl]]" secured-by="[[selected.securedBy]]" on-selected-changed="_selectedChanged" auth-required="{{authRequired}}" auth-valid="{{authValid}}"></authorization-panel>
         <oauth2-authorization></oauth2-authorization>
         <oauth1-authorization></oauth1-authorization>
 
