@@ -1,3 +1,13 @@
+<a name="0.6.7"></a>
+## [0.6.7](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.6...0.6.7) (2017-11-08)
+
+
+### Update
+
+* Added styles to update iron-collapse ([76a4b29bab40385e8384742c48ab77565203b86a](https://github.com/advanced-rest-client/authorization-panel/commit/76a4b29bab40385e8384742c48ab77565203b86a))
+
+
+
 <a name="0.6.6"></a>
 ## [0.6.6](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.5...0.6.6) (2017-11-02)
 
