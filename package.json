@@ -1,6 +1,6 @@
 {
   "name": "authorization-panel",
-  "version": "0.6.4",
+  "version": "0.6.6",
   "license": "Apache-2.0 OR CC-BY-4.0",
   "description": "The authorization panel used in the request panel",
   "devDependencies": {
