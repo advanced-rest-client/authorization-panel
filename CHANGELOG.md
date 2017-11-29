@@ -1,3 +1,13 @@
+<a name="0.6.9"></a>
+## [0.6.9](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.8...0.6.9) (2017-11-29)
+
+
+### Update
+
+* Updated demo page. [no-travis] ([e951d49255b67fd9b7031784cb2f56c10ceadaf5](https://github.com/advanced-rest-client/authorization-panel/commit/e951d49255b67fd9b7031784cb2f56c10ceadaf5))
+
+
+
 <a name="0.6.8"></a>
 ## [0.6.8](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.7...0.6.8) (2017-11-08)
 
