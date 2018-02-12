@@ -1,3 +1,17 @@
+<a name="0.6.14"></a>
+## [0.6.14](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.13...0.6.14) (2018-02-12)
+
+
+### Fix
+
+* Fixed tests ([f4b73fd0b330ffcdaf16f5adee1698c1f244e846](https://github.com/advanced-rest-client/authorization-panel/commit/f4b73fd0b330ffcdaf16f5adee1698c1f244e846))
+
+### New
+
+* Added ability to read settings from the outside of element. ([a7611254b94cd4d7dddc093d401f9573b89966d0](https://github.com/advanced-rest-client/authorization-panel/commit/a7611254b94cd4d7dddc093d401f9573b89966d0))
+
+
+
 <a name="0.6.13"></a>
 ## [0.6.13](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.12...0.6.13) (2018-02-12)
 
