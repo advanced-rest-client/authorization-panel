@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert, sinon, TestHelpers */
+    /* global fixture, assert, TestHelpers */
     suite('basic-auth-method-test', function() {
       var element;
       setup(function() {
@@ -53,14 +53,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
-      test('Should fire `request-header-changed` event', function() {
+      test('Should fire `request-header-changed` event', function(done) {
         var basicPanel = Polymer.dom(element.root).querySelector('auth-method-basic');
-        var spy = sinon.stub();
-        element.addEventListener('request-header-changed', spy);
+        element.addEventListener('request-header-changed', function clb() {
+          element.removeEventListener('request-header-changed', clb);
+          done();
+        });
         basicPanel.username = 'test';
-        assert.isTrue(spy.calledOnce);
       });
-
     });
     </script>
 
