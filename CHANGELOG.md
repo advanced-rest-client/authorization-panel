@@ -1,3 +1,13 @@
+<a name="0.6.12"></a>
+## [0.6.12](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.11...0.6.12) (2018-02-12)
+
+
+### Update
+
+* Added clear method. ([edf0368c2ab49d3869442cbd418ca265fd9cc439](https://github.com/advanced-rest-client/authorization-panel/commit/edf0368c2ab49d3869442cbd418ca265fd9cc439))
+
+
+
 <a name="0.6.11"></a>
 ## [0.6.11](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.10...0.6.11) (2018-02-12)
 
