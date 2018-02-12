@@ -371,7 +371,6 @@ Custom property | Description | Default
        */
       settings: {
         type: Object,
-        readOnly: true,
         notify: true
       },
       /**
@@ -452,8 +451,21 @@ Custom property | Description | Default
     },
 
     observers: [
-      '_authSettingsChanged(selected, settings.*)'
+      // '_authSettingsChanged(selected, settings.*)',
+      '_authUpdated(settings.*)'
     ],
+
+    get currentPanel() {
+      if (!this.$) {
+        this.$ = {};
+      }
+      if (this.$[this.selected]) {
+        return this.$[this.selected];
+      }
+      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
+      this.$[this.selected] = panel;
+      return panel;
+    },
 
     // Overrides ArcBehaviors.EventsTargetBehavior
     _attachListeners: function() {},
@@ -475,7 +487,7 @@ Custom property | Description | Default
      */
     clear: function() {
       this.selected = undefined;
-      this._setSettings({});
+      this.settings = {};
     },
     /**
      * Updates validation state for the selected form.
@@ -488,7 +500,7 @@ Custom property | Description | Default
         this.set('settings.valid', true);
         return;
       }
-      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
+      var panel = this.currentPanel;
       if (!panel) {
         console.warn('The auth panel for %s not set', this.selected);
         return;
@@ -510,16 +522,30 @@ Custom property | Description | Default
       if (type !== this.selected) {
         return;
       }
-      this._setSettings(e.detail);
+      this.settings = e.detail;
     },
-
-    // Fires the `authorization-settings-changed` event when something change
-    _authSettingsChanged: function(selected, record) {
-      if (!selected || !record || !record.base) {
+    _authUpdated: function(record) {
+      if (record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
         return;
       }
-      var set = record.base;
-      this._notifySettings(set, selected);
+      var base = record.base;
+      if (!base || !base.type) {
+          return;
+      }
+      if (base.type !== this.selected) {
+          this._restoreSettings(base);
+          return;
+      }
+      this.debounce('notify-oauth2-change', function() {
+        this._notifySettings(base, this.selected);
+      }, 50);
+    },
+
+    _restoreSettings: function(settings) {
+      if (settings.type !== this.selected) {
+        this.selected = settings.type;
+      }
+      this.currentPanel.restore(settings.settings);
     },
     /**
      * Notifies settings change if currently selected method is the same as
@@ -589,7 +615,7 @@ Custom property | Description | Default
           valid: false
         };
       }
-      this._setSettings(settings);
+      this.settings = settings;
       this._notifySettings(settings, this.selected);
     },
 
@@ -833,7 +859,7 @@ Custom property | Description | Default
       if (!this.selected || this.selected === 'none') {
         return;
       }
-      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
+      var panel = this.currentPanel;
       if (!panel) {
         // Custom scheme can be unavailable yet.
         return;
@@ -1017,7 +1043,7 @@ Custom property | Description | Default
         console.warn('forceTokenAuthorization can be only called for OAuth types');
         return;
       }
-      var panel = this.$$('#authPanelSelector [data-type="' + this.selected + '"]');
+      var panel = this.currentPanel;
       panel.authorize();
     }
   });
