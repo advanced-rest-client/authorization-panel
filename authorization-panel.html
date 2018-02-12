@@ -471,6 +471,13 @@ Custom property | Description | Default
       'authorization-settings-changed': '_onAuthSettingsChanged'
     },
     /**
+     * Clears the state of the panel.
+     */
+    clear: function() {
+      this.selected = undefined;
+      this._setSettings({});
+    },
+    /**
      * Updates validation state for the selected form.
      * When element is initializing and RAML's `securedBy` property is set
      * during the initialization time, events with settings are fired before the form
