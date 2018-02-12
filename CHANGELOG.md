@@ -1,3 +1,17 @@
+<a name="0.6.11"></a>
+## [0.6.11](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.10...0.6.11) (2018-02-12)
+
+
+### Fix
+
+* Fixed digest notification. ([6131dd2763bb7e1cc67d558c64059bac89a78b8c](https://github.com/advanced-rest-client/authorization-panel/commit/6131dd2763bb7e1cc67d558c64059bac89a78b8c))
+
+### Update
+
+* Adding HTTP request fields mapping for digest method. ([a1eebe5e218d64158401db7b076a236defb7dbf7](https://github.com/advanced-rest-client/authorization-panel/commit/a1eebe5e218d64158401db7b076a236defb7dbf7))
+
+
+
 <a name="0.6.10"></a>
 ## [0.6.10](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.9...0.6.10) (2017-11-29)
 
