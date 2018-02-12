@@ -261,7 +261,7 @@ Custom property | Description | Default
       <iron-pages id="authPanelSelector" selected="[[selected]]" attr-for-selected="data-type" hidden$="[[!isSelected]]" selected-attribute="opened">
         <div data-type="none"></div>
         <auth-method-basic events-target="[[eventsTarget]]" data-type="basic" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-basic>
-        <auth-method-digest events-target="[[eventsTarget]]" data-type="digest" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-digest>
+        <auth-method-digest events-target="[[eventsTarget]]" data-type="digest" no-stepper="[[noSteps]]" attr-for-opened="opened" http-method="[[httpMethod]]" request-url="[[requestUrl]]" request-body="[[requestBody]]"></auth-method-digest>
         <auth-method-oauth1 events-target="[[eventsTarget]]" data-type="oauth1" no-stepper="[[noSteps]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 1.0')]]" attr-for-opened="opened"></auth-method-oauth1>
         <auth-method-oauth2 events-target="[[eventsTarget]]" data-type="oauth2" no-stepper="[[noSteps]]" redirect-url="[[redirectUrl]]" raml-settings="[[_computeSettings(securedBy, 'OAuth 2.0')]]" attr-for-opened="opened"></auth-method-oauth2>
         <auth-method-ntlm events-target="[[eventsTarget]]" data-type="ntlm" no-stepper="[[noSteps]]" attr-for-opened="opened"></auth-method-ntlm>
@@ -415,7 +415,13 @@ Custom property | Description | Default
         readOnly: true
       },
       // If true then the ripple effect on step title is disabled.
-      noink: Boolean
+      noink: Boolean,
+      // Current HTTP method. Passed to digest method.
+      httpMethod: String,
+      // Current request URL. Passed to digest method.
+      requestUrl: String,
+      // Current request body. Passed to digest method.
+      requestBody: String
     },
 
     /**
@@ -949,7 +955,7 @@ Custom property | Description | Default
         return;
       }
       var data = settings.settings;
-      if (data.username && data.password) {
+      if (!(data.username && data.password)) {
         return;
       }
       var value = 'Digest ';
