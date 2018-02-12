@@ -949,7 +949,7 @@ Custom property | Description | Default
         return;
       }
       var data = settings.settings;
-      if (data.username && data.password) {
+      if (!(data.username && data.password)) {
         return;
       }
       var value = 'Digest ';
