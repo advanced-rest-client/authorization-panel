@@ -17,10 +17,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <link rel="import" href="../authorization-panel.html">
+    <link rel="import" href="../../iron-meta/iron-meta.html">
     <link rel="import" href="../../raml-js-parser/raml-js-parser.html">
     <link rel="import" href="../../raml-json-enhance/raml-json-enhance.html">
+    <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
 
@@ -36,15 +36,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
-    <test-fixture id="basic">
+    <test-fixture id="meta">
       <template>
+        <iron-meta key="auth-methods" value='[null, "digest", "oauth1", "oauth2"]'></iron-meta>
         <authorization-panel></authorization-panel>
       </template>
     </test-fixture>
 
     <script>
     /* global fixture, assert, TestHelpers */
-    suite('basic', function() {
+    var available = [{
+        'id': 'none',
+        'name': 'No authorization'
+      }, {
+        'id': 'digest',
+        'name': 'Digest Authentication'
+      }, {
+        'id': 'oauth1',
+        'name': 'Oauth 1.0'
+      }, {
+        'id': 'oauth2',
+        'name': 'Oauth 2.0'
+      }];
+    suite('Meta data with iron-meta element', function() {
+      var element;
+      setup(function() {
+        element = fixture('meta')[1];
+      });
+
+      test('Computes auth methods', function() {
+        assert.lengthOf(element.authMethods, 4);
+      });
+
+      test('Has only defined methods', function() {
+        assert.deepEqual(element.authMethods, available);
+      });
+    });
+
+    suite('With RAML', function() {
       var parsedRaml;
       var element;
 
@@ -68,58 +97,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       setup(function() {
-        element = fixture('basic');
+        element = fixture('meta')[1];
+      });
+
+      test('Computes empty methods list', function() {
+        element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
+        assert.lengthOf(element.authMethods, 0);
       });
 
       test('Computes hasAuthMethods property', function() {
         element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
-        assert.isTrue(element.hasAuthMethods);
+        assert.isFalse(element.hasAuthMethods);
       });
 
-      test('authRequired is computed', function() {
+      test('Computes empty message', function() {
         element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
-        assert.isTrue(element.authRequired);
+        TestHelpers.forceXIfStamp(element);
+        var message = element.$$('.no-method-info');
+        assert.ok(message);
       });
 
-      test('`authMethods` contains one element for basic auth method', function() {
-        element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
-        assert.equal(element.authMethods.length, 1);
-        assert.equal(element.authMethods[0].id, 'basic');
-      });
-
-      test('`authMethods` contains two elements', function() {
+      test('Computes single method', function() {
         element.securedBy = parsedRaml.resources[1].methods[0].securedBy;
-        assert.equal(element.authMethods.length, 2);
-        assert.equal(element.authMethods[0].id, 'basic');
+        assert.lengthOf(element.authMethods, 1);
+        assert.equal(element.authMethods[0].id, 'digest');
+      });
+
+      test('Computes two methods', function() {
+        element.securedBy = parsedRaml.resources[2].methods[0].securedBy;
+        assert.lengthOf(element.authMethods, 2);
+        assert.equal(element.authMethods[0].id, 'none');
         assert.equal(element.authMethods[1].id, 'digest');
       });
 
-      test('Renders custom schemes', function() {
-        element.securedBy = parsedRaml.resources[5].methods[0].securedBy;
-        TestHelpers.forceXIfStamp(element);
-        assert.equal(element.authMethods.length, 2);
-        assert.equal(element.authMethods[1].id, 'x-other');
-        var custom = element.$$('auth-method-custom');
-        assert.ok(custom);
-      });
-
-      test('Allows no authorization', function() {
-        element.securedBy = parsedRaml.resources[5].methods[0].securedBy;
-        assert.equal(element.authMethods.length, 2);
+      test('Computes custom methods', function() {
+        element.securedBy = parsedRaml.resources[3].methods[0].securedBy;
+        assert.lengthOf(element.authMethods, 6);
         assert.equal(element.authMethods[0].id, 'none');
+        assert.equal(element.authMethods[1].id, 'digest');
+        assert.equal(element.authMethods[2].id, 'oauth1');
+        assert.equal(element.authMethods[3].id, 'oauth2');
+        assert.equal(element.authMethods[4].id, 'x-other');
+        assert.equal(element.authMethods[5].id, 'x-test1');
       });
 
-      test('renderSelector false for single method', function() {
-        element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
-        assert.isFalse(element.renderSelector);
-      });
-
-      test('Renders method label instead of selector', function() {
-        element.noSteps = true;
-        element.securedBy = parsedRaml.resources[0].methods[0].securedBy;
+      test('Restores meta list methods', function() {
+        element.securedBy = parsedRaml.resources[3].methods[0].securedBy;
         TestHelpers.forceXIfStamp(element);
-        var title = element.$$('.method-title');
-        assert.ok(title);
+        element.securedBy = undefined;
+        assert.lengthOf(element.authMethods, 4);
+        assert.deepEqual(element.authMethods, available);
       });
     });
     </script>

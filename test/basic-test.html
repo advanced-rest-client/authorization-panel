@@ -45,6 +45,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isUndefined(element.settings);
       });
 
+      test('Computes hasAuthMethods property', function() {
+        assert.isTrue(element.hasAuthMethods);
+      });
+
+      test('Does not compute empty message', function() {
+        TestHelpers.forceXIfStamp(element);
+        var message = element.$$('.no-method-info');
+        assert.notOk(message);
+      });
+
       test('No `selected` by default', function() {
         assert.isUndefined(element.selected, 'selected is undefined');
         assert.isFalse(element.isSelected, 'isSelected is false');
