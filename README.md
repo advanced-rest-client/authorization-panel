@@ -8,18 +8,37 @@ It is a set of forms that allow set up the authorization method for a HTTP reque
 The element do not perform authorization. Depending on selected method there are
 different ways of dealing with the authorization.
 
-### Auth methods availability
-By default the element will display all authorization methods available in it.
-Currently they are:
+## Auth methods availability
+
+By default the element renders all authorization methods available to it.
+
+Currently these are:
+- none (auth is optional)
 - basic
 - digest
+- ntlm
 - OAuth 2.0
+- OAuth 1.0
 
-If `securedBy` property is set (which is the `securedBy` property of the RAML's
-definition produced by [raml-js-parser](https://elements.advancedrestclient.com/elements/raml-js-parser)
-and [raml-json-enhance](https://elements.advancedrestclient.com/elements/raml-json-enhance))
-then it will show only those methods that are supported by this known endpoint.
-See this element's documentation for more information.
+The list can be changed by setting the `securedBy` property to the RAML security
+scheme data model produced by [RAML JS parser](https://elements.advancedrestclient.com/elements/raml-js-parser).
+
+Alternatively, use `iron-meta` element with `key` property set to `auth-methods`
+and `value` property set to list of suppored methods.
+
+#### Example
+
+```html
+<iron-meta key="auth-methods" value='[null, "basic", "oauth1", "oauth2"]'></iron-meta>
+```
+
+Keys can be any of `none`, `basic`, `ntlm`, `digest`, `oauth1` and `oauth2`.
+
+Note, that if you set meta data and `securedBy` property it will use combination
+of both. The base list of rendered methods is meta data list and then reduced to
+defined in RAML methods. Also note, that custom auth methods are always rendered.
+
+## Supported methods
 
 Detailed information about authorization methods can be find in the [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods).
 
@@ -91,7 +110,11 @@ Custom property | Description | Default
 `--stepper-step-title-color` | Color of the label of the step (if selected auth method support this) | `#3D8099`
 `--stepper-step-selection-label-color` | Color of the label of closed section (with selected option) | `rgba(0, 0, 0, 0.54)`
 `--stepper-line-color` | Left hand side line color of the stepper. | `rgba(0, 0, 0, 0.12)`
-`--arc-font-body1` | Theme mixin, Mixin applied to the elements that are containg text | ``
+`--arc-font-body1` | Theme mixin, Mixin applied to the elements that are containg text | `{}`
+`--empty-info` | Mixin applied to the element that renders no methods availability message | `{}`
+
+Also check [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods) for methods
+styling instructions.
 
 
 

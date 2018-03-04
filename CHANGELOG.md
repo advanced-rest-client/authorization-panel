@@ -1,3 +1,13 @@
+<a name="0.6.16"></a>
+## [0.6.16](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.15...0.6.16) (2018-03-04)
+
+
+### New
+
+* Added support for `iron-meta` and list of methods. ([1fa4439ec29fbf1e670f859b0f182a1fb050a025](https://github.com/advanced-rest-client/authorization-panel/commit/1fa4439ec29fbf1e670f859b0f182a1fb050a025))
+
+
+
 <a name="0.6.15"></a>
 ## [0.6.15](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.14...0.6.15) (2018-02-12)
 
