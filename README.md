@@ -1,6 +1,13 @@
-[![Build Status](https://travis-ci.org/advanced-rest-client/authorization-panel.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/authorization-panel)  
+[![Build Status](https://travis-ci.org/advanced-rest-client/authorization-panel.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/authorization-panel)
 
-# authorization-panel
+## undefined component
+Tag: `<authorization-panel>`
+
+### Installation
+Using bower:
+```
+bower install --save advanced-rest-client/authorization-panel
+```
 
 `<authorization-panel>` The authorization panel used in the request panel.
 It is a set of forms that allow set up the authorization method for a HTTP request.
@@ -116,15 +123,135 @@ Custom property | Description | Default
 Also check [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods) for methods
 styling instructions.
 
+## API
+### Component properties (attributes)
+
+#### eventsTarget
+- Type: `Object`
+Events handlers target. By default the element listens on
+`window` object. If set, all events listeners will be attached to this
+object instead of `window`.
+
+#### selected
+- Type: `string`
+Selected authorization type. Can be onle of `basic`, `digest`, `oauth1`,
+`oauth2`, `none` and `ntlm`.
+
+#### isSelected
+- Type: `boolean`
+- Default: `false`
+- Read only property
+Computed value. `true` when authorization method has been selected.
+
+#### authRequired
+- Type: `boolean`
+- Default: `false`
+Set to true to inform the element that authorization is required
+for an endpoint.
+It computes this value automatically when RAML security scheme is set.
+It can be set to `true` only if selected authorization method
+requires user to authenticate the call.
+It can be `false` if selected method is `none`, meaning RAML spec
+allows no authorization.
+
+#### authValid
+- Type: `boolean`
+- Default: `true`
+- Read only property
+Determines if the user propertly provided authorization data into the
+authorization form.
+For OAuth 1/2 authorization methods it means that the token (and
+token secret for OAuth 1) is set.
+This property is only relevant when `authRequired` is set to true.
+Application should override `authRequired` state if it's set to true.
+
+For example the application can show a warning message to the user that
+authorization is required when `authRequired` is true and hide the
+information when `authVaid` is `true` even if `authRequired` is `true`.
+
+#### settings
+- Type: `Object`
+Current settings of selected auth type.
+Can be `undefined` if the user hasn't filled all required fields in the
+form. of if RAML settings allows no authorization and user selectd this
+option.
+
+#### securedBy
+- Type: `Object`
+A definition of the RAML `securedBy` node of the method.
+If set it will limit number of authorization methods rendered by this
+element to show only those which are defined in the RAML spec.
+
+#### redirectUrl
+- Type: `string`
+The OAuth2 redirect URL to be set in the OAuth2 form pane.
+
+#### authMethods
+- Type: `Array`
+List of currently available authorization methods.
+Value computed when `securedBy` property change to a list of auth
+methods defined in RAML for selected endpoint and supported by this
+element.
+
+#### hasAuthMethods
+- Type: `boolean`
+- Default: `false`
+- Read only property
+Computed value, `true` if any method is rendered.
+
+#### noSteps
+- Type: `boolean`
+- Default: `false`
+If true then the numbered steps aren't rendered.
+
+#### customSchemes
+- Type: `Array`
+List of currently available custom security schemes declared in
+the RAML API spec file.
+
+#### renderSelector
+- Type: `boolean`
+- Default: `true`
+- Read only property
+Computed value. If true then type selector is not rendered.
+
+#### noink
+- Type: `boolean`
+If true then the ripple effect on step title is disabled.
+
+#### httpMethod
+- Type: `string`
+Current HTTP method. Passed to digest method.
+
+#### requestUrl
+- Type: `string`
+Current request URL. Passed to digest method.
+
+#### requestBody
+- Type: `string`
+Current request body. Passed to digest method.
+
+#### supportedMethods
+- Type: `Function`
+List of authorization methods supported by this element.
+Each item has `id` and `name` property. The `id` is internal ID for
+authorization methods. Can be any of: `none`, `basic`, `ntlm`, `digest`,
+`oauth1` and `oauth2`. The `name` property is a lable for the method
+used in UI.
+
+#### currentPanel
+- Type: `Function`
 
 
-### Events
-| Name | Description | Params |
-| --- | --- | --- |
-| authorization-settings-changed | Fired when auth settings change.  It will be fired when any of types is currently selected and any value of any property has changed. | settings **Object** - Current auth settings. It depends on enabled `type`. |
-type **String** - Enabled auth type. For example `basic`, `ntlm` or `oauth2`. |
-| authorization-type-changed | Fired when the authorization type changed. Note that the `settings` property may not be updated at the moment of of firing the event.  This event is cancelable. If handler cancels the event the operation is stopped and selection is set to previous value. | type **String** - Current auth type |
-| query-parameter-changed | Fired when the query param changed and all listeners should update parameters / URL value. | name **String** - Name of the header that has changed |
-value **String** - Header new value |
-| request-header-changed | Fired when the request header changed and all listeners should update header value. | name **String** - Name of the header that has changed |
-value **String** - Header new value |
+
+### Component methods
+
+#### clear
+- Return type: `undefined`
+Clears the state of the panel.
+#### forceTokenAuthorization
+- Return type: `undefined`
+If selected authorization type is `oauth1` or `oauth2` it calls
+`authorize()` function of selected panel.
+If other method is selected it does nothing.
+
