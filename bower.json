@@ -1,50 +1,52 @@
 {
   "name": "authorization-panel",
   "description": "The authorization panel used in the request panel",
-  "version": "1.0.0",
+  "version": "2.0.0-preview",
+  "license": "Apache-2.0",
   "authors": [
+    "pawel Psztyc",
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "keywords": [
-    "authorization"
+    "authorization",
+    "oauth",
+    "ntlm",
+    "oauth1",
+    "oauth2",
+    "basic",
+    "disgest",
+    "api"
   ],
   "private": true,
-  "main": [
-    "authorization-panel.html"
-  ],
+  "main": "authorization-panel.html",
   "repository": {
     "type": "git",
     "url": "git@github.com:advanced-rest-client/authorization-panel.git"
   },
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.0.0",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
-    "iron-pages": "PolymerElements/iron-pages#^1.0.8",
-    "auth-methods": "advanced-rest-client/auth-methods#^2.3.0",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.0",
-    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2",
-    "paper-item": "PolymerElements/paper-item#^1.2.1",
-    "iron-collapse": "PolymerElements/iron-collapse#^1.3.0",
-    "paper-ripple": "PolymerElements/paper-ripple#^1.0.10",
-    "paper-tooltip": "PolymerElements/paper-tooltip#^1.1.3",
-    "arc-icons": "advanced-rest-client/arc-icons#^1.0.18",
-    "iron-icon": "PolymerElements/iron-icon#^1.0.13",
-    "events-target-behavior": "advanced-rest-client/events-target-behavior#^0.1.3"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.3",
+    "iron-pages": "PolymerElements/iron-pages#^2.1.0",
+    "auth-methods": "advanced-rest-client/auth-methods#3.0.0-preview",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.3",
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
+    "paper-item": "PolymerElements/paper-item#^2.1.0",
+    "iron-collapse": "PolymerElements/iron-collapse#^2.2.0",
+    "paper-ripple": "PolymerElements/paper-ripple#^2.1.0",
+    "arc-icons": "advanced-rest-client/arc-icons#^2.0.0",
+    "iron-icon": "PolymerElements/iron-icon#^2.1.0",
+    "events-target-behavior": "advanced-rest-client/events-target-behavior#^2.0.0"
   },
   "devDependencies": {
-    "iron-component-page": "polymerelements/iron-component-page#1.0.0",
-    "web-component-tester": "^4.0.0",
-    "paper-styles": "polymerelements/paper-styles#^1.0.2",
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
-    "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0",
-    "test-fixture": "PolymerElements/test-fixture#^1.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "oauth-authorization": "advanced-rest-client/oauth-authorization#^0.3.0",
-    "arc-demo-helpers": "advanced-rest-client/arc-demo-helpers#^1.0.10"
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#^2.0.0",
+    "iron-component-page": "^3.0.1",
+    "oauth-authorization": "advanced-rest-client/oauth-authorization#^2.0.1"
   },
   "ignore": [
     "**/.*",
-    "dependencyci.yml",
     "node_modules",
     "bower_components",
     "test",
