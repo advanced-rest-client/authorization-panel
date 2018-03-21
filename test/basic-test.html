@@ -84,16 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('noSteps is false by default', () => {
         assert.isFalse(element.noSteps);
       });
-
-      test('tap on selection title clears the selection', (done) => {
-        element.selected = 1;
-        flush(() => {
-          let stepper = element.shadowRoot.querySelector('span[slot="inactive-title"]');
-          MockInteractions.tap(stepper);
-          assert.equal(element.selected, -1);
-          done();
-        });
-      });
     });
     </script>
   </body>
