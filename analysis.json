@@ -1,0 +1,1868 @@
+{
+  "schema_version": "1.0.0",
+  "elements": [
+    {
+      "description": "The authorization panel used in the request panel to perform\nuser authorization.\n\nIt is a set of forms that allow set up the authorization method for a HTTP request.\n\nThe element do not perform authorization. Depending on selected method there\nare different ways of dealing with the authorization.\n\n## Auth methods availability\n\nBy default the element renders all authorization methods available to it.\n\nCurrently these are:\n- none (auth is optional)\n- basic\n- digest\n- ntlm\n- OAuth 2.0\n- OAuth 1.0\n\nThe list can be changed by setting the `securedBy` property to the\n[AMF](https://github.com/mulesoft/amf) security description.\n\nAlternatively, use `iron-meta` element with `key` property set to `auth-methods`\nand `value` property set to list of suppored methods.\n\n#### Example\n\n```html\n<iron-meta key=\"auth-methods\" value='[null, \"basic\", \"oauth1\", \"oauth2\"]'></iron-meta>\n```\n\nKeys can be any of `none`, `basic`, `ntlm`, `digest`, `oauth1` and `oauth2`.\n\nNote, that if you set meta data and `securedBy` property it will use combination\nof both. The base list of rendered methods is meta data list and then reduced to\ndefined in RAML methods. Also note, that custom auth methods are always rendered.\n\n## Supported methods\n\nDetailed information about authorization methods can be find in the\n[auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods).\n\n### Basic Authentication\n\nThe element sends the `request-header-changed` custom event to inform any other\nelement that is listening to this event that header value has changed\n(Authorization in this case). The `raml-headers-form` is an example of an\nelement that is listening for this event and change request headers value\nwhen auth data change.\n\n### OAuth 2.0\n\nThe [Oauth 2 form](https://elements.advancedrestclient.com/elements/auth-methods?active=auth-method-oauth2)\nsends the `oauth2-token-requested` custom event with the OAuth settings provided\nby the user.\nAny element / hosting app can handle this event and perform authorization.\nARC elements provides the [oauth2-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)\nelement (from the `oauth-authorization` package) that can be placed anywhere\nin the DOM (from current element where `authorization-panel` is attached up\nto the body) and perform OAuth athorization.\n\nHowever it can be also done by any other element / app  or even server.\nSee `<oauth2-authorization>` for detailed documentation.\n\n\nNote: OAuth 2.0 server flow probably will not work in regular browser\nenvironment because main providers aren't setting CORS headers. Therefore the\nrequest will be canceled by the browser.\n\nTo make it work, handle the `oauth2-token-requested` fired from the inside of this element.\nIf it's browser flow type (implicit) then the `oauth2-authorization` element can be used.\nFor other other types, handle and cancel the event and use server to handle token exchange.\nThe ARC elements offers a [Chrome extension](https://github.com/advanced-rest-client/api-console-extension)\nthat once installed will propxy auth requests and made the exchange even for\nthe server flow. The application should use [api-console-ext-comm](https://github.com/advanced-rest-client/api-console-ext-comm)\nelement to communicate with the extension.\n\n#### `redirect-url` property for OAuth 2.0\n\nOAuth protocol requires to define a redirect URL that is registered in the\nOAuth provider. The redirect URL should point to a page that will pass the URL\nparameters to the opener page (OAuth 2 panel).\nIf you application uses the [oauth-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)\nelement then it provides a popup that pases the data back to the application.\nIn this case your redirect URL would be `https://your.domain.com/bower_components/oauth-authorization/oauth-popup.html`.\nUser have to change OAuth provider's settings and adjust the redirect URL to\npoint to this page.\n\nYou can also use the [oauth-popup.html](https://github.com/advanced-rest-client/oauth-authorization/blob/stage/oauth-popup.html)\nto build your own page.\n\n### OAuth 1.0a\n\nOauth 1a is not currently supported. However, it uses obsolite hashing\nalgorithms and should not be used.\n\n### Digest Authentication\n\nWhen the user provide all required information for Digest authorization then\nthis element will fire `request-header-changed` custom event which will do the\nsame thing as in case of Basic authentication.\n\n### Example\n\n```\n<authorization-panel redirect-url=\"http://domain.com/bower_components/oauth-authorization/oauth-popup.html\"></authorization-panel>\n```\n\n### Styling\n\n`<authorization-panel>` provides the following custom properties and mixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--authorization-panel` | Mixin applied to the element | `{}`\n`--arc-font-body1` | Theme mixin, Mixin applied to the elements that are containg text | `{}`\n`--empty-info` | Mixin applied to the element that renders no methods availability message | `{}`\n\nAlso check [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods)\nfor methods styling instructions.\n\n## Changes in version 2\n\n- Renamed properties:\n - `redirectUrl` -> `redirectUri`\n - `_restoreSettings()` is not `restore()` function\n- `auth-settings-changed` custom event is stopped from bubbling. Listen for\n`authorization-settings-changed` event instead.",
+      "summary": "",
+      "path": "authorization-panel.html",
+      "properties": [
+        {
+          "name": "eventsTarget",
+          "type": "Object",
+          "description": "Events handlers target. By default the element listens on\n`window` object. If set, all events listeners will be attached to this\nobject instead of `window`.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 73,
+              "column": 8
+            },
+            "end": {
+              "line": 76,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_eventsTargetChanged\""
+            }
+          },
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "_oldEventsTarget",
+          "type": "Object",
+          "description": "An event target used to attach listeners.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 78,
+              "column": 8
+            },
+            "end": {
+              "line": 78,
+              "column": 32
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          },
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "selected",
+          "type": "number",
+          "description": "Selected authorization type. It is one of the types supported by\n`advanced-rest-client/auth-methods` component.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 208,
+              "column": 8
+            },
+            "end": {
+              "line": 212,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "observer": "\"_selectedChanged\""
+            }
+          }
+        },
+        {
+          "name": "isSelected",
+          "type": "boolean",
+          "description": "Computed value. `true` when authorization method is selected.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 216,
+              "column": 8
+            },
+            "end": {
+              "line": 220,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "authRequired",
+          "type": "boolean",
+          "description": "Computed value from the AMF model.\nIf authorization is required by endpoint defined in the model,\nthen internally this property is set to `true`.\n\nIt can be `false` if `selected` is `none`, meaning RAML spec\nallows no authorization.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 229,
+              "column": 8
+            },
+            "end": {
+              "line": 233,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "authValid",
+          "type": "boolean",
+          "description": "Determines if the user propertly provided authorization data into the\nauthorization form.\n\nFor OAuth 1/2 authorization token must be set for this to be computed\nto `true`.\n\nThis property is only relevant when `authRequired` is set to true.\nThis status can be cancelled by setting `authRequired` to false.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 244,
+              "column": 8
+            },
+            "end": {
+              "line": 249,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "readOnly": true
+            }
+          },
+          "defaultValue": "true"
+        },
+        {
+          "name": "settings",
+          "type": "Object",
+          "description": "Current settings of selected auth type.\n\nCan be `undefined` if the user hasn't filled all required fields in the\nform.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 256,
+              "column": 8
+            },
+            "end": {
+              "line": 259,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true
+            }
+          }
+        },
+        {
+          "name": "securedBy",
+          "type": "Array",
+          "description": "Security definition for an endpoint in AMF json/ld model.\nIt is `http://raml.org/vocabularies/security#security`\nproperty of the `http://www.w3.org/ns/hydra/core#supportedOperation`\nproperty of an endpoint.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 266,
+              "column": 8
+            },
+            "end": {
+              "line": 269,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_securedByChanged\""
+            }
+          }
+        },
+        {
+          "name": "redirectUri",
+          "type": "boolean",
+          "description": "The OAuth2 redirect URL to be set in the OAuth2 form pane.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 273,
+              "column": 8
+            },
+            "end": {
+              "line": 276,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_redirectUriChanged\""
+            }
+          }
+        },
+        {
+          "name": "authMethods",
+          "type": "Array",
+          "description": "List of currently rendered authorization methods.\nThis value changes when `securedBy` changes to reflect number of\nauthorization methods supported by current endpoint.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 282,
+              "column": 8
+            },
+            "end": {
+              "line": 282,
+              "column": 26
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        },
+        {
+          "name": "hasAuthMethods",
+          "type": "boolean",
+          "description": "Computed value, `true` if any method is rendered.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 286,
+              "column": 8
+            },
+            "end": {
+              "line": 290,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "noSteps",
+          "type": "boolean",
+          "description": "If true then the numbered steps aren't rendered.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 294,
+              "column": 8
+            },
+            "end": {
+              "line": 298,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_nostepChanged\""
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "customSchemes",
+          "type": "Array",
+          "description": "List of currently available custom security schemes declared in\nthe AMF",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 303,
+              "column": 8
+            },
+            "end": {
+              "line": 303,
+              "column": 28
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        },
+        {
+          "name": "renderSelector",
+          "type": "boolean",
+          "description": "Computed value. If true then type selector is not rendered.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 307,
+              "column": 8
+            },
+            "end": {
+              "line": 311,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true
+            }
+          },
+          "defaultValue": "true"
+        },
+        {
+          "name": "noink",
+          "type": "boolean",
+          "description": "If true then the ripple effect on step title is disabled.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 313,
+              "column": 8
+            },
+            "end": {
+              "line": 316,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_noinkChanged\""
+            }
+          }
+        },
+        {
+          "name": "httpMethod",
+          "type": "string",
+          "description": "Current HTTP method. Passed to digest method.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 318,
+              "column": 8
+            },
+            "end": {
+              "line": 321,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_requestMethodChanged\""
+            }
+          }
+        },
+        {
+          "name": "requestUrl",
+          "type": "string",
+          "description": "Current request URL. Passed to digest method.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 323,
+              "column": 8
+            },
+            "end": {
+              "line": 326,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_requestUrlChanged\""
+            }
+          }
+        },
+        {
+          "name": "requestBody",
+          "type": "string",
+          "description": "Current request body. Passed to digest method.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 328,
+              "column": 8
+            },
+            "end": {
+              "line": 331,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "observer": "\"_requestBodyChanged\""
+            }
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 81,
+              "column": 4
+            },
+            "end": {
+              "line": 84,
+              "column": 6
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "disconnectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 86,
+              "column": 5
+            },
+            "end": {
+              "line": 91,
+              "column": 6
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "_eventsTargetChanged",
+          "description": "Removes old handlers (if any) and attaches listeners on new event\nevent target.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 99,
+              "column": 4
+            },
+            "end": {
+              "line": 105,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "eventsTarget",
+              "type": "?Node",
+              "description": "Event target to set handlers on. If not set it\nwill set handlers on the `window` object."
+            }
+          ],
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "_attachListeners",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 388,
+              "column": 4
+            },
+            "end": {
+              "line": 391,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_detachListeners",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 393,
+              "column": 4
+            },
+            "end": {
+              "line": 396,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "ready",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 398,
+              "column": 4
+            },
+            "end": {
+              "line": 406,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "clear",
+          "description": "Clears the state of the panel.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 410,
+              "column": 4
+            },
+            "end": {
+              "line": 413,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_selectedChanged",
+          "description": "Replaces active panel with new one and dipatches\n`authorization-type-changed` event.\n\nIf the event is canceled it restores previous value in the selector.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 421,
+              "column": 4
+            },
+            "end": {
+              "line": 439,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected"
+            },
+            {
+              "name": "oldValue"
+            }
+          ]
+        },
+        {
+          "name": "__notifySelectionChanged",
+          "description": "Dispatches `authorization-type-changed`.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 446,
+              "column": 4
+            },
+            "end": {
+              "line": 453,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "String",
+              "description": "Current selection of the auth method"
+            }
+          ],
+          "return": {
+            "type": "Boolean",
+            "desc": "Whether selectoin was cancelled."
+          }
+        },
+        {
+          "name": "__removeExistingPanel",
+          "description": "Removes any existing authorization panel from local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 457,
+              "column": 4
+            },
+            "end": {
+              "line": 471,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "__createAuthPanel",
+          "description": "Creates an authorization panel described as a `selected`.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 477,
+              "column": 4
+            },
+            "end": {
+              "line": 488,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "Object",
+              "description": "Model from `authMethods`"
+            }
+          ]
+        },
+        {
+          "name": "__addCommonProperties",
+          "description": "Adds shared properties for all panels.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 495,
+              "column": 4
+            },
+            "end": {
+              "line": 501,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "panel",
+              "type": "HTMLElement"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "Authorization type."
+            }
+          ]
+        },
+        {
+          "name": "__createBasicAuth",
+          "description": "Creates instance of Basic auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 505,
+              "column": 4
+            },
+            "end": {
+              "line": 509,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "__createDigestAuth",
+          "description": "Creates instance of Digest auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 513,
+              "column": 4
+            },
+            "end": {
+              "line": 520,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "__createNtlmAuth",
+          "description": "Creates instance of NTLM auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 524,
+              "column": 4
+            },
+            "end": {
+              "line": 528,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "__createOAuth1Auth",
+          "description": "Creates instance of OAuth1 auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 534,
+              "column": 4
+            },
+            "end": {
+              "line": 540,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "Object",
+              "description": "Selected item from `authMethods`"
+            }
+          ]
+        },
+        {
+          "name": "__createOAuth2Auth",
+          "description": "Creates instance of OAuth2 auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 546,
+              "column": 4
+            },
+            "end": {
+              "line": 552,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "Object",
+              "description": "Selected item from `authMethods`"
+            }
+          ]
+        },
+        {
+          "name": "__createCustomAuth",
+          "description": "Creates instance of custom auth panel and adds it to local DOM.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 558,
+              "column": 4
+            },
+            "end": {
+              "line": 563,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "Object",
+              "description": "Selected item from `authMethods`"
+            }
+          ]
+        },
+        {
+          "name": "__createUnsupportedAuth",
+          "description": "Creates \"unsuppoerted method\" panel.",
+          "privacy": "private",
+          "sourceRange": {
+            "start": {
+              "line": 569,
+              "column": 4
+            },
+            "end": {
+              "line": 577,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "Object",
+              "description": "Selected item from `authMethods`"
+            }
+          ]
+        },
+        {
+          "name": "_computeAmfSettings",
+          "description": "Searches for AMF security description in the AMF model.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 585,
+              "column": 4
+            },
+            "end": {
+              "line": 607,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "type",
+              "type": "String",
+              "description": "Security scheme type as defined in RAML spec."
+            },
+            {
+              "name": "name",
+              "type": "?String",
+              "description": "Display name of the security scheme"
+            }
+          ],
+          "return": {
+            "type": "[type]",
+            "desc": "[description]"
+          }
+        },
+        {
+          "name": "_nostepChanged",
+          "description": "Updates `noSteps` property on current panel.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 613,
+              "column": 4
+            },
+            "end": {
+              "line": 619,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "value",
+              "type": "String",
+              "description": "New value to set"
+            }
+          ]
+        },
+        {
+          "name": "_passEventsTarget",
+          "description": "Updates events target property on current panel.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 625,
+              "column": 4
+            },
+            "end": {
+              "line": 631,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "target",
+              "type": "HTMLElement",
+              "description": "New target"
+            }
+          ]
+        },
+        {
+          "name": "_noinkChanged",
+          "description": "Updates `noink` property on panels.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 637,
+              "column": 4
+            },
+            "end": {
+              "line": 643,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "value",
+              "type": "Boolean",
+              "description": "Current value."
+            }
+          ]
+        },
+        {
+          "name": "_redirectUriChanged",
+          "description": "Updates `redirectUri` property on oauth panels.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 649,
+              "column": 4
+            },
+            "end": {
+              "line": 659,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "uri"
+            }
+          ]
+        },
+        {
+          "name": "_requestMethodChanged",
+          "description": "Updates `httpMethod` property on Digest panel.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 665,
+              "column": 4
+            },
+            "end": {
+              "line": 675,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "method",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "name": "_requestUrlChanged",
+          "description": "Updates `requestUrl` property on Digest panel.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 681,
+              "column": 4
+            },
+            "end": {
+              "line": 691,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "name": "_requestBodyChanged",
+          "description": "Updates `requestBody` property on Digest panel.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 697,
+              "column": 4
+            },
+            "end": {
+              "line": 707,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "body",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "name": "_listAuthMethods",
+          "description": "Lists available authorization methods.\nBy default it returns list from `supportedMethods` property which is the\nlist of all supported methods by this element.\nIf `iron-meta` element with key `auth-methods` is set then it will use\nthis information to compute list of auth methods.\nSee element description for more information.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 718,
+              "column": 4
+            },
+            "end": {
+              "line": 724,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "Array.<Object>",
+            "desc": "See `supportedMethods` property for data model."
+          }
+        },
+        {
+          "name": "_listMetaAuthMethods",
+          "description": "Creates a listing of methods from `iron-meta` definition.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 731,
+              "column": 4
+            },
+            "end": {
+              "line": 783,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "(Array | undefined)",
+            "desc": "List of methods defined in `iron-meta`\nor undefined if not set."
+          }
+        },
+        {
+          "name": "_updateValidationState",
+          "description": "Updates validation state for the selected form.\nWhen element is initializing and RAML's `securedBy` property is set\nduring the initialization time, events with settings are fired before the form\nis ready.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 790,
+              "column": 4
+            },
+            "end": {
+              "line": 812,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_authSettingsHandler",
+          "description": "Handler for `auth-settings-changed` custom event.\nSets up `settings` property from the event.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 820,
+              "column": 4
+            },
+            "end": {
+              "line": 825,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ]
+        },
+        {
+          "name": "_authSettingsUpdated",
+          "description": "Notifies about changes to authorization settings object.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 829,
+              "column": 4
+            },
+            "end": {
+              "line": 845,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "record"
+            }
+          ]
+        },
+        {
+          "name": "restore",
+          "description": "Restores settings to a panel including selection and data.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 853,
+              "column": 4
+            },
+            "end": {
+              "line": 866,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "settings",
+              "type": "Object",
+              "description": "The same settings object as dispatched in\n`detail` object from this element."
+            }
+          ]
+        },
+        {
+          "name": "_notifySettings",
+          "description": "Notifies settings change if currently selected method is the same as\n`settings.type`.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 873,
+              "column": 4
+            },
+            "end": {
+              "line": 884,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "settings",
+              "type": "Object",
+              "description": "Authorization settings to notify."
+            }
+          ]
+        },
+        {
+          "name": "_securedByChanged",
+          "description": "A handler called when the `securedBy` property changes.\nIt sets up the list of available auth methods",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 889,
+              "column": 4
+            },
+            "end": {
+              "line": 939,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "secured"
+            }
+          ]
+        },
+        {
+          "name": "_getAmfValue",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 944,
+              "column": 4
+            },
+            "end": {
+              "line": 950,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "model",
+              "type": "Object",
+              "description": "Amf model"
+            }
+          ],
+          "return": {
+            "type": "(String | undefined)",
+            "desc": "Value for the model."
+          }
+        },
+        {
+          "name": "_modelHasType",
+          "description": "Checks if a model has a type.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 957,
+              "column": 4
+            },
+            "end": {
+              "line": 961,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "model",
+              "type": "Object",
+              "description": "Model to test"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "Type name"
+            }
+          ],
+          "return": {
+            "type": "Boolean",
+            "desc": "True if model has a type."
+          }
+        },
+        {
+          "name": "_computeIsSelected",
+          "description": "Computes value for `isSelected` property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 963,
+              "column": 4
+            },
+            "end": {
+              "line": 965,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected"
+            }
+          ]
+        },
+        {
+          "name": "_computeSelectedLabel",
+          "description": "Computes label for step title.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 971,
+              "column": 4
+            },
+            "end": {
+              "line": 977,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selected",
+              "type": "String",
+              "description": "ID of selected method."
+            }
+          ],
+          "return": {
+            "type": "String",
+            "desc": "Label for selection."
+          }
+        },
+        {
+          "name": "_clearSelection",
+          "description": "Resets `selected` property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 979,
+              "column": 4
+            },
+            "end": {
+              "line": 984,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_computeAuthValid",
+          "description": "Computes value for the `authValid` property.\nAuthorization is valid when form panel reports it is valid and\nan auth method is selected.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 994,
+              "column": 4
+            },
+            "end": {
+              "line": 1005,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "formValid",
+              "type": "Boolean",
+              "description": "Reported state"
+            },
+            {
+              "name": "selected",
+              "type": "String",
+              "description": "Selected auth method"
+            },
+            {
+              "name": "authRequired"
+            }
+          ],
+          "return": {
+            "type": "Boolean",
+            "desc": "True if is valid and selected"
+          }
+        },
+        {
+          "name": "_onAuthSettingsChanged",
+          "description": "Rstores authorization settings if event is external.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1009,
+              "column": 4
+            },
+            "end": {
+              "line": 1014,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e"
+            }
+          ]
+        },
+        {
+          "name": "_processPanelSettings",
+          "description": "Processes incomming settings and acts if any action needed to authorize\nthe use has to be performed.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1021,
+              "column": 4
+            },
+            "end": {
+              "line": 1026,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "settings",
+              "type": "Object",
+              "description": "Current settings."
+            }
+          ]
+        },
+        {
+          "name": "_handleOauth2Settings",
+          "description": "Handles the case when OAuth2 settings changed.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1032,
+              "column": 4
+            },
+            "end": {
+              "line": 1055,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "settings",
+              "type": "Object",
+              "description": "Oauth2 auth settings object"
+            }
+          ]
+        },
+        {
+          "name": "_handleDigestSettings",
+          "description": "Handles the case when digest auth method settings changed.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1064,
+              "column": 4
+            },
+            "end": {
+              "line": 1090,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "settings",
+              "type": "Object",
+              "description": "Digest auth method settings object\nIt can be either username and password (that will be passed to\ntransport method) then this function do nothing or list of Authorization\nheader parameters."
+            }
+          ]
+        },
+        {
+          "name": "fire",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 1092,
+              "column": 4
+            },
+            "end": {
+              "line": 1107,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "type"
+            },
+            {
+              "name": "detail"
+            },
+            {
+              "name": "options"
+            }
+          ]
+        },
+        {
+          "name": "forceTokenAuthorization",
+          "description": "If selected authorization type is `oauth1` or `oauth2` it calls\n`authorize()` function of selected panel.\nIf other method is selected it does nothing.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 1113,
+              "column": 4
+            },
+            "end": {
+              "line": 1124,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_computeHasAuthMethods",
+          "description": "Computes value for `hasAuthMethods` property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1131,
+              "column": 4
+            },
+            "end": {
+              "line": 1133,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "authMethods",
+              "type": "Array",
+              "description": "List of current methods."
+            }
+          ],
+          "return": {
+            "type": "Boolean",
+            "desc": "True if at leas one methos is available to select."
+          }
+        },
+        {
+          "name": "_analyticsEvent",
+          "description": "Dispatches analytics event.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 1141,
+              "column": 4
+            },
+            "end": {
+              "line": 1153,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "category",
+              "type": "String",
+              "description": "Event category"
+            },
+            {
+              "name": "action",
+              "type": "String",
+              "description": "Event action"
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "description": "Event label"
+            }
+          ]
+        }
+      ],
+      "staticMethods": [],
+      "demos": [
+        {
+          "url": "demo/basic.html",
+          "description": "Basic element"
+        },
+        {
+          "url": "demo/meta-data.html",
+          "description": "IronMeta defined methods"
+        },
+        {
+          "url": "demo/amf.html",
+          "description": "RAML or OAS data from AMF model"
+        },
+        {
+          "url": "demo/amf-meta.html",
+          "description": "RAML or OAS data from AMF model and IronMeta"
+        }
+      ],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 200,
+          "column": 2
+        },
+        "end": {
+          "line": 1192,
+          "column": 3
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "UiElements.AuthorizationPanel",
+      "attributes": [
+        {
+          "name": "events-target",
+          "description": "Events handlers target. By default the element listens on\n`window` object. If set, all events listeners will be attached to this\nobject instead of `window`.",
+          "sourceRange": {
+            "file": "bower_components/events-target-behavior/events-target-behavior.html",
+            "start": {
+              "line": 73,
+              "column": 8
+            },
+            "end": {
+              "line": 76,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "Object",
+          "inheritedFrom": "ArcBehaviors.EventsTargetBehavior"
+        },
+        {
+          "name": "selected",
+          "description": "Selected authorization type. It is one of the types supported by\n`advanced-rest-client/auth-methods` component.",
+          "sourceRange": {
+            "start": {
+              "line": 208,
+              "column": 8
+            },
+            "end": {
+              "line": 212,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "number"
+        },
+        {
+          "name": "is-selected",
+          "description": "Computed value. `true` when authorization method is selected.",
+          "sourceRange": {
+            "start": {
+              "line": 216,
+              "column": 8
+            },
+            "end": {
+              "line": 220,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "auth-required",
+          "description": "Computed value from the AMF model.\nIf authorization is required by endpoint defined in the model,\nthen internally this property is set to `true`.\n\nIt can be `false` if `selected` is `none`, meaning RAML spec\nallows no authorization.",
+          "sourceRange": {
+            "start": {
+              "line": 229,
+              "column": 8
+            },
+            "end": {
+              "line": 233,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "auth-valid",
+          "description": "Determines if the user propertly provided authorization data into the\nauthorization form.\n\nFor OAuth 1/2 authorization token must be set for this to be computed\nto `true`.\n\nThis property is only relevant when `authRequired` is set to true.\nThis status can be cancelled by setting `authRequired` to false.",
+          "sourceRange": {
+            "start": {
+              "line": 244,
+              "column": 8
+            },
+            "end": {
+              "line": 249,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "settings",
+          "description": "Current settings of selected auth type.\n\nCan be `undefined` if the user hasn't filled all required fields in the\nform.",
+          "sourceRange": {
+            "start": {
+              "line": 256,
+              "column": 8
+            },
+            "end": {
+              "line": 259,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        },
+        {
+          "name": "secured-by",
+          "description": "Security definition for an endpoint in AMF json/ld model.\nIt is `http://raml.org/vocabularies/security#security`\nproperty of the `http://www.w3.org/ns/hydra/core#supportedOperation`\nproperty of an endpoint.",
+          "sourceRange": {
+            "start": {
+              "line": 266,
+              "column": 8
+            },
+            "end": {
+              "line": 269,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "Array"
+        },
+        {
+          "name": "redirect-uri",
+          "description": "The OAuth2 redirect URL to be set in the OAuth2 form pane.",
+          "sourceRange": {
+            "start": {
+              "line": 273,
+              "column": 8
+            },
+            "end": {
+              "line": 276,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "auth-methods",
+          "description": "List of currently rendered authorization methods.\nThis value changes when `securedBy` changes to reflect number of\nauthorization methods supported by current endpoint.",
+          "sourceRange": {
+            "start": {
+              "line": 282,
+              "column": 8
+            },
+            "end": {
+              "line": 282,
+              "column": 26
+            }
+          },
+          "metadata": {},
+          "type": "Array"
+        },
+        {
+          "name": "has-auth-methods",
+          "description": "Computed value, `true` if any method is rendered.",
+          "sourceRange": {
+            "start": {
+              "line": 286,
+              "column": 8
+            },
+            "end": {
+              "line": 290,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "no-steps",
+          "description": "If true then the numbered steps aren't rendered.",
+          "sourceRange": {
+            "start": {
+              "line": 294,
+              "column": 8
+            },
+            "end": {
+              "line": 298,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "custom-schemes",
+          "description": "List of currently available custom security schemes declared in\nthe AMF",
+          "sourceRange": {
+            "start": {
+              "line": 303,
+              "column": 8
+            },
+            "end": {
+              "line": 303,
+              "column": 28
+            }
+          },
+          "metadata": {},
+          "type": "Array"
+        },
+        {
+          "name": "render-selector",
+          "description": "Computed value. If true then type selector is not rendered.",
+          "sourceRange": {
+            "start": {
+              "line": 307,
+              "column": 8
+            },
+            "end": {
+              "line": 311,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "noink",
+          "description": "If true then the ripple effect on step title is disabled.",
+          "sourceRange": {
+            "start": {
+              "line": 313,
+              "column": 8
+            },
+            "end": {
+              "line": 316,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean"
+        },
+        {
+          "name": "http-method",
+          "description": "Current HTTP method. Passed to digest method.",
+          "sourceRange": {
+            "start": {
+              "line": 318,
+              "column": 8
+            },
+            "end": {
+              "line": 321,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        },
+        {
+          "name": "request-url",
+          "description": "Current request URL. Passed to digest method.",
+          "sourceRange": {
+            "start": {
+              "line": 323,
+              "column": 8
+            },
+            "end": {
+              "line": 326,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        },
+        {
+          "name": "request-body",
+          "description": "Current request body. Passed to digest method.",
+          "sourceRange": {
+            "start": {
+              "line": 328,
+              "column": 8
+            },
+            "end": {
+              "line": 331,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "authorization-settings-changed",
+          "description": "authorization-settings-changed",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "authorization-type-changed",
+          "description": "authorization-type-changed",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "query-parameter-changed",
+          "description": "query-parameter-changed",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "request-header-changed",
+          "description": "request-header-changed",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "selected-changed",
+          "description": "Fired when the `selected` property changes.",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "auth-required-changed",
+          "description": "Fired when the `authRequired` property changes.",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "auth-valid-changed",
+          "description": "Fired when the `authValid` property changes.",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "settings-changed",
+          "description": "Fired when the `settings` property changes.",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "authorization-panel",
+      "mixins": [
+        "ArcBehaviors.EventsTargetBehavior"
+      ]
+    }
+  ]
+}
