@@ -26,15 +26,11 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.3",
-    "iron-pages": "PolymerElements/iron-pages#^2.1.0",
     "auth-methods": "advanced-rest-client/auth-methods#3.0.0-preview",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.3",
     "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
     "paper-item": "PolymerElements/paper-item#^2.1.0",
-    "iron-collapse": "PolymerElements/iron-collapse#^2.2.0",
     "paper-ripple": "PolymerElements/paper-ripple#^2.1.0",
-    "arc-icons": "advanced-rest-client/arc-icons#^2.0.0",
-    "iron-icon": "PolymerElements/iron-icon#^2.1.0",
     "events-target-behavior": "advanced-rest-client/events-target-behavior#^2.0.0"
   },
   "devDependencies": {
@@ -43,7 +39,9 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "iron-test-helpers": "PolymerElements/iron-test-helpers#^2.0.0",
     "iron-component-page": "^3.0.1",
-    "oauth-authorization": "advanced-rest-client/oauth-authorization#^2.0.1"
+    "oauth-authorization": "advanced-rest-client/oauth-authorization#^2.0.1",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0",
+    "cryptojs-lib": "advanced-rest-client/cryptojs-lib#^0.1.1"
   },
   "ignore": [
     "**/.*",

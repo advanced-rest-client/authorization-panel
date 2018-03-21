@@ -17,26 +17,24 @@ the License.
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-
   <title>authorization-panel demo</title>
-
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../../oauth-authorization/oauth2-authorization.html">
   <link rel="import" href="../../oauth-authorization/oauth1-authorization.html">
-  <link rel="import" href="../../iron-meta/iron-meta.html">
+  <link rel="import" href="../../paper-toggle-button/paper-toggle-button.html">
   <link rel="import" href="../authorization-panel.html">
-
-  <style is="custom-style" include="demo-pages-shared-styles">
-
+  <link rel="import" href="../../iron-meta/iron-meta.html">
+  <link rel="import" href="../../cryptojs-lib/cryptojs-lib.html">
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
     :root {
-      --arc-font-body1: {
-        @apply(--paper-font-body1);
-      }
       --accent-color: #FF5040;
+      --arc-font-body1: {
+        @apply --paper-font-body1;
+      };
     }
 
     .vertical-section-container {
@@ -53,8 +51,8 @@ the License.
     #settings {
       margin-top: 40px;
     }
-
-  </style>
+    </style>
+  </custom-style>
 </head>
 <body unresolved>
   <div class="vertical-section-container centered">
@@ -62,39 +60,50 @@ the License.
     <demo-snippet>
       <template>
         <iron-meta key="auth-methods" value='[null, "basic", "oauth1", "oauth2"]'></iron-meta>
-        <authorization-panel></authorization-panel>
+        <authorization-panel id="auth"></authorization-panel>
         <oauth2-authorization></oauth2-authorization>
         <oauth1-authorization></oauth1-authorization>
-
+        <paper-toggle-button id="toggle">Hide steps</paper-toggle-button>
         <output id="settings"></output>
         <output id="state"></output>
-
-        <script>
-          var redirectUrl = location.href.replace(/authorization-panel\/demo\/(basic\.html)?/,
-            'oauth-authorization/oauth-popup.html');
-
-          var panel = document.querySelector('authorization-panel');
-          panel.redirectUrl = redirectUrl;
-          panel.addEventListener('authorization-settings-changed', function(e) {
-            var data = e.detail;
-            var output = document.querySelector('#settings');
-            if (!data.settings) {
-              output.innerHTML = '';
-            } else {
-              var txt = 'Authorization type: ' + data.type + '\n\n';
-              txt += JSON.stringify(data.settings, null, 2);
-              output.innerHTML = txt;
-            }
-          });
-
-          panel.addEventListener('authorization-type-changed', function(e) {
-            var type = e.detail.type;
-            var output = document.querySelector('#state');
-            output.innerHTML += 'Selected ' + type + ' authorization method\n';
-          });
-        </script>
       </template>
     </demo-snippet>
   </div>
+  <script>
+  (function() {
+    const AuthDemo = {
+      init: () => {
+        const redirectUri = location.href.replace(/authorization-panel\/demo\/(basic\.html)?/,
+          'oauth-authorization/oauth-popup.html');
+        AuthDemo.auth = document.getElementById('auth');
+        AuthDemo.settings = document.getElementById('settings');
+        AuthDemo.state = document.getElementById('state');
+        document.getElementById('toggle').addEventListener('checked-changed', () => AuthDemo.toggleNoStep());
+        AuthDemo.auth.addEventListener('authorization-settings-changed', AuthDemo.settingsChanged);
+        AuthDemo.auth.addEventListener('authorization-type-changed', AuthDemo.typeChanged);
+        AuthDemo.auth.redirectUri = redirectUri;
+      },
+      settingsChanged: function(e) {
+        const data = e.detail;
+        let txt = 'Authorization type: ';
+        if (!data.settings) {
+          txt += 'none.';
+        } else {
+          txt += data.type + '\n\n';
+          txt += JSON.stringify(data.settings, null, 1);
+        }
+        AuthDemo.settings.innerHTML = txt;
+      },
+      typeChanged: function(e) {
+        const type = e.detail.type;
+        AuthDemo.state.innerHTML = `Selected ${type} authorization method`;
+      },
+      toggleNoStep: function() {
+        AuthDemo.auth.noSteps = !AuthDemo.auth.noSteps;
+      }
+    };
+    window.addEventListener('WebComponentsReady', () => AuthDemo.init());
+  })();
+  </script>
 </body>
 </html>

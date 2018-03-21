@@ -12,15 +12,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
-
     <test-fixture id="basic">
       <template>
         <authorization-panel selected="basic"></authorization-panel>
@@ -28,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert, TestHelpers */
+    /* global TestHelpers */
     suite('basic-auth-method-test', function() {
       var element;
       setup(function() {
