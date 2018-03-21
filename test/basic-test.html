@@ -35,81 +35,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
     /* global fixture, assert, TestHelpers, MockInteractions */
-    suite('basic', function() {
-      var element;
-      setup(function() {
+    suite('basic', () => {
+
+      let element;
+      setup((done) => {
         element = fixture('basic');
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
       });
 
-      test('`settings` is undefined', function() {
+      test('`settings` is undefined', () => {
         assert.isUndefined(element.settings);
       });
 
-      test('Computes hasAuthMethods property', function() {
+      test('Computes hasAuthMethods property', () => {
         assert.isTrue(element.hasAuthMethods);
       });
 
-      test('Does not compute empty message', function() {
-        TestHelpers.forceXIfStamp(element);
-        var message = element.$$('.no-method-info');
-        assert.notOk(message);
+      test('Empty message is hidden', () => {
+        const node = element.shadowRoot.querySelector('.no-method-info');
+        const display = getComputedStyle(node).display;
+        assert.equal(display, 'none');
       });
 
-      test('No `selected` by default', function() {
+      test('No `selected` by default', () => {
         assert.isUndefined(element.selected, 'selected is undefined');
         assert.isFalse(element.isSelected, 'isSelected is false');
       });
 
-      test('Displays all available methods', function() {
+      test('Displays all available methods', () => {
         assert.deepEqual(element.authMethods, element.supportedMethods);
       });
 
-      test('Should not be required', function() {
+      test('Should not be required', () => {
         assert.isFalse(element.authRequired);
       });
 
-      test('Should be valid', function() {
+      test('Should be valid', () => {
         assert.isTrue(element.authValid);
       });
 
-      test('isSelected is computed', function() {
+      test('isSelected is computed', () => {
         element.selected = 'basic';
         assert.isTrue(element.isSelected);
       });
 
-      test('noSteps is false by default', function() {
+      test('noSteps is false by default', () => {
         assert.isFalse(element.noSteps);
       });
 
-      test('tap on selection title clears the selection', function() {
-        element.selected = 'basic';
-        TestHelpers.forceXIfStamp(element);
-        var stepper = element.$$('.stepper');
-        MockInteractions.tap(stepper);
-        assert.equal(element.selected, '');
-      });
-    });
-
-    suite('Steps', function() {
-      var element;
-      setup(function() {
-        element = fixture('noSteps');
-        TestHelpers.forceXIfStamp(element);
-      });
-
-      test('Steps are not rendered for noSteps', function() {
-        var stepper = element.$$('.stepper');
-        assert.notOk(stepper);
-      });
-
-      test('Steps are rendered without noSteps', function() {
-        element.noSteps = false;
-        TestHelpers.forceXIfStamp(element);
-        var stepper = element.$$('.stepper');
-        assert.ok(stepper);
+      test('tap on selection title clears the selection', (done) => {
+        element.selected = 1;
+        flush(() => {
+          let stepper = element.shadowRoot.querySelector('span[slot="inactive-title"]');
+          MockInteractions.tap(stepper);
+          assert.equal(element.selected, -1);
+          done();
+        });
       });
     });
     </script>
-
   </body>
 </html>

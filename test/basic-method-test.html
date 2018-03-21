@@ -24,21 +24,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global TestHelpers */
-    suite('basic-auth-method-test', function() {
-      var element;
-      setup(function() {
+    suite('basic-auth-method-test', () => {
+      let element;
+      setup((done) => {
         element = fixture('basic');
-        element.selected = 'basic';
-        TestHelpers.forceXIfStamp(element);
+        element.selected = 1;
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
       });
 
-      test('Displays all available methods', function() {
+      test('Displays all available methods', () => {
         assert.deepEqual(element.authMethods, element.supportedMethods);
       });
 
-      test('Is not required', function() {
+      test('Is not required', () => {
         assert.isFalse(element.authRequired);
+      });
+
+      test('Basic panel is rendered', () => {
+        const panel = element.currentPanel;
+        assert.equal(panel.nodeName, 'AUTH-METHOD-BASIC');
       });
 
       test('Panel is invaild when data are not provided', function(done) {
@@ -47,15 +53,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           assert.isFalse(e.detail.valid);
           done();
         });
+        const panel = element.shadowRoot.querySelector('auth-method-basic');
+        panel.password = 'test';
       });
 
       test('Should fire `request-header-changed` event', function(done) {
-        var basicPanel = Polymer.dom(element.root).querySelector('auth-method-basic');
         element.addEventListener('request-header-changed', function clb() {
           element.removeEventListener('request-header-changed', clb);
           done();
         });
-        basicPanel.username = 'test';
+        const panel = element.shadowRoot.querySelector('auth-method-basic');
+        panel.username = 'test';
       });
     });
     </script>

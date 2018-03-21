@@ -401,6 +401,7 @@ the License.
         if (!this.authMethods) {
           this.set('authMethods', this._listAuthMethods());
         }
+        this._selectedChanged(this.selected, this.selected);
         this._updateValidationState();
       });
     }
@@ -419,11 +420,16 @@ the License.
      * If the event is canceled it restores previous value in the selector.
      */
     _selectedChanged(selected, oldValue) {
-      if (selected === -1) {
-        this.__removeExistingPanel();
+      const methods = this.authMethods;
+      if (!methods) {
         return;
       }
-      const item = this.authMethods[selected];
+      if (selected === -1) {
+        this.__removeExistingPanel();
+        this._notifySettings(undefined, methods[oldValue]);
+        return;
+      }
+      const item = methods[selected];
       if (!item) {
         return;
       }
@@ -476,15 +482,20 @@ the License.
      */
     __createAuthPanel(selected) {
       switch(selected.type) {
-        case 'none': return;
-        case 'Basic Authentication': return this.__createBasicAuth();
-        case 'Digest Authentication': return this.__createDigestAuth();
-        case 'ntlm': return this.__createNtlmAuth();
-        case 'OAuth 1.0': return this.__createOAuth1Auth(selected);
-        case 'OAuth 2.0': return this.__createOAuth2Auth(selected);
-        case 'x-custom':  return this.__createCustomAuth(selected);
-        default: return this.__createUnsupportedAuth(selected);
+        case 'none': break;
+        case 'Basic Authentication': this.__createBasicAuth(); break;
+        case 'Digest Authentication': this.__createDigestAuth(); break;
+        case 'ntlm': this.__createNtlmAuth(); break;
+        case 'OAuth 1.0': this.__createOAuth1Auth(selected); break;
+        case 'OAuth 2.0': this.__createOAuth2Auth(selected); break;
+        case 'x-custom': this.__createCustomAuth(selected); break;
+        default: this.__createUnsupportedAuth(selected); break;
       }
+      Polymer.RenderStatus.afterNextRender(this, () => {
+        const panel = this.currentPanel;
+        const settings = panel ? panel.getSettings() : undefined;
+        this._notifySettings(settings);
+      });
     }
     /**
      * Adds shared properties for all panels.
@@ -774,7 +785,6 @@ the License.
         if (name) {
           result.push({
             type: key,
-            id: key,
             name: name
           });
         }
@@ -869,13 +879,16 @@ the License.
      * `settings.type`.
      *
      * @param {Object} settings Authorization settings to notify.
+     * @param {Object} selected Selected model.
      */
-    _notifySettings(settings) {
-      const selected = this.authMethods && this.authMethods[this.selected];
+    _notifySettings(settings, selected) {
+      if (!selected) {
+        selected = this.authMethods && this.authMethods[this.selected];
+      }
       if (!selected) {
         return;
       }
-      const valid = settings ? settings.valid : (this.authVaid || false);
+      const valid = settings ? (settings.valid || false) : (this.authVaid || false);
       this.fire('authorization-settings-changed', {
         settings: settings,
         valid: valid,
@@ -920,15 +933,13 @@ the License.
 
         supported[supported.length] = {
           name: name,
-          type: type,
-          id: type + '|' + name
+          type: type
         };
       }
       if (hasNull) {
         supported.unshift({
           name: 'No authorization',
-          type: 'none',
-          id: 'none'
+          type: 'none'
         });
       }
       this.set('authMethods', supported);
@@ -969,7 +980,11 @@ the License.
      * @return {String} Label for selection.
      */
     _computeSelectedLabel(selected) {
-      const info = this.authMethods[selected];
+      const methods = this.authMethods;
+      if (!methods) {
+        return;
+      }
+      const info = methods[selected];
       if (!info) {
         return;
       }
