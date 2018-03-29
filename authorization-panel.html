@@ -493,7 +493,7 @@ the License.
       }
       Polymer.RenderStatus.afterNextRender(this, () => {
         const panel = this.currentPanel;
-        const settings = panel ? panel.getSettings() : undefined;
+        const settings = panel && panel.getSettings ? panel.getSettings() : undefined;
         this._notifySettings(settings);
       });
     }
@@ -609,7 +609,7 @@ the License.
           if (!name) {
             return item;
           }
-          const modelName = this._getAmfValue(item['http://schema.org/displayName']);
+          const modelName = this._getAmfValue(item[secPrefix + 'name']);
           if (modelName === name) {
             return item;
           }
