@@ -99,6 +99,9 @@
         <authorization-panel no-steps="[[noSteps]]" redirect-uri="[[redirectUri]]" on-selected-changed="_selectedChanged" auth-required="{{authRequired}}" auth-valid="{{authValid}}" secured-by="[[securedBy]]"></authorization-panel>
         <oauth2-authorization></oauth2-authorization>
         <oauth1-authorization></oauth1-authorization>
+      </section>
+
+      <output class="vertical-section-container centered">
         <template is="dom-if" if="[[authRequired]]">
           <p>Authorization is <b>required</b> for this endpoint.</p>
         </template>
@@ -113,7 +116,7 @@
         </template>
         <output id="settings">[[settings]]</output>
         <output id="state">[[state]]</output>
-      </section>
+      </output>
 
       <fieldset role="form" class="centered">
         <legend>Events based API</legend>
