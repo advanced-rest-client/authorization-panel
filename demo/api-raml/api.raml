@@ -212,3 +212,6 @@ securitySchemes:
 /combo:
   get:
     securedBy: [null, basic, digest, pass, oauth1, oauth2Normal, custom1, custom2]
+/custom-only:
+  get:
+    securedBy: [custom1, custom2]

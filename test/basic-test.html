@@ -15,8 +15,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
@@ -33,8 +31,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="PassedProperties">
+      <template>
+        <authorization-panel no-steps noink></authorization-panel>
+      </template>
+    </test-fixture>
+
     <script>
-    /* global fixture, assert, TestHelpers, MockInteractions */
+    /* global fixture, assert */
     suite('basic', () => {
 
       let element;
@@ -83,6 +87,124 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       test('noSteps is false by default', () => {
         assert.isFalse(element.noSteps);
+      });
+    });
+
+    ['basic', 'digest', 'ntlm', 'oauth1', 'oauth2', 'custom'].forEach((type) => {
+      const upperNameFirst = type[0].toLocaleUpperCase() + type.substr(1);
+      const upperName = type.toLocaleUpperCase();
+      const fnName = `__create${upperNameFirst}Auth`;
+      const settings = {
+        type: type,
+        name: type
+      };
+      suite(`${fnName}()`, () => {
+        let element;
+        setup((done) => {
+          element = fixture('PassedProperties');
+          Polymer.RenderStatus.afterNextRender(this, () => {
+            flush(() => done());
+          });
+        });
+
+        test('Adds panel to shadow DOM', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}`);
+          assert.ok(panel);
+        });
+
+        test(`currentPanel returns ${type} panel`, () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.equal(panel.nodeName, 'AUTH-METHOD-' + upperName);
+        });
+
+        test('panel has eventsTarget', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel._oldEventsTarget === element._oldEventsTarget);
+        });
+
+        test('Add has data-auth-panel attribute', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}[data-auth-panel]`);
+          assert.ok(panel);
+        });
+
+        test('Add has data-type attribute', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}[data-type="${type}"]`);
+          assert.ok(panel);
+        });
+
+        test('noSteps is set', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel.noSteps);
+        });
+
+        test('noink is set', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel.noink);
+        });
+
+        test('__removeExistingPanel removes the panel from shadow DOM', () => {
+          element[fnName](settings);
+          element.__removeExistingPanel();
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}`);
+          assert.notOk(panel);
+        });
+
+        test('Updates noink when changes', () => {
+          element[fnName](settings);
+          element.noink = false;
+          const panel = element.currentPanel;
+          assert.isFalse(panel.noink);
+        });
+
+        test('Updates noSteps when changes', () => {
+          element[fnName](settings);
+          element.noSteps = false;
+          const panel = element.currentPanel;
+          assert.isFalse(panel.noSteps);
+        });
+
+        test('Updates eventsTarget when changes', () => {
+          element[fnName](settings);
+          const et = document.createElement('div');
+          element.eventsTarget = et;
+          const panel = element.currentPanel;
+          assert.isTrue(panel.eventsTarget === et);
+        });
+      });
+    });
+
+    suite('Unsupported method selected', () => {
+      const settings = {
+        type: 'test message'
+      };
+      const selector = '[data-type="unsupported"]';
+
+      let element;
+      setup((done) => {
+        element = fixture('PassedProperties');
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
+      });
+
+      test('Adds panel to shadow DOM', () => {
+        element.__createUnsupportedAuth(settings);
+        const panel = element.shadowRoot.querySelector(selector);
+        assert.ok(panel);
+      });
+
+      test('__removeExistingPanel removes the panel from shadow DOM', () => {
+        element.__createUnsupportedAuth(settings);
+        element.__removeExistingPanel();
+        const panel = element.shadowRoot.querySelector(selector);
+        assert.notOk(panel);
       });
     });
     </script>
