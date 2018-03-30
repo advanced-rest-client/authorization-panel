@@ -609,7 +609,7 @@ the License.
           if (!name) {
             return item;
           }
-          const modelName = this._getAmfValue(item[secPrefix + 'name']);
+          const modelName = this._getAmfValue(item['http://schema.org/displayName']);
           if (modelName === name) {
             return item;
           }
