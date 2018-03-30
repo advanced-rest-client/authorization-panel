@@ -328,7 +328,12 @@ the License.
         requestBody: {
           type: String,
           observer: '_requestBodyChanged'
-        }
+        },
+        /**
+         * If set, automatically selects first authorization method from
+         * the `amfSettings`.
+         */
+        autoSelect: Boolean
       };
     }
 
@@ -947,6 +952,11 @@ the License.
       const isRequired = !!(this.authMethods && this.authMethods.length) && !hasNull;
       this.set('authRequired', isRequired);
       this._analyticsEvent('authorization-panel', 'usage-amf', 'loaded');
+      if (isRequired && this.autoSelect) {
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          this.selected = 0;
+        });
+      }
     }
     /**
      * @param {Object} model Amf model
