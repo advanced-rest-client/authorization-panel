@@ -199,18 +199,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         });
       });
-
-      test('Auth is not valid when selected other', (done) => {
-        element = fixture('basic');
-        element.securedBy = amf;
-        element.selected = 7;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => {
-            assert.isFalse(element.authValid);
-            done();
-          });
-        });
-      });
     });
 
     suite('Validation withouth null scheme', () => {

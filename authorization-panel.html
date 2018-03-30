@@ -1038,6 +1038,9 @@ the License.
       if ((selected === undefined || selected === -1) && !authRequired) {
         return true;
       }
+      if (formValid === undefined && !authRequired) {
+        return true;
+      }
       if (!formValid) {
         return false;
       }
