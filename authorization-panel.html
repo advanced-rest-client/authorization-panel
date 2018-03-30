@@ -491,8 +491,8 @@ the License.
         case 'Basic Authentication': this.__createBasicAuth(); break;
         case 'Digest Authentication': this.__createDigestAuth(); break;
         case 'ntlm': this.__createNtlmAuth(); break;
-        case 'OAuth 1.0': this.__createOAuth1Auth(selected); break;
-        case 'OAuth 2.0': this.__createOAuth2Auth(selected); break;
+        case 'OAuth 1.0': this.__createOauth1Auth(selected); break;
+        case 'OAuth 2.0': this.__createOauth2Auth(selected); break;
         case 'x-custom': this.__createCustomAuth(selected); break;
         default: this.__createUnsupportedAuth(selected); break;
       }
@@ -547,7 +547,7 @@ the License.
      *
      * @param {Object} selected Selected item from `authMethods`
      */
-    __createOAuth1Auth(selected) {
+    __createOauth1Auth(selected) {
       const panel = document.createElement('auth-method-oauth1');
       this.__addCommonProperties(panel, 'oauth1');
       panel.redirectUrl = this.redirectUri;
@@ -559,7 +559,7 @@ the License.
      *
      * @param {Object} selected Selected item from `authMethods`
      */
-    __createOAuth2Auth(selected) {
+    __createOauth2Auth(selected) {
       const panel = document.createElement('auth-method-oauth2');
       this.__addCommonProperties(panel, 'oauth2');
       panel.redirectUri = this.redirectUri;
