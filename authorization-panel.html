@@ -431,7 +431,7 @@ the License.
       }
       if (selected === -1) {
         this.__removeExistingPanel();
-        this._notifySettings(undefined, methods[oldValue]);
+        this._notifySettings();
         return;
       }
       const item = methods[selected];
@@ -890,14 +890,26 @@ the License.
       if (!selected) {
         selected = this.authMethods && this.authMethods[this.selected];
       }
-      if (!selected) {
-        return;
+      let valid = false;
+      let type;
+      if (selected) {
+        type = selected.type;
+        if (selected.type === 'none') {
+          valid = true;
+        } else if (settings) {
+          valid = settings.valid || false;
+        } else if (this.authVaid) {
+          valid = true;
+        }
+      } else {
+        if (!this.authRequired) {
+          valid = true;
+        }
       }
-      const valid = settings ? (settings.valid || false) : (this.authVaid || false);
       this.fire('authorization-settings-changed', {
         settings: settings,
         valid: valid,
-        type: selected.type
+        type: type
       });
     }
     /**
@@ -1017,10 +1029,10 @@ the License.
      * @return {Boolean} True if is valid and selected
      */
     _computeAuthValid(formValid, selected, authRequired) {
-      if (!selected && authRequired) {
+      if ((!selected || selected === -1) && authRequired) {
         return false;
       }
-      if (!selected && !authRequired) {
+      if ((!selected || selected === -1) && !authRequired) {
         return true;
       }
       if (!formValid) {
@@ -1184,8 +1196,15 @@ the License.
      * any value of any property has changed.
      *
      * @event authorization-settings-changed
-     * @param {Object} settings Current auth settings. It depends on enabled `type`.
-     * @param {String} type Enabled auth type. For example `basic`, `ntlm` or `oauth2`.
+     * @param {?Object} settings Current auth settings. It depends on enabled `type`.
+     * It might be undefined if the user unselected a method (if possible). This
+     * means that there's no selection at the moment.
+     * @param {?String} type Enabled auth type. For example `basic`, `ntlm` or `oauth2`.
+     * It may be `undefined` if the user deselected current method and none is selected.
+     * @param {Boolean} valid Flag determining if current settings are valid.
+     * This property depends on `null` security scheme when scheme is unselected
+     * (`settings` and `type` are `undefined`). If `null` security is set then
+     * it is valid when methos is unselected. `false` otherise.
      */
     /**
      * Fired when the authorization type changed.
