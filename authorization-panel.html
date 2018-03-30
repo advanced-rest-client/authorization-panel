@@ -1032,10 +1032,10 @@ the License.
      * @return {Boolean} True if is valid and selected
      */
     _computeAuthValid(formValid, selected, authRequired) {
-      if ((!selected || selected === -1) && authRequired) {
+      if ((selected === undefined || selected === -1) && authRequired) {
         return false;
       }
-      if ((!selected || selected === -1) && !authRequired) {
+      if ((selected === undefined || selected === -1) && !authRequired) {
         return true;
       }
       if (!formValid) {
