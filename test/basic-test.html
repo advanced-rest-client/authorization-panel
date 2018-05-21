@@ -15,8 +15,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
@@ -33,83 +31,182 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="PassedProperties">
+      <template>
+        <authorization-panel no-steps noink></authorization-panel>
+      </template>
+    </test-fixture>
+
     <script>
-    /* global fixture, assert, TestHelpers, MockInteractions */
-    suite('basic', function() {
-      var element;
-      setup(function() {
+    /* global fixture, assert */
+    suite('basic', () => {
+
+      let element;
+      setup((done) => {
         element = fixture('basic');
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
       });
 
-      test('`settings` is undefined', function() {
+      test('`settings` is undefined', () => {
         assert.isUndefined(element.settings);
       });
 
-      test('Computes hasAuthMethods property', function() {
+      test('Computes hasAuthMethods property', () => {
         assert.isTrue(element.hasAuthMethods);
       });
 
-      test('Does not compute empty message', function() {
-        TestHelpers.forceXIfStamp(element);
-        var message = element.$$('.no-method-info');
-        assert.notOk(message);
+      test('Empty message is hidden', () => {
+        const node = element.shadowRoot.querySelector('.no-method-info');
+        const display = getComputedStyle(node).display;
+        assert.equal(display, 'none');
       });
 
-      test('No `selected` by default', function() {
+      test('No `selected` by default', () => {
         assert.isUndefined(element.selected, 'selected is undefined');
         assert.isFalse(element.isSelected, 'isSelected is false');
       });
 
-      test('Displays all available methods', function() {
+      test('Displays all available methods', () => {
         assert.deepEqual(element.authMethods, element.supportedMethods);
       });
 
-      test('Should not be required', function() {
+      test('Should not be required', () => {
         assert.isFalse(element.authRequired);
       });
 
-      test('Should be valid', function() {
+      test('Should be valid', () => {
         assert.isTrue(element.authValid);
       });
 
-      test('isSelected is computed', function() {
+      test('isSelected is computed', () => {
         element.selected = 'basic';
         assert.isTrue(element.isSelected);
       });
 
-      test('noSteps is false by default', function() {
+      test('noSteps is false by default', () => {
         assert.isFalse(element.noSteps);
-      });
-
-      test('tap on selection title clears the selection', function() {
-        element.selected = 'basic';
-        TestHelpers.forceXIfStamp(element);
-        var stepper = element.$$('.stepper');
-        MockInteractions.tap(stepper);
-        assert.equal(element.selected, '');
       });
     });
 
-    suite('Steps', function() {
-      var element;
-      setup(function() {
-        element = fixture('noSteps');
-        TestHelpers.forceXIfStamp(element);
+    ['basic', 'digest', 'ntlm', 'oauth1', 'oauth2', 'custom'].forEach((type) => {
+      const upperNameFirst = type[0].toLocaleUpperCase() + type.substr(1);
+      const upperName = type.toLocaleUpperCase();
+      const fnName = `__create${upperNameFirst}Auth`;
+      const settings = {
+        type: type,
+        name: type
+      };
+      suite(`${fnName}()`, () => {
+        let element;
+        setup((done) => {
+          element = fixture('PassedProperties');
+          Polymer.RenderStatus.afterNextRender(this, () => {
+            flush(() => done());
+          });
+        });
+
+        test('Adds panel to shadow DOM', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}`);
+          assert.ok(panel);
+        });
+
+        test(`currentPanel returns ${type} panel`, () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.equal(panel.nodeName, 'AUTH-METHOD-' + upperName);
+        });
+
+        test('panel has eventsTarget', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel._oldEventsTarget === element._oldEventsTarget);
+        });
+
+        test('Add has data-auth-panel attribute', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}[data-auth-panel]`);
+          assert.ok(panel);
+        });
+
+        test('Add has data-type attribute', () => {
+          element[fnName](settings);
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}[data-type="${type}"]`);
+          assert.ok(panel);
+        });
+
+        test('noSteps is set', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel.noSteps);
+        });
+
+        test('noink is set', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel.noink);
+        });
+
+        test('__removeExistingPanel removes the panel from shadow DOM', () => {
+          element[fnName](settings);
+          element.__removeExistingPanel();
+          const panel = element.shadowRoot.querySelector(`auth-method-${type}`);
+          assert.notOk(panel);
+        });
+
+        test('Updates noink when changes', () => {
+          element[fnName](settings);
+          element.noink = false;
+          const panel = element.currentPanel;
+          assert.isFalse(panel.noink);
+        });
+
+        test('Updates noSteps when changes', () => {
+          element[fnName](settings);
+          element.noSteps = false;
+          const panel = element.currentPanel;
+          assert.isFalse(panel.noSteps);
+        });
+
+        test('Updates eventsTarget when changes', () => {
+          element[fnName](settings);
+          const et = document.createElement('div');
+          element.eventsTarget = et;
+          const panel = element.currentPanel;
+          assert.isTrue(panel.eventsTarget === et);
+        });
+      });
+    });
+
+    suite('Unsupported method selected', () => {
+      const settings = {
+        type: 'test message'
+      };
+      const selector = '[data-type="unsupported"]';
+
+      let element;
+      setup((done) => {
+        element = fixture('PassedProperties');
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
       });
 
-      test('Steps are not rendered for noSteps', function() {
-        var stepper = element.$$('.stepper');
-        assert.notOk(stepper);
+      test('Adds panel to shadow DOM', () => {
+        element.__createUnsupportedAuth(settings);
+        const panel = element.shadowRoot.querySelector(selector);
+        assert.ok(panel);
       });
 
-      test('Steps are rendered without noSteps', function() {
-        element.noSteps = false;
-        TestHelpers.forceXIfStamp(element);
-        var stepper = element.$$('.stepper');
-        assert.ok(stepper);
+      test('__removeExistingPanel removes the panel from shadow DOM', () => {
+        element.__createUnsupportedAuth(settings);
+        element.__removeExistingPanel();
+        const panel = element.shadowRoot.querySelector(selector);
+        assert.notOk(panel);
       });
     });
     </script>
-
   </body>
 </html>
