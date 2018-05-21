@@ -267,6 +267,12 @@ declare namespace UiElements {
      * Current request body. Passed to digest method.
      */
     requestBody: string|null|undefined;
+
+    /**
+     * If set, automatically selects first authorization method from
+     * the `amfSettings`.
+     */
+    autoSelect: boolean|null|undefined;
     _attachListeners(): void;
     _detachListeners(): void;
     ready(): void;
