@@ -12,65 +12,63 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../authorization-panel.html">
   </head>
   <body>
-
     <test-fixture id="basic">
       <template>
         <authorization-panel></authorization-panel>
       </template>
     </test-fixture>
-
     <script>
-    /* global fixture, assert */
-    suite('Events test', function() {
-      var element;
-      setup(function() {
+    suite('Events test', () => {
+      let element;
+      setup((done) => {
         element = fixture('basic');
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          flush(() => done());
+        });
       });
 
-      test('Fires `authorization-type-changed` when selection changes', function() {
-        var data;
+      test('Fires `authorization-type-changed` when selection changes', () => {
+        let data;
         element.addEventListener('authorization-type-changed', function clb(e) {
           element.removeEventListener('authorization-type-changed', clb);
           data = e.detail;
         });
-        element.selected = 'basic';
+        element.selected = 1;
         assert.typeOf(data, 'object');
-        assert.equal(data.type, 'basic');
+        assert.equal(data.type, 'Basic Authentication');
       });
 
-      test('`authorization-type-changed` can be canceled', function() {
-        element.selected = 'basic';
+      test('`authorization-type-changed` can be canceled', () => {
+        element.selected = 1;
         element.addEventListener('authorization-type-changed', function clb(e) {
           element.removeEventListener('authorization-type-changed', clb);
           e.preventDefault();
         });
-        element.selected = 'oauth1';
-        assert.equal(element.selected, 'basic');
+        element.selected = 2;
+        assert.equal(element.selected, 1);
       });
 
       test('Fires `authorization-settings-changed` when selection changes', function(done) {
+        element.selected = 1;
         element.addEventListener('authorization-settings-changed', function clb(e) {
           element.removeEventListener('authorization-settings-changed', clb);
           assert.typeOf(e.detail, 'object');
-          assert.equal(e.detail.type, 'basic');
+          assert.equal(e.detail.type, 'Basic Authentication');
           assert.isFalse(e.detail.valid);
           assert.typeOf(e.detail.settings, 'object');
           done();
         });
-        element.selected = 'basic';
+
       });
 
-      test('Does not fires `authorization-settings-changed` when selection is canceled', function() {
-        var called = false;
-        element.selected = 'basic';
+      test('Does not fires `authorization-settings-changed` when selection is canceled', () => {
+        let called = false;
+        element.selected = 1;
         element.addEventListener('authorization-settings-changed', function clb() {
           element.removeEventListener('authorization-settings-changed', clb);
           called = true;
@@ -79,7 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           element.removeEventListener('authorization-type-changed', clb);
           e.preventDefault();
         });
-        element.selected = 'basic';
+        element.selected = 1;
         assert.isFalse(called);
       });
     });

@@ -1,3 +1,19 @@
+<a name="2.0.1"></a>
+## [2.0.1](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.16...2.0.1) (2018-05-21)
+
+
+### Docs
+
+* Added analysis file. ([4cad57a48363cda3eeaebe0854ee1bb73d50fbae](https://github.com/advanced-rest-client/authorization-panel/commit/4cad57a48363cda3eeaebe0854ee1bb73d50fbae))
+* Updated component documentation. ([e66b2a40d238ee9d975f716deebbafdb589abb61](https://github.com/advanced-rest-client/authorization-panel/commit/e66b2a40d238ee9d975f716deebbafdb589abb61))
+* Updated documentation page ([a0d7c62c1d23ce5b9713bee7a0c186bb2ce0a822](https://github.com/advanced-rest-client/authorization-panel/commit/a0d7c62c1d23ce5b9713bee7a0c186bb2ce0a822))
+
+### Fix
+
+* Fixed `authRequired` setting ([31f8dd5ec6a0fd2018c079e396dd0d3527f4b93b](https://github.com/advanced-rest-client/authorization-panel/commit/31f8dd5ec6a0fd2018c079e396dd0d3527f4b93b))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.16...1.0.0) (2018-03-20)
 
