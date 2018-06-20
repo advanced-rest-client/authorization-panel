@@ -17,6 +17,7 @@
   <link rel="import" href="../../paper-item/paper-item.html">
   <link rel="import" href="../../paper-listbox/paper-listbox.html">
   <link rel="import" href="../../cryptojs-lib/cryptojs-lib.html">
+  <link rel="import" href="../../neon-animation/web-animations.html">
   <link rel="import" href="../authorization-panel.html">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -129,7 +130,7 @@
   </dom-bind>
   <script>
   (function(app) {
-    app.redirectUri = location.href.replace(/authorization-panel\/demo\/(raml\.html)?/,
+    app.redirectUri = location.href.replace(/authorization-panel\/demo\/(amf\.html)?/,
       'oauth-authorization/oauth-popup.html');
     app._load = function() {
       fetch('./amf-model.json')
