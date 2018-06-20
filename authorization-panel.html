@@ -451,6 +451,7 @@ the License.
       }
       this.__removeExistingPanel();
       this.__createAuthPanel(item);
+      this.__latestSelected = selected;
     }
     /**
      * Dispatches `authorization-type-changed`.
@@ -971,7 +972,11 @@ the License.
       const isRequired = !!(this.authMethods && this.authMethods.length) && !hasNull;
       this.set('authRequired', isRequired);
       this._analyticsEvent('authorization-panel', 'usage-amf', 'loaded');
-      if (isRequired && this.autoSelect) {
+      if (this.__latestSelected !== undefined) {
+        if (supported.length > this.__latestSelected) {
+          this.selected = this.__latestSelected;
+        }
+      } else if (isRequired && this.autoSelect) {
         Polymer.RenderStatus.afterNextRender(this, () => {
           this.selected = 0;
         });
