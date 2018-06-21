@@ -47,7 +47,7 @@ the License.
       <template is="dom-if" if="[[!hasAuthMethods]]">
         <p class="no-method-info">Authorization method for current endpoint is not supported.</p>
       </template>
-      <auth-method-step step-start-index="0" step="1" no-steps="[[noSteps]]" inactive="[[isSelected]]" hidden$="[[!renderSelector]]" on-inactive-tap="_clearSelection">
+      <auth-method-step step-start-index="0" step="1" no-steps="[[noSteps]]" inactive="[[isSelected]]" on-inactive-tap="_clearSelection">
         <span slot="title">Authorization method</span>
         <span slot="inactive-title">[[_computeSelectedLabel(selected)]]</span>
         <paper-dropdown-menu label="Authorization method">
@@ -305,14 +305,6 @@ the License.
          * the AMF
          */
         customSchemes: Array,
-        /**
-         * Computed value. If true then type selector is not rendered.
-         */
-        renderSelector: {
-          type: Boolean,
-          value: true,
-          readOnly: true
-        },
         // If true then the ripple effect on step title is disabled.
         noink: {
           type: Boolean,
@@ -1026,9 +1018,6 @@ the License.
     }
     // Resets `selected` property.
     _clearSelection() {
-      if (!this.renderSelector) {
-        return;
-      }
       this.selected = -1;
     }
     /**
