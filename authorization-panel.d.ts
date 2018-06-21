@@ -169,6 +169,8 @@ declare namespace UiElements {
     /**
      * Selected authorization type. It is one of the types supported by
      * `advanced-rest-client/auth-methods` component.
+     *
+     * This corresponds to the index of `authMethods` array.
      */
     selected: number|null|undefined;
 
@@ -242,11 +244,6 @@ declare namespace UiElements {
      * the AMF
      */
     customSchemes: any[]|null|undefined;
-
-    /**
-     * Computed value. If true then type selector is not rendered.
-     */
-    readonly renderSelector: boolean|null|undefined;
 
     /**
      * If true then the ripple effect on step title is disabled.

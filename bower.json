@@ -1,7 +1,7 @@
 {
   "name": "authorization-panel",
   "description": "The authorization panel used in the request panel",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "Apache-2.0",
   "authors": [
     "pawel Psztyc",
@@ -41,7 +41,10 @@
     "iron-component-page": "^3.0.1",
     "oauth-authorization": "advanced-rest-client/oauth-authorization#^2.0.1",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0",
-    "cryptojs-lib": "advanced-rest-client/cryptojs-lib#^0.1.1"
+    "cryptojs-lib": "advanced-rest-client/cryptojs-lib#^0.1.1",
+    "neon-animation": "PolymerElements/neon-animation#^2.2.1",
+    "web-animations-js": "web-animations/web-animations-js#^2.3",
+    "arc-polyfills": "advanced-rest-client/arc-polyfills#^0.1.11"
   },
   "ignore": [
     "**/.*",

@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>authorization-panel demo</title>
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
   <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
@@ -17,6 +17,7 @@
   <link rel="import" href="../../paper-item/paper-item.html">
   <link rel="import" href="../../paper-listbox/paper-listbox.html">
   <link rel="import" href="../../cryptojs-lib/cryptojs-lib.html">
+  <link rel="import" href="../../neon-animation/web-animations.html">
   <link rel="import" href="../authorization-panel.html">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -129,7 +130,7 @@
   </dom-bind>
   <script>
   (function(app) {
-    app.redirectUri = location.href.replace(/authorization-panel\/demo\/(raml\.html)?/,
+    app.redirectUri = location.href.replace(/authorization-panel\/demo\/(amf\.html)?/,
       'oauth-authorization/oauth-popup.html');
     app._load = function() {
       fetch('./amf-model.json')

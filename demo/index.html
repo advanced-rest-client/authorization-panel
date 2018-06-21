@@ -13,23 +13,17 @@ License for the specific language governing permissions and limitations under
 the License.
 -->
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>Authorization panel demo</title>
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-
-  <style is="custom-style" include="demo-pages-shared-styles">
-  .vertical-section-container {
-    max-width: 600px;
-  }
-  </style>
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles"></style>
+  </custom-style>
 </head>
-
 <body unresolved>
   <div class="vertical-section-container centered">
     <h3>Authorization panel</h3>
@@ -38,7 +32,6 @@ the License.
       <dd>A usage as a single element</dd>
       <dt><a href="meta-data.html">With `iron-meta` support</a></dt>
       <dd>Sets supported authorization methods list via `iron-meta`.</dd>
-
       <dt><a href="amf.html">With RAML (AMF model)</a></dt>
       <dd>Demo page for usage with RAML parsed to AMF model.</dd>
       <dt><a href="amf-meta.html">With `iron-meta` and RAML support (AMF model)</a></dt>
@@ -46,5 +39,4 @@ the License.
     </dl>
   </div>
 </body>
-
 </html>
