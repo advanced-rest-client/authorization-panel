@@ -19,6 +19,7 @@
 /// <reference path="../auth-methods/auth-methods.d.ts" />
 /// <reference path="../events-target-behavior/events-target-behavior.d.ts" />
 /// <reference path="../auth-methods/auth-method-step.d.ts" />
+/// <reference path="../amf-helper-mixin/amf-helper-mixin.d.ts" />
 
 declare namespace UiElements {
 
@@ -154,7 +155,8 @@ declare namespace UiElements {
    */
   class AuthorizationPanel extends
     ArcBehaviors.EventsTargetBehavior(
-    Polymer.Element) {
+    ApiElements.AmfHelperMixin(
+    Polymer.Element)) {
 
     /**
      * List of authorization methods supported by this element.
