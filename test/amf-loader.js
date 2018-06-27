@@ -15,10 +15,11 @@ AmfLoader.load = function(endpointIndex, method) {
         reject(e);
         return;
       }
-      data = data[0]['http://raml.org/vocabularies/document#encodes'][0];
-      data = data['http://raml.org/vocabularies/http#endpoint'][endpointIndex];
-      data = data['http://www.w3.org/ns/hydra/core#supportedOperation'][method];
-      data = data['http://raml.org/vocabularies/security#security'];
+      const ns = ApiElements.Amf.ns;
+      data = data[0][ns.raml.vocabularies.document + 'encodes'][0];
+      data = data[ns.raml.vocabularies.http + 'endpoint'][endpointIndex];
+      data = data[ns.w3.hydra.supportedOperation][method];
+      data = data[ns.raml.vocabularies.security + 'security'];
       resolve(data);
     });
     xhr.addEventListener('error',

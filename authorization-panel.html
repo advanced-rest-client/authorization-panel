@@ -22,6 +22,7 @@ the License.
 <link rel="import" href="../auth-methods/auth-methods.html">
 <link rel="import" href="../events-target-behavior/events-target-behavior.html">
 <link rel="import" href="../auth-methods/auth-method-step.html">
+<link rel="import" href="../amf-helper-mixin/amf-helper-mixin.html">
 <dom-module id="authorization-panel">
   <template>
     <style>
@@ -196,12 +197,14 @@ the License.
    * @polymer
    * @memberof UiElements
    * @appliesMixin ArcBehaviors.EventsTargetBehavior
+   * @appliesMixin ApiElements.AmfHelperMixin
    * @demo demo/basic.html Basic element
    * @demo demo/meta-data.html IronMeta defined methods
    * @demo demo/amf.html RAML or OAS data from AMF model
    * @demo demo/amf-meta.html RAML or OAS data from AMF model and IronMeta
    */
-  class AuthorizationPanel extends ArcBehaviors.EventsTargetBehavior(Polymer.Element) {
+  class AuthorizationPanel extends ApiElements.AmfHelperMixin(
+      ArcBehaviors.EventsTargetBehavior(Polymer.Element)) {
     static get is() { return 'authorization-panel'; }
     static get properties() {
       return {
@@ -605,7 +608,7 @@ the License.
       if (name === type) {
         name = undefined;
       }
-      const secPrefix = 'http://raml.org/vocabularies/security#';
+      const secPrefix = this.ns.raml.vocabularies.security;
       for (let i = 0, len = model.length; i < len; i++) {
         const item = model[i];
         const modelType = this._getAmfValue(item[secPrefix + 'type']);
@@ -613,7 +616,7 @@ the License.
           if (!name) {
             return item;
           }
-          let modelName = this._getAmfValue(item['http://schema.org/displayName']);
+          let modelName = this._getAmfValue(item[this.ns.schema.displayName]);
           if (!modelName) {
             modelName = this._getAmfValue(item[secPrefix + 'name']);
           }
@@ -819,7 +822,14 @@ the License.
         console.warn('The auth panel for %s not set', selected.type);
         return;
       }
-      let state = panel.validate();
+      let state;
+      try {
+        // In case when the validation is called when the auth panel is still
+        // initializing 
+        state = panel.validate();
+      } catch (_) {
+        state = true;
+      }
       if (state && selected.type === 'OAuth 2.0') {
         if (this.settings && !this.settings.settings.tokenValue) {
           state = false;
@@ -926,7 +936,7 @@ the License.
         return;
       }
       const supported = [];
-      const secPrefix = 'http://raml.org/vocabularies/security#';
+      const secPrefix = this.ns.raml.vocabularies.security;
       let hasNull = false;
       for (let i = 0, len = secured.length; i < len; i++) {
         const item = secured[i];
@@ -938,7 +948,7 @@ the License.
           hasNull = true;
           continue;
         }
-        let name = this._getAmfValue(item['http://schema.org/displayName']);
+        let name = this._getAmfValue(item[this.ns.schema.displayName]);
         if (!name) {
           if (type === 'x-custom') {
             name = this._getAmfValue(item[secPrefix + 'name']);

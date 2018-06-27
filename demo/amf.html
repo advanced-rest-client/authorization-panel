@@ -149,10 +149,10 @@
     };
 
     app._setEndpointsList = function(data) {
-      data = data[0]['http://raml.org/vocabularies/document#encodes'][0];
-      const endpoints = data['http://raml.org/vocabularies/http#endpoint'];
+      data = data[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
+      const endpoints = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'];
       const list = endpoints.map((item) => {
-        return app._getAmfValue(item['http://raml.org/vocabularies/http#path']);
+        return app._getAmfValue(item[ApiElements.Amf.ns.raml.vocabularies.http + 'path']);
       });
       app.endpoints = list;
     };
@@ -163,11 +163,11 @@
     };
 
     app._computeOperations = function(index) {
-      let data = app.amfModel[0]['http://raml.org/vocabularies/document#encodes'][0];
-      data = data['http://raml.org/vocabularies/http#endpoint'][index];
-      const operations = data['http://www.w3.org/ns/hydra/core#supportedOperation'];
+      let data = app.amfModel[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
+      data = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'][index];
+      const operations = data[ApiElements.Amf.ns.w3.hydra.supportedOperation];
       const list = operations.map((item) => {
-        return app._getAmfValue(item['http://www.w3.org/ns/hydra/core#method']);
+        return app._getAmfValue(item[ApiElements.Amf.ns.w3.hydra.core + 'method']);
       });
       const selector = document.getElementById('operationsList');
       selector.selected = -1;
@@ -185,21 +185,27 @@
     };
 
     app.passAmf = function(enpointIndex, operationIndex) {
-      let data = app.amfModel[0]['http://raml.org/vocabularies/document#encodes'][0];
-      data = data['http://raml.org/vocabularies/http#endpoint'][enpointIndex];
-      data = data['http://www.w3.org/ns/hydra/core#supportedOperation'][operationIndex];
-      data = data['http://raml.org/vocabularies/security#security'];
+      let data = app.amfModel[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
+      data = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'][enpointIndex];
+      data = data[ApiElements.Amf.ns.w3.hydra.supportedOperation][operationIndex];
+      data = data[ApiElements.Amf.ns.raml.vocabularies.security + 'security'];
       app.securedBy = data;
     };
 
     app._selectedChanged = function(e) {
       if (e.detail.value === 'digest') {
-        app.fire('url-value-changed', {
-          value: 'https://api.domain.com/endpoint'
-        });
-        app.fire('http-method-changed', {
-          value: 'GET'
-        });
+        document.body.dispatchEvent(new CustomEvent('url-value-changed', {
+          bubbles: true,
+          detail: {
+            value: 'https://api.domain.com/endpoint'
+          }
+        }));
+        document.body.dispatchEvent(new CustomEvent('http-method-changed', {
+          bubbles: true,
+          detail: {
+            value: 'GET'
+          }
+        }));
       }
     };
     app.settings = '';
@@ -208,10 +214,14 @@
     app.headerValue = '';
 
     app.sendHeaderEvent = function() {
-      app.fire('request-header-changed', {
-        name: app.headerName,
-        value: app.headerValue
+      const e = new CustomEvent('request-header-changed', {
+        bubbles: true,
+        detail: {
+          name: app.headerName,
+          value: app.headerValue
+        }
       });
+      document.body.dispatchEvent(e);
     };
 
     window.addEventListener('authorization-settings-changed', function(e) {

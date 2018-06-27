@@ -1,3 +1,22 @@
+<a name="2.0.3"></a>
+## [2.0.3](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...2.0.3) (2018-06-27)
+
+
+### Breaking
+
+* Updating component to use AMF stable data model. ([5d945d3b5f27cbcce55ea2071c7d3e311386043e](https://github.com/advanced-rest-client/authorization-panel/commit/5d945d3b5f27cbcce55ea2071c7d3e311386043e))
+
+### Docs
+
+* Updating auto-doc ([33201272f5bf3314789abb7464a24ecee03e5623](https://github.com/advanced-rest-client/authorization-panel/commit/33201272f5bf3314789abb7464a24ecee03e5623))
+* Updating documentation. ([25ec2263a78c3200d104647272ab5cf9652dbb8a](https://github.com/advanced-rest-client/authorization-panel/commit/25ec2263a78c3200d104647272ab5cf9652dbb8a))
+
+### Fix
+
+* Fixing an issue when validation throws error during initialization ([78050ed6d3af52162ae46f981bdd387628fc2099](https://github.com/advanced-rest-client/authorization-panel/commit/78050ed6d3af52162ae46f981bdd387628fc2099))
+
+
+
 <a name="2.0.2"></a>
 ## [2.0.2](https://github.com/advanced-rest-client/authorization-panel/compare/0.6.16...2.0.2) (2018-06-21)
 
