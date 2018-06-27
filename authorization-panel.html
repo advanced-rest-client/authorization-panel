@@ -822,7 +822,14 @@ the License.
         console.warn('The auth panel for %s not set', selected.type);
         return;
       }
-      let state = panel.validate();
+      let state;
+      try {
+        // In case when the validation is called when the auth panel is still
+        // initializing 
+        state = panel.validate();
+      } catch (_) {
+        state = true;
+      }
       if (state && selected.type === 'OAuth 2.0') {
         if (this.settings && !this.settings.settings.tokenValue) {
           state = false;

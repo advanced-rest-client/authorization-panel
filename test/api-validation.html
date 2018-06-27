@@ -51,10 +51,12 @@
         element = fixture('Basic');
         element.securedBy = amf;
         element.selected = 0;
-        Polymer.RenderStatus.afterNextRender(this, function() {
-          flush(function() {
-            assert.isTrue(element.authValid);
-            done();
+        flush(() => {
+          Polymer.RenderStatus.afterNextRender(this, function() {
+            flush(function() {
+              assert.isTrue(element.authValid);
+              done();
+            });
           });
         });
       });
