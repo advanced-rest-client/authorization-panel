@@ -130,10 +130,11 @@
   </dom-bind>
   <script>
   (function(app) {
+    const ns = ApiElements.Amf.ns;
     app.redirectUri = location.href.replace(/authorization-panel\/demo\/(amf\.html)?/,
       'oauth-authorization/oauth-popup.html');
     app._load = function() {
-      fetch('./amf-model.json')
+      fetch('./api-raml.json')
       .then((response) => response.json())
       .then((data) => {
         app.amfModel = data;
@@ -149,10 +150,10 @@
     };
 
     app._setEndpointsList = function(data) {
-      data = data[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
-      const endpoints = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'];
+      data = data[0][ns.raml.vocabularies.document + 'encodes'][0];
+      const endpoints = data[ns.raml.vocabularies.http + 'endpoint'];
       const list = endpoints.map((item) => {
-        return app._getAmfValue(item[ApiElements.Amf.ns.raml.vocabularies.http + 'path']);
+        return app._getAmfValue(item[ns.raml.vocabularies.http + 'path']);
       });
       app.endpoints = list;
     };
@@ -163,11 +164,11 @@
     };
 
     app._computeOperations = function(index) {
-      let data = app.amfModel[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
-      data = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'][index];
-      const operations = data[ApiElements.Amf.ns.w3.hydra.supportedOperation];
+      let data = app.amfModel[0][ns.raml.vocabularies.document + 'encodes'][0];
+      data = data[ns.raml.vocabularies.http + 'endpoint'][index];
+      const operations = data[ns.w3.hydra.supportedOperation];
       const list = operations.map((item) => {
-        return app._getAmfValue(item[ApiElements.Amf.ns.w3.hydra.core + 'method']);
+        return app._getAmfValue(item[ns.w3.hydra.core + 'method']);
       });
       const selector = document.getElementById('operationsList');
       selector.selected = -1;
@@ -185,10 +186,10 @@
     };
 
     app.passAmf = function(enpointIndex, operationIndex) {
-      let data = app.amfModel[0][ApiElements.Amf.ns.raml.vocabularies.document + 'encodes'][0];
-      data = data[ApiElements.Amf.ns.raml.vocabularies.http + 'endpoint'][enpointIndex];
-      data = data[ApiElements.Amf.ns.w3.hydra.supportedOperation][operationIndex];
-      data = data[ApiElements.Amf.ns.raml.vocabularies.security + 'security'];
+      let data = app.amfModel[0][ns.raml.vocabularies.document + 'encodes'][0];
+      data = data[ns.raml.vocabularies.http + 'endpoint'][enpointIndex];
+      data = data[ns.w3.hydra.supportedOperation][operationIndex];
+      data = data[ns.raml.vocabularies.security + 'security'];
       app.securedBy = data;
     };
 
