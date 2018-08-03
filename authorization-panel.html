@@ -825,7 +825,7 @@ the License.
       let state;
       try {
         // In case when the validation is called when the auth panel is still
-        // initializing 
+        // initializing
         state = panel.validate();
       } catch (_) {
         state = true;
@@ -972,8 +972,11 @@ the License.
         });
       }
       this.set('authMethods', supported);
+      if (supported.length === 1) {
+        this.selected = 0;
+      }
       this._updateValidationState();
-      const isRequired = !!(this.authMethods && this.authMethods.length) && !hasNull;
+      const isRequired = !!(supported && supported.length) && !hasNull;
       this.set('authRequired', isRequired);
       this._analyticsEvent('authorization-panel', 'usage-amf', 'loaded');
       if (this.__latestSelected !== undefined) {
@@ -1162,18 +1165,20 @@ the License.
      * If selected authorization type is `oauth1` or `oauth2` it calls
      * `authorize()` function of selected panel.
      * If other method is selected it does nothing.
+     *
+     * @return {Boolean} True if the panel received intent to authorize and
+     * `false` otherwise
      */
     forceTokenAuthorization() {
       const selected = this.authMethods && this.authMethods[this.selected];
       if (!selected) {
-        return;
+        return false;
       }
       if (['OAuth 2.0','OAuth 1.0'].indexOf(selected.type) === -1) {
-        console.warn('forceTokenAuthorization can be only called for OAuth types');
-        return;
+        return false;
       }
       const panel = this.currentPanel;
-      panel.authorize();
+      return panel.authorize();
     }
     /**
      * Computes value for `hasAuthMethods` property.

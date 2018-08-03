@@ -480,8 +480,11 @@ declare namespace UiElements {
      * If selected authorization type is `oauth1` or `oauth2` it calls
      * `authorize()` function of selected panel.
      * If other method is selected it does nothing.
+     *
+     * @returns True if the panel received intent to authorize and
+     * `false` otherwise
      */
-    forceTokenAuthorization(): void;
+    forceTokenAuthorization(): Boolean|null;
 
     /**
      * Computes value for `hasAuthMethods` property.
