@@ -1,3 +1,30 @@
+<a name="2.0.4"></a>
+## [2.0.4](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...2.0.4) (2018-08-03)
+
+
+### Breaking
+
+* Updating component to use AMF stable data model. ([5d945d3b5f27cbcce55ea2071c7d3e311386043e](https://github.com/advanced-rest-client/authorization-panel/commit/5d945d3b5f27cbcce55ea2071c7d3e311386043e))
+
+### Docs
+
+* Updating auto-doc ([33201272f5bf3314789abb7464a24ecee03e5623](https://github.com/advanced-rest-client/authorization-panel/commit/33201272f5bf3314789abb7464a24ecee03e5623))
+* Updating docs. ([9fc3d2d8d800ee880ec36293cdbc2e4e779777bc](https://github.com/advanced-rest-client/authorization-panel/commit/9fc3d2d8d800ee880ec36293cdbc2e4e779777bc))
+* Updating documentation. ([25ec2263a78c3200d104647272ab5cf9652dbb8a](https://github.com/advanced-rest-client/authorization-panel/commit/25ec2263a78c3200d104647272ab5cf9652dbb8a))
+
+### Fix
+
+* Adding missing dependency ([449784a4f7c5ae40eaa83e6379c63e48f5408584](https://github.com/advanced-rest-client/authorization-panel/commit/449784a4f7c5ae40eaa83e6379c63e48f5408584))
+* Fixin sauce labs configuration ([5ee5a34ea76eb4bd7b8c123e2b4c76f8dcea96b9](https://github.com/advanced-rest-client/authorization-panel/commit/5ee5a34ea76eb4bd7b8c123e2b4c76f8dcea96b9))
+* Fixing an issue when validation throws error during initialization ([78050ed6d3af52162ae46f981bdd387628fc2099](https://github.com/advanced-rest-client/authorization-panel/commit/78050ed6d3af52162ae46f981bdd387628fc2099))
+
+### Update
+
+* Adding autocelection a single auth method from AMF ([ede2d08a92e85ed6df4646f8de0faec1e0f469bf](https://github.com/advanced-rest-client/authorization-panel/commit/ede2d08a92e85ed6df4646f8de0faec1e0f469bf))
+* Forcing token auth function now returns a value. ([5400de9f9cc53beefa975e8ec5b4df62d8b45d0f](https://github.com/advanced-rest-client/authorization-panel/commit/5400de9f9cc53beefa975e8ec5b4df62d8b45d0f))
+
+
+
 <a name="2.0.3"></a>
 ## [2.0.3](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...2.0.3) (2018-06-27)
 
