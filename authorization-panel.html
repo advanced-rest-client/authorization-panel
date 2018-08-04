@@ -116,11 +116,13 @@ the License.
    *
    * ### OAuth 2.0
    *
-   * The [Oauth 2 form](https://elements.advancedrestclient.com/elements/auth-methods?active=auth-method-oauth2)
+   * The [Oauth 2 form]
+   * (https://elements.advancedrestclient.com/elements/auth-methods?active=auth-method-oauth2)
    * sends the `oauth2-token-requested` custom event with the OAuth settings provided
    * by the user.
    * Any element / hosting app can handle this event and perform authorization.
-   * ARC elements provides the [oauth2-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
+   * ARC elements provides the
+   * [oauth2-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
    * element (from the `oauth-authorization` package) that can be placed anywhere
    * in the DOM (from current element where `authorization-panel` is attached up
    * to the body) and perform OAuth athorization.
@@ -136,9 +138,11 @@ the License.
    * To make it work, handle the `oauth2-token-requested` fired from the inside of this element.
    * If it's browser flow type (implicit) then the `oauth2-authorization` element can be used.
    * For other other types, handle and cancel the event and use server to handle token exchange.
-   * The ARC elements offers a [Chrome extension](https://github.com/advanced-rest-client/api-console-extension)
+   * The ARC elements offers a
+   * [Chrome extension](https://github.com/advanced-rest-client/api-console-extension)
    * that once installed will propxy auth requests and made the exchange even for
-   * the server flow. The application should use [api-console-ext-comm](https://github.com/advanced-rest-client/api-console-ext-comm)
+   * the server flow. The application should use
+   * [api-console-ext-comm](https://github.com/advanced-rest-client/api-console-ext-comm)
    * element to communicate with the extension.
    *
    * #### `redirect-url` property for OAuth 2.0
@@ -146,13 +150,17 @@ the License.
    * OAuth protocol requires to define a redirect URL that is registered in the
    * OAuth provider. The redirect URL should point to a page that will pass the URL
    * parameters to the opener page (OAuth 2 panel).
-   * If you application uses the [oauth-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
+   * If you application uses the
+   * [oauth-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
    * element then it provides a popup that pases the data back to the application.
-   * In this case your redirect URL would be `https://your.domain.com/bower_components/oauth-authorization/oauth-popup.html`.
+   * In this case your redirect URL would be
+   * `https://your.domain.com/bower_components/oauth-authorization/oauth-popup.html`.
    * User have to change OAuth provider's settings and adjust the redirect URL to
    * point to this page.
    *
-   * You can also use the [oauth-popup.html](https://github.com/advanced-rest-client/oauth-authorization/blob/stage/oauth-popup.html)
+   * You can also use the
+   * [oauth-popup.html]
+   * (https://github.com/advanced-rest-client/oauth-authorization/blob/stage/oauth-popup.html)
    * to build your own page.
    *
    * ### OAuth 1.0a
@@ -169,7 +177,9 @@ the License.
    * ### Example
    *
    * ```
-   * <authorization-panel redirect-url="http://domain.com/bower_components/oauth-authorization/oauth-popup.html"></authorization-panel>
+   * <authorization-panel
+   *  redirect-url="http://domain.com/bower_components/oauth-authorization/oauth-popup.html"
+   *  ></authorization-panel>
    * ```
    *
    * ### Styling
@@ -182,7 +192,8 @@ the License.
    * `--arc-font-body1` | Theme mixin, Mixin applied to the elements that are containg text | `{}`
    * `--empty-info` | Mixin applied to the element that renders no methods availability message | `{}`
    *
-   * Also check [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods)
+   * Also check [auth-methods documentation page]
+   * (https://elements.advancedrestclient.com/elements/auth-methods)
    * for methods styling instructions.
    *
    * ## Changes in version 2
@@ -205,7 +216,7 @@ the License.
    */
   class AuthorizationPanel extends ApiElements.AmfHelperMixin(
       ArcBehaviors.EventsTargetBehavior(Polymer.Element)) {
-    static get is() { return 'authorization-panel'; }
+    static get is() {return 'authorization-panel';}
     static get properties() {
       return {
         /**
@@ -316,7 +327,7 @@ the License.
           observer: '_noinkChanged'
         },
         // Current HTTP method. Passed to digest method.
-        httpMethod:{
+        httpMethod: {
           type: String,
           observer: '_requestMethodChanged'
         },
@@ -424,6 +435,9 @@ the License.
      * `authorization-type-changed` event.
      *
      * If the event is canceled it restores previous value in the selector.
+     *
+     * @param {Number} selected
+     * @param {Number} oldValue
      */
     _selectedChanged(selected, oldValue) {
       const methods = this.authMethods;
@@ -471,7 +485,7 @@ the License.
      */
     __removeExistingPanel() {
       const panel = this.currentPanel;
-      if(!panel) {
+      if (!panel) {
         return;
       }
       const events = this.__currentListeners;
@@ -849,6 +863,8 @@ the License.
     }
     /**
      * Notifies about changes to authorization settings object.
+     *
+     * @param {Object} record Change record
      */
     _authSettingsUpdated(record) {
       if (record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
@@ -856,7 +872,7 @@ the License.
       }
       let base = record.base;
       if (!base || !base.type) {
-          return;
+        return;
       }
       if (this.__notyfyingSettings) {
         return;
@@ -928,6 +944,8 @@ the License.
     /**
      * A handler called when the `securedBy` property changes.
      * It sets up the list of available auth methods
+     *
+     * @param {Array<Object>} secured List of AMF security definitions
      */
     _securedByChanged(secured) {
       this.selected = -1;
@@ -1043,6 +1061,7 @@ the License.
      *
      * @param {Boolean} formValid Reported state
      * @param {String} selected Selected auth method
+     * @param {Boolean} authRequired Value of `authRequired` property
      * @return {Boolean} True if is valid and selected
      */
     _computeAuthValid(formValid, selected, authRequired) {
@@ -1062,6 +1081,8 @@ the License.
     }
     /**
      * Rstores authorization settings if event is external.
+     *
+     * @param {CustomEvent} e
      */
     _onAuthSettingsChanged(e) {
       if (e.target === this) {
@@ -1120,10 +1141,11 @@ the License.
      */
     _handleDigestSettings(settings) {
       if (!settings.valid) {
-        return this.fire('request-header-changed', {
+        this.fire('request-header-changed', {
           name: 'authorization',
           value: ''
         });
+        return;
       }
       settings = settings.settings;
       if (!settings) {
@@ -1135,7 +1157,7 @@ the License.
       }
       let value = 'Digest ';
       Object.keys(data).forEach((name) => {
-        value += name + '="' +  data[name] + '", ';
+        value += name + '="' + data[name] + '", ';
       });
       value = value.substr(0, value.length - 2);
       this.fire('request-header-changed', {
