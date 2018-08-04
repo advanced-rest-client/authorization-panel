@@ -76,11 +76,13 @@ declare namespace UiElements {
    *
    * ### OAuth 2.0
    *
-   * The [Oauth 2 form](https://elements.advancedrestclient.com/elements/auth-methods?active=auth-method-oauth2)
+   * The [Oauth 2 form]
+   * (https://elements.advancedrestclient.com/elements/auth-methods?active=auth-method-oauth2)
    * sends the `oauth2-token-requested` custom event with the OAuth settings provided
    * by the user.
    * Any element / hosting app can handle this event and perform authorization.
-   * ARC elements provides the [oauth2-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
+   * ARC elements provides the
+   * [oauth2-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
    * element (from the `oauth-authorization` package) that can be placed anywhere
    * in the DOM (from current element where `authorization-panel` is attached up
    * to the body) and perform OAuth athorization.
@@ -96,9 +98,11 @@ declare namespace UiElements {
    * To make it work, handle the `oauth2-token-requested` fired from the inside of this element.
    * If it's browser flow type (implicit) then the `oauth2-authorization` element can be used.
    * For other other types, handle and cancel the event and use server to handle token exchange.
-   * The ARC elements offers a [Chrome extension](https://github.com/advanced-rest-client/api-console-extension)
+   * The ARC elements offers a
+   * [Chrome extension](https://github.com/advanced-rest-client/api-console-extension)
    * that once installed will propxy auth requests and made the exchange even for
-   * the server flow. The application should use [api-console-ext-comm](https://github.com/advanced-rest-client/api-console-ext-comm)
+   * the server flow. The application should use
+   * [api-console-ext-comm](https://github.com/advanced-rest-client/api-console-ext-comm)
    * element to communicate with the extension.
    *
    * #### `redirect-url` property for OAuth 2.0
@@ -106,13 +110,17 @@ declare namespace UiElements {
    * OAuth protocol requires to define a redirect URL that is registered in the
    * OAuth provider. The redirect URL should point to a page that will pass the URL
    * parameters to the opener page (OAuth 2 panel).
-   * If you application uses the [oauth-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
+   * If you application uses the
+   * [oauth-authorization](https://elements.advancedrestclient.com/elements/oauth-authorization)
    * element then it provides a popup that pases the data back to the application.
-   * In this case your redirect URL would be `https://your.domain.com/bower_components/oauth-authorization/oauth-popup.html`.
+   * In this case your redirect URL would be
+   * `https://your.domain.com/bower_components/oauth-authorization/oauth-popup.html`.
    * User have to change OAuth provider's settings and adjust the redirect URL to
    * point to this page.
    *
-   * You can also use the [oauth-popup.html](https://github.com/advanced-rest-client/oauth-authorization/blob/stage/oauth-popup.html)
+   * You can also use the
+   * [oauth-popup.html]
+   * (https://github.com/advanced-rest-client/oauth-authorization/blob/stage/oauth-popup.html)
    * to build your own page.
    *
    * ### OAuth 1.0a
@@ -129,7 +137,9 @@ declare namespace UiElements {
    * ### Example
    *
    * ```
-   * <authorization-panel redirect-url="http://domain.com/bower_components/oauth-authorization/oauth-popup.html"></authorization-panel>
+   * <authorization-panel
+   *  redirect-url="http://domain.com/bower_components/oauth-authorization/oauth-popup.html"
+   *  ></authorization-panel>
    * ```
    *
    * ### Styling
@@ -142,7 +152,8 @@ declare namespace UiElements {
    * `--arc-font-body1` | Theme mixin, Mixin applied to the elements that are containg text | `{}`
    * `--empty-info` | Mixin applied to the element that renders no methods availability message | `{}`
    *
-   * Also check [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods)
+   * Also check [auth-methods documentation page]
+   * (https://elements.advancedrestclient.com/elements/auth-methods)
    * for methods styling instructions.
    *
    * ## Changes in version 2
@@ -287,7 +298,7 @@ declare namespace UiElements {
      *
      * If the event is canceled it restores previous value in the selector.
      */
-    _selectedChanged(selected: any, oldValue: any): void;
+    _selectedChanged(selected: Number|null, oldValue: Number|null): void;
 
     /**
      * Searches for AMF security description in the AMF model.
@@ -297,6 +308,14 @@ declare namespace UiElements {
      * @returns [description]
      */
     _computeAmfSettings(type: String|null, name: String|null): any;
+
+    /**
+     * Changes property value on the panel, if any panel exists.
+     *
+     * @param prop The property name to set value on.
+     * @param value The value
+     */
+    _changePanelValue(prop: String|null, value: any|null): void;
 
     /**
      * Updates `noSteps` property on current panel.
@@ -321,8 +340,10 @@ declare namespace UiElements {
 
     /**
      * Updates `redirectUri` property on oauth panels.
+     *
+     * @param uri New value to set
      */
-    _redirectUriChanged(uri: any): void;
+    _redirectUriChanged(uri: String|null): void;
 
     /**
      * Updates `httpMethod` property on Digest panel.
@@ -375,8 +396,10 @@ declare namespace UiElements {
 
     /**
      * Notifies about changes to authorization settings object.
+     *
+     * @param record Change record
      */
-    _authSettingsUpdated(record: any): void;
+    _authSettingsUpdated(record: object|null): void;
 
     /**
      * Restores settings to a panel including selection and data.
@@ -398,8 +421,10 @@ declare namespace UiElements {
     /**
      * A handler called when the `securedBy` property changes.
      * It sets up the list of available auth methods
+     *
+     * @param secured List of AMF security definitions
      */
-    _securedByChanged(secured: any): void;
+    _securedByChanged(secured: Array<object|null>|null): void;
 
     /**
      * @param model Amf model
@@ -441,14 +466,15 @@ declare namespace UiElements {
      *
      * @param formValid Reported state
      * @param selected Selected auth method
+     * @param authRequired Value of `authRequired` property
      * @returns True if is valid and selected
      */
-    _computeAuthValid(formValid: Boolean|null, selected: String|null, authRequired: any): Boolean|null;
+    _computeAuthValid(formValid: Boolean|null, selected: String|null, authRequired: Boolean|null): Boolean|null;
 
     /**
      * Rstores authorization settings if event is external.
      */
-    _onAuthSettingsChanged(e: any): void;
+    _onAuthSettingsChanged(e: CustomEvent|null): void;
 
     /**
      * Processes incomming settings and acts if any action needed to authorize
@@ -473,7 +499,7 @@ declare namespace UiElements {
      * transport method) then this function do nothing or list of Authorization
      * header parameters.
      */
-    _handleDigestSettings(settings: object|null): any;
+    _handleDigestSettings(settings: object|null): void;
     fire(type: any, detail: any, options: any): any;
 
     /**
