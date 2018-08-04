@@ -437,6 +437,7 @@ the License.
       }
       const item = methods[selected];
       if (!item) {
+        this.set('settings', undefined);
         return;
       }
       if (oldValue !== undefined) {
@@ -446,6 +447,7 @@ the License.
         this.set('selected', oldValue);
         return;
       }
+      this.set('settings', undefined);
       this.__removeExistingPanel();
       this.__createAuthPanel(item);
       this.__latestSelected = selected;
