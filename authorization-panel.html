@@ -636,16 +636,24 @@ the License.
       }
     }
     /**
+     * Changes property value on the panel, if any panel exists.
+     * @param {String} prop The property name to set value on.
+     * @param {any} value The value
+     */
+    _changePanelValue(prop, value) {
+      const panel = this.currentPanel;
+      if (!panel) {
+        return;
+      }
+      panel[prop] = value;
+    }
+    /**
      * Updates `noSteps` property on current panel.
      *
      * @param {String} value New value to set
      */
     _nostepChanged(value) {
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.noSteps = value;
+      this._changePanelValue('noSteps', value);
     }
     /**
      * Updates events target property on current panel.
@@ -653,11 +661,7 @@ the License.
      * @param {HTMLElement} target New target
      */
     _passEventsTarget(target) {
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.eventsTarget = target;
+      this._changePanelValue('eventsTarget', target);
     }
     /**
      * Updates `noink` property on panels.
@@ -665,27 +669,19 @@ the License.
      * @param {Boolean} value Current value.
      */
     _noinkChanged(value) {
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.noink = value;
+      this._changePanelValue('noink', value);
     }
     /**
      * Updates `redirectUri` property on oauth panels.
      *
-     * @param {String} value New value to set
+     * @param {String} uri New value to set
      */
     _redirectUriChanged(uri) {
       const selected = this.authMethods && this.authMethods[this.selected];
       if (!selected || (selected.type !== 'OAuth 1.0' && selected.type !== 'OAuth 2.0')) {
         return;
       }
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.redirectUri = uri;
+      this._changePanelValue('redirectUri', uri);
     }
     /**
      * Updates `httpMethod` property on Digest panel.
@@ -697,11 +693,7 @@ the License.
       if (!selected || selected.type !== 'Digest Authentication') {
         return;
       }
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.httpMethod = method;
+      this._changePanelValue('httpMethod', method);
     }
     /**
      * Updates `requestUrl` property on Digest panel.
@@ -713,11 +705,7 @@ the License.
       if (!selected || selected.type !== 'Digest Authentication') {
         return;
       }
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.requestUrl = url;
+      this._changePanelValue('requestUrl', url);
     }
     /**
      * Updates `requestBody` property on Digest panel.
@@ -729,11 +717,7 @@ the License.
       if (!selected || selected.type !== 'Digest Authentication') {
         return;
       }
-      const panel = this.currentPanel;
-      if(!panel) {
-        return;
-      }
-      panel.requestBody = body;
+      this._changePanelValue('requestBody', body);
     }
     /**
      * Lists available authorization methods.
