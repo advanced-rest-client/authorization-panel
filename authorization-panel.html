@@ -488,8 +488,10 @@ the License.
      * @param {Object} selected Model from `authMethods`
      */
     __createAuthPanel(selected) {
-      switch(selected.type) {
-        case 'none': break;
+      switch (selected.type) {
+        case 'none':
+          this.set('settings', {valid: true});
+          break;
         case 'Basic Authentication': this.__createBasicAuth(); break;
         case 'Digest Authentication': this.__createDigestAuth(); break;
         case 'ntlm': this.__createNtlmAuth(); break;
@@ -499,8 +501,15 @@ the License.
         default: this.__createUnsupportedAuth(selected); break;
       }
       Polymer.RenderStatus.afterNextRender(this, () => {
-        const panel = this.currentPanel;
-        const settings = panel && panel.getSettings ? panel.getSettings() : undefined;
+        let settings;
+        if (selected.type === 'none') {
+          settings = {
+            valid: true
+          };
+        } else {
+          const panel = this.currentPanel;
+          settings = panel && panel.getSettings ? panel.getSettings() : undefined;
+        }
         this._notifySettings(settings);
       });
     }
@@ -814,7 +823,9 @@ the License.
       }
       const selected = this.authMethods[this.selected];
       if (!selected || selected.type === 'none') {
-        this.set('settings.valid', true);
+        this.set('settings', {
+          valid: true
+        });
         return;
       }
       let panel = this.currentPanel;
