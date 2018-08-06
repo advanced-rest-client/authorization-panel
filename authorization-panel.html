@@ -326,6 +326,14 @@ the License.
           type: Boolean,
           observer: '_noinkChanged'
         },
+        /**
+         * If true the panels won't render inline documentation if
+         * the information is available.
+         */
+        noDocs: {
+          type: Boolean,
+          observer: '_noDocsChanged'
+        },
         // Current HTTP method. Passed to digest method.
         httpMethod: {
           type: String,
@@ -559,6 +567,7 @@ the License.
       panel.httpMethod = this.httpMethod;
       panel.requestUrl = this.requestUrl;
       panel.requestBody = this.requestBody;
+      panel.noDocs = this.noDocs;
       this.shadowRoot.querySelector('.auth-panel').appendChild(panel);
     }
     /**
@@ -686,6 +695,14 @@ the License.
      */
     _noinkChanged(value) {
       this._changePanelValue('noink', value);
+    }
+    /**
+     * Updates `noDocs` property on panels.
+     *
+     * @param {Boolean} value Current value.
+     */
+    _noDocsChanged(value) {
+      this._changePanelValue('noDocs', value);
     }
     /**
      * Updates `redirectUri` property on oauth panels.

@@ -264,6 +264,12 @@ declare namespace UiElements {
     noink: boolean|null|undefined;
 
     /**
+     * If true the panels won't render inline documentation if
+     * the information is available.
+     */
+    noDocs: boolean|null|undefined;
+
+    /**
      * Current HTTP method. Passed to digest method.
      */
     httpMethod: string|null|undefined;
@@ -337,6 +343,13 @@ declare namespace UiElements {
      * @param value Current value.
      */
     _noinkChanged(value: Boolean|null): void;
+
+    /**
+     * Updates `noDocs` property on panels.
+     *
+     * @param value Current value.
+     */
+    _noDocsChanged(value: Boolean|null): void;
 
     /**
      * Updates `redirectUri` property on oauth panels.
