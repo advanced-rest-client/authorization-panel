@@ -480,9 +480,13 @@ the License.
         this.set('selected', oldValue);
         return;
       }
-      this.set('settings', undefined);
-      this.__removeExistingPanel();
-      this.__createAuthPanel(item);
+      if (selected !== oldValue) {
+        this.set('settings', undefined);
+        this.__removeExistingPanel();
+        if (!this.currentPanel) {
+          this.__createAuthPanel(item);
+        }
+      }
       this.__latestSelected = selected;
     }
     /**
