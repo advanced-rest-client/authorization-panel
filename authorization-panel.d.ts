@@ -64,7 +64,8 @@ declare namespace UiElements {
    * ## Supported methods
    *
    * Detailed information about authorization methods can be find in the
-   * [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods).
+   * [auth-methods documentation page]
+   * (https://elements.advancedrestclient.com/elements/auth-methods).
    *
    * ### Basic Authentication
    *
@@ -289,6 +290,12 @@ declare namespace UiElements {
      * the `amfSettings`.
      */
     autoSelect: boolean|null|undefined;
+
+    /**
+     * When set, changes in the auth panels are not propagated through
+     * the application.
+     */
+    readonly: boolean|null|undefined;
     _attachListeners(): void;
     _detachListeners(): void;
     ready(): void;
@@ -406,6 +413,13 @@ declare namespace UiElements {
      * Sets up `settings` property from the event.
      */
     _authSettingsHandler(e: CustomEvent|null): void;
+
+    /**
+     * Finds a RAML method name from both RAML type or auth panel type.
+     *
+     * @returns RAML type name
+     */
+    _panelTypeToRamType(type: String|null): String|null|undefined;
 
     /**
      * Notifies about changes to authorization settings object.
