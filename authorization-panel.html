@@ -104,7 +104,8 @@ the License.
    * ## Supported methods
    *
    * Detailed information about authorization methods can be find in the
-   * [auth-methods documentation page](https://elements.advancedrestclient.com/elements/auth-methods).
+   * [auth-methods documentation page]
+   * (https://elements.advancedrestclient.com/elements/auth-methods).
    *
    * ### Basic Authentication
    *
@@ -353,7 +354,12 @@ the License.
          * If set, automatically selects first authorization method from
          * the `amfSettings`.
          */
-        autoSelect: Boolean
+        autoSelect: Boolean,
+        /**
+         * When set, changes in the auth panels are not propagated through
+         * the application.
+         */
+        readonly: Boolean
       };
     }
 
@@ -411,6 +417,9 @@ the License.
     }
 
     _attachListeners() {
+      if (!this.authMethods) {
+        this.set('authMethods', this._listAuthMethods());
+      }
       this.addEventListener('auth-settings-changed', this._authSettingsHandler);
       this.addEventListener('authorization-settings-changed', this._onAuthSettingsChanged);
     }
@@ -423,11 +432,13 @@ the License.
     ready() {
       super.ready();
       Polymer.RenderStatus.afterNextRender(this, () => {
-        if (!this.authMethods) {
-          this.set('authMethods', this._listAuthMethods());
+        if (this.selected >= 0) {
+          this._selectedChanged(this.selected, this.selected);
+          this._updateValidationState();
         }
-        this._selectedChanged(this.selected, this.selected);
-        this._updateValidationState();
+        if (this.selected === undefined && this.settings) {
+          this.restore(this.settings);
+        }
       });
     }
     /**
@@ -448,13 +459,13 @@ the License.
      * @param {Number} oldValue
      */
     _selectedChanged(selected, oldValue) {
-      const methods = this.authMethods;
-      if (!methods) {
-        return;
-      }
-      if (selected === -1) {
+      if (selected === -1 || selected === undefined) {
         this.__removeExistingPanel();
         this._notifySettings();
+        return;
+      }
+      const methods = this.authMethods;
+      if (!methods) {
         return;
       }
       const item = methods[selected];
@@ -549,6 +560,7 @@ the License.
       panel.dataset.authPanel = true;
       panel.noSteps = this.noSteps;
       panel.noink = this.noink;
+      panel.readonly = this.readonly;
     }
     /**
      * Creates instance of Basic auth panel and adds it to local DOM.
@@ -875,8 +887,38 @@ the License.
     _authSettingsHandler(e) {
       e.stopPropagation();
       e.stopImmediatePropagation();
+      if (this.readonly) {
+        return;
+      }
       this.settings = e.detail;
       this._processPanelSettings(e.detail);
+    }
+    /**
+     * Finds a RAML method name from both RAML type or auth panel type.
+     * @param {String} type
+     * @return {String|undefined} RAML type name
+     */
+    _panelTypeToRamType(type) {
+      switch (type) {
+        case 'none':
+        case 'No authorization':
+          return 'none';
+        case 'ntlm':
+        case 'NTLM':
+          return 'ntlm';
+        case 'basic':
+        case 'Basic Authentication':
+          return 'Basic Authentication';
+        case 'digest':
+        case 'Digest Authentication':
+          return 'Digest Authentication';
+        case 'oauth1':
+        case 'OAuth 1.0':
+          return 'OAuth 1.0';
+        case 'oauth2':
+        case 'OAuth 2.0':
+          return 'OAuth 2.0';
+      }
     }
     /**
      * Notifies about changes to authorization settings object.
@@ -884,11 +926,30 @@ the License.
      * @param {Object} record Change record
      */
     _authSettingsUpdated(record) {
-      if (record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
+      if (this.readonly || record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
+        return;
+      }
+      if (this._cancelSettingsProcessing) {
         return;
       }
       let base = record.base;
       if (!base || !base.type) {
+        this.restore();
+        return;
+      }
+      const type = this._panelTypeToRamType(base.type);
+      if (!type) {
+        return;
+      }
+      if ((this.selected === undefined || this.selected === -1)) {
+        base.type = type;
+        this.restore(base);
+        return;
+      }
+      const selected = this.authMethods && this.authMethods[this.selected];
+      if (selected && selected.type !== type) {
+        base.type = type;
+        this.restore(base);
         return;
       }
       if (this.__notyfyingSettings) {
@@ -908,6 +969,12 @@ the License.
      * `detail` object from this element.
      */
     restore(settings) {
+      if (!settings) {
+        if (this.selected || this.selected === 0) {
+          this.selected = undefined;
+        }
+        return;
+      }
       const methods = this.authMethods;
       if (!methods) {
         return;
@@ -917,7 +984,9 @@ the License.
         return;
       }
       if (this.selected !== index) {
+        this._cancelSettingsProcessing = true;
         this.selected = index;
+        this._cancelSettingsProcessing = false;
       }
       const panel = this.currentPanel;
       if (panel) {
@@ -933,6 +1002,10 @@ the License.
      * @param {Object} selected Selected model.
      */
     _notifySettings(settings, selected) {
+      if (this.readonly) {
+        return;
+      }
+
       if (!selected) {
         selected = this.authMethods && this.authMethods[this.selected];
       }
@@ -1102,7 +1175,7 @@ the License.
      * @param {CustomEvent} e
      */
     _onAuthSettingsChanged(e) {
-      if (e.target === this) {
+      if (this.readonly || e.composedPath()[0] === this) {
         return;
       }
       this.restore(e.detail);
