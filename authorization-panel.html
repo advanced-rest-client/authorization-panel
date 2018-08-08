@@ -353,7 +353,12 @@ the License.
          * If set, automatically selects first authorization method from
          * the `amfSettings`.
          */
-        autoSelect: Boolean
+        autoSelect: Boolean,
+        /**
+         * When set, changes in the auth panels are not propagated through
+         * the application.
+         */
+        readonly: Boolean
       };
     }
 
@@ -448,13 +453,13 @@ the License.
      * @param {Number} oldValue
      */
     _selectedChanged(selected, oldValue) {
-      const methods = this.authMethods;
-      if (!methods) {
-        return;
-      }
-      if (selected === -1) {
+      if (selected === -1 || selected === undefined) {
         this.__removeExistingPanel();
         this._notifySettings();
+        return;
+      }
+      const methods = this.authMethods;
+      if (!methods) {
         return;
       }
       const item = methods[selected];
@@ -549,6 +554,7 @@ the License.
       panel.dataset.authPanel = true;
       panel.noSteps = this.noSteps;
       panel.noink = this.noink;
+      panel.readonly = this.readonly;
     }
     /**
      * Creates instance of Basic auth panel and adds it to local DOM.
@@ -875,6 +881,9 @@ the License.
     _authSettingsHandler(e) {
       e.stopPropagation();
       e.stopImmediatePropagation();
+      if (this.readonly) {
+        return;
+      }
       this.settings = e.detail;
       this._processPanelSettings(e.detail);
     }
@@ -884,11 +893,12 @@ the License.
      * @param {Object} record Change record
      */
     _authSettingsUpdated(record) {
-      if (record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
+      if (this.readonly || record.path !== 'settings' || record.path.indexOf('.splices') !== -1) {
         return;
       }
       let base = record.base;
       if (!base || !base.type) {
+        this.restore({});
         return;
       }
       if (this.__notyfyingSettings) {
@@ -933,6 +943,10 @@ the License.
      * @param {Object} selected Selected model.
      */
     _notifySettings(settings, selected) {
+      if (this.readonly) {
+        return;
+      }
+
       if (!selected) {
         selected = this.authMethods && this.authMethods[this.selected];
       }
@@ -1102,7 +1116,7 @@ the License.
      * @param {CustomEvent} e
      */
     _onAuthSettingsChanged(e) {
-      if (e.target === this) {
+      if (this.readonly || e.composedPath()[0] === this) {
         return;
       }
       this.restore(e.detail);
