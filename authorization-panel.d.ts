@@ -314,6 +314,21 @@ declare namespace UiElements {
     _selectedChanged(selected: Number|null, oldValue: Number|null): void;
 
     /**
+     * Ensures that the authorization header is removed if previously
+     * selected (and now deselected) type is one of using Authorization
+     * header.
+     *
+     * @param oldSelected Previously selected auth method
+     */
+    _ensureAuthHeaderRemoved(oldSelected: Number|null): void;
+
+    /**
+     * Dispatches `request-header-deleted` custom event to inform listeners
+     * that `authorization` header should not be used.
+     */
+    _clearAuthHeader(): void;
+
+    /**
      * Searches for AMF security description in the AMF model.
      *
      * @param type Security scheme type as defined in RAML spec.
