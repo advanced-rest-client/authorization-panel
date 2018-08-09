@@ -459,6 +459,7 @@ the License.
      * @param {Number} oldValue
      */
     _selectedChanged(selected, oldValue) {
+      this._ensureAuthHeaderRemoved(oldValue);
       if (selected === -1 || selected === undefined) {
         this.__removeExistingPanel();
         this._notifySettings();
@@ -483,11 +484,41 @@ the License.
       if (selected !== oldValue) {
         this.set('settings', undefined);
         this.__removeExistingPanel();
-        if (!this.currentPanel) {
-          this.__createAuthPanel(item);
-        }
+        this.__createAuthPanel(item);
       }
       this.__latestSelected = selected;
+    }
+    /**
+     * Ensures that the authorization header is removed if previously
+     * selected (and now deselected) type is one of using Authorization
+     * header.
+     * @param {Number} oldSelected Previously selected auth method
+     */
+    _ensureAuthHeaderRemoved(oldSelected) {
+      const methods = this.authMethods;
+      if (oldSelected === undefined || !methods) {
+        return;
+      }
+      const oldMethod = methods[oldSelected];
+      const type = oldMethod && this._panelTypeToRamType(oldMethod.type);
+      if (type && ['Basic Authentication', 'OAuth 1.0', 'OAuth 2.0']
+        .indexOf(type) !== -1) {
+        this._clearAuthHeader();
+      }
+    }
+    /**
+     * Dispatches `request-header-deleted` custom event to inform listeners
+     * that `authorization` header should not be used.
+     */
+    _clearAuthHeader() {
+      this.dispatchEvent(new CustomEvent('request-header-deleted', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: {
+          name: 'authorization'
+        }
+      }));
     }
     /**
      * Dispatches `authorization-type-changed`.
@@ -529,7 +560,8 @@ the License.
     __createAuthPanel(selected) {
       switch (selected.type) {
         case 'none':
-          this.set('settings', {valid: true});
+          this.set('settings', {valid: true, type: 'none'});
+          this._clearAuthHeader();
           break;
         case 'Basic Authentication': this.__createBasicAuth(); break;
         case 'Digest Authentication': this.__createDigestAuth(); break;
