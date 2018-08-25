@@ -1,3 +1,46 @@
+<a name="2.0.9"></a>
+## [2.0.9](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...2.0.9) (2018-08-25)
+
+
+### Breaking
+
+* Updating component to use AMF stable data model. ([5d945d3b5f27cbcce55ea2071c7d3e311386043e](https://github.com/advanced-rest-client/authorization-panel/commit/5d945d3b5f27cbcce55ea2071c7d3e311386043e))
+
+### Docs
+
+* Updating auto-doc ([33201272f5bf3314789abb7464a24ecee03e5623](https://github.com/advanced-rest-client/authorization-panel/commit/33201272f5bf3314789abb7464a24ecee03e5623))
+* Updating docs ([3103638fa2086690efa8ee46b0471ed7378aeb2f](https://github.com/advanced-rest-client/authorization-panel/commit/3103638fa2086690efa8ee46b0471ed7378aeb2f))
+* Updating docs. ([9fc3d2d8d800ee880ec36293cdbc2e4e779777bc](https://github.com/advanced-rest-client/authorization-panel/commit/9fc3d2d8d800ee880ec36293cdbc2e4e779777bc))
+* Updating documentation ([0b52c12f50b42c0502811deb7f904c79dadb45fd](https://github.com/advanced-rest-client/authorization-panel/commit/0b52c12f50b42c0502811deb7f904c79dadb45fd))
+* Updating documentation ([c4e0bb85d0512b3382e44f21d1af6dd40faeae8e](https://github.com/advanced-rest-client/authorization-panel/commit/c4e0bb85d0512b3382e44f21d1af6dd40faeae8e))
+* Updating documentation and typings ([b37a1e6f68fa2cbca78d01dd7313cc1f28ce5f28](https://github.com/advanced-rest-client/authorization-panel/commit/b37a1e6f68fa2cbca78d01dd7313cc1f28ce5f28))
+* Updating documentation. ([25ec2263a78c3200d104647272ab5cf9652dbb8a](https://github.com/advanced-rest-client/authorization-panel/commit/25ec2263a78c3200d104647272ab5cf9652dbb8a))
+
+### Fix
+
+* Adding missing dependency ([449784a4f7c5ae40eaa83e6379c63e48f5408584](https://github.com/advanced-rest-client/authorization-panel/commit/449784a4f7c5ae40eaa83e6379c63e48f5408584))
+* Fixed restoring auth data ([20f1599dd917efcced36053fca1549cc5cd8e08d](https://github.com/advanced-rest-client/authorization-panel/commit/20f1599dd917efcced36053fca1549cc5cd8e08d))
+* Fixin sauce labs configuration ([5ee5a34ea76eb4bd7b8c123e2b4c76f8dcea96b9](https://github.com/advanced-rest-client/authorization-panel/commit/5ee5a34ea76eb4bd7b8c123e2b4c76f8dcea96b9))
+* Fixing an issue when validation throws error during initialization ([78050ed6d3af52162ae46f981bdd387628fc2099](https://github.com/advanced-rest-client/authorization-panel/commit/78050ed6d3af52162ae46f981bdd387628fc2099))
+* Fixing restoring auth state ([afd9ab6265079a341c3f322ab3b688d6ae097e40](https://github.com/advanced-rest-client/authorization-panel/commit/afd9ab6265079a341c3f322ab3b688d6ae097e40))
+
+### New
+
+* Adding `noDocs` property to pass on the panels. ([94e2b4b7d602a6a624b137112be387134a469712](https://github.com/advanced-rest-client/authorization-panel/commit/94e2b4b7d602a6a624b137112be387134a469712))
+* Adding authorization state restoration from settings object ([cad1d20fa84676717524798a46bf3a4ff0c74a64](https://github.com/advanced-rest-client/authorization-panel/commit/cad1d20fa84676717524798a46bf3a4ff0c74a64))
+* Adding readonly property ([2066bd46c4be41b3cdb8f31b64ab032c5f72883c](https://github.com/advanced-rest-client/authorization-panel/commit/2066bd46c4be41b3cdb8f31b64ab032c5f72883c))
+
+### Update
+
+* Adding autocelection a single auth method from AMF ([ede2d08a92e85ed6df4646f8de0faec1e0f469bf](https://github.com/advanced-rest-client/authorization-panel/commit/ede2d08a92e85ed6df4646f8de0faec1e0f469bf))
+* Checking for nulls when accessing panel ([7d6c3f2a87bd5c70288a03e2e7d78a30eabaf0cf](https://github.com/advanced-rest-client/authorization-panel/commit/7d6c3f2a87bd5c70288a03e2e7d78a30eabaf0cf))
+* Ensuring settings are set when no authorization scheme is used ([f00fd629cb1e297297a984b7d8a44d99a8c7c53f](https://github.com/advanced-rest-client/authorization-panel/commit/f00fd629cb1e297297a984b7d8a44d99a8c7c53f))
+* Ensuting the authorization header is cleared when changing type ([4cb38ea2080a961abf4a7004b939a83752cc4d4d](https://github.com/advanced-rest-client/authorization-panel/commit/4cb38ea2080a961abf4a7004b939a83752cc4d4d))
+* Forcing token auth function now returns a value. ([5400de9f9cc53beefa975e8ec5b4df62d8b45d0f](https://github.com/advanced-rest-client/authorization-panel/commit/5400de9f9cc53beefa975e8ec5b4df62d8b45d0f))
+* Settings are now cleared when panel selection changes ([a7a7412105ce50a75b89c72fdcefbde1a95852b2](https://github.com/advanced-rest-client/authorization-panel/commit/a7a7412105ce50a75b89c72fdcefbde1a95852b2))
+
+
+
 <a name="2.0.8"></a>
 ## [2.0.8](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...2.0.8) (2018-08-09)
 
