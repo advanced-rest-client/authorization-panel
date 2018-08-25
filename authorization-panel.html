@@ -477,7 +477,7 @@ the License.
       if (oldValue !== undefined) {
         this._analyticsEvent('authorization-panel', 'usage-auth-method', item.type);
       }
-      if (!this.__notifySelectionChanged(item.type)) {
+      if (!this._cancelSettingsProcessing && !this.__notifySelectionChanged(item.type)) {
         this.set('selected', oldValue);
         return;
       }
@@ -1028,6 +1028,11 @@ the License.
       if (panel) {
         // Can be no-auth panel
         panel.restore(settings.settings);
+      }
+      if (this.settings !== settings) {
+        this._cancelSettingsProcessing = true;
+        this.settings = settings;
+        this._cancelSettingsProcessing = false;
       }
     }
     /**

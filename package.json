@@ -1,6 +1,6 @@
 {
   "name": "@api-components/authorization-panel",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "license": "Apache-2.0",
   "description": "The authorization panel used in the request panel",
   "devDependencies": {
