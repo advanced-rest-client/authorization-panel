@@ -1,7 +1,7 @@
 {
   "name": "authorization-panel",
   "description": "The authorization panel used in the request panel",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "license": "Apache-2.0",
   "authors": [
     "pawel Psztyc",
