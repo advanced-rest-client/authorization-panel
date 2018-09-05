@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>authorization-panel demo</title>
   <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="../../shadycss/apply-shim.html">
   <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
@@ -16,25 +17,15 @@
   <link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
   <link rel="import" href="../../paper-item/paper-item.html">
   <link rel="import" href="../../paper-listbox/paper-listbox.html">
+  <link rel="import" href="../../neon-animation/web-animations.html">
   <link rel="import" href="../../cryptojs-lib/cryptojs-lib.html">
   <link rel="import" href="../../neon-animation/web-animations.html">
+  <link rel="import" href="../../arc-electron-default-theme/arc-electron-default-theme.html">
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../../api-navigation/api-navigation.html">
   <link rel="import" href="../authorization-panel.html">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
-    :root {
-      --arc-font-common-base: {
-        font-family: 'Roboto', 'Noto', sans-serif;
-        -webkit-font-smoothing: antialiased;
-      };
-
-      --arc-font-subhead: {
-        @apply --paper-font-common-base;
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 24px;
-      };
-    }
-
     output {
       @apply --paper-font-code1;
       white-space: pre-wrap;
@@ -51,6 +42,7 @@
 
     html,
     body {
+      background-color: #e5e5e5;
       margin: 0;
       padding: 0;
     }
@@ -58,6 +50,8 @@
     header {
       padding: 12px 24px;
       background-color: #C5E1A5;
+      @apply --layout-horizontal;
+      @apply --layout-center;
       --iron-icon-fill-color: #3E2723;
       --paper-input-container-focus-color: #33691E;
       --paper-input-container-label: {
@@ -65,11 +59,40 @@
       };
     }
 
-    .main {
-      margin-top: 40px;
+    .spacer {
+      @apply --layout-flex;
+    }
+
+    .options {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+
+    .options > * {
+      margin-left: 8px;
+    }
+
+    authorization-panel {
+      @apply --layout-flex;
+    }
+
+    api-navigation {
+      width: 256px;
+    }
+
+    [role="main"] {
+      max-width: 1100px;
+      @apply --layout-horizontal;
+      @apply --layout-start;
+    }
+
+    .card {
       @apply --shadow-elevation-4dp;
-      padding: 24px;
-      margin-bottom: 40px;
+      padding: 20px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      background-color: #fff;
     }
     </style>
   </custom-style>
@@ -78,28 +101,35 @@
 <body unresolved>
   <dom-bind id="demo">
     <template is="dom-bind">
+      <oauth2-authorization></oauth2-authorization>
+      <oauth1-authorization></oauth1-authorization>
+
       <header>
         <paper-dropdown-menu label="Select demo endpoint">
-          <paper-listbox slot="dropdown-content" id="enpointsList" on-selected-changed="_endpointChanged">
-            <template is="dom-repeat" items="[[endpoints]]">
-              <paper-item>[[item]]</paper-item>
-            </template>
+          <paper-listbox slot="dropdown-content" id="apisList" on-selected-changed="_apiChanged">
+            <paper-item data-src="demo-api.json">Demo api</paper-item>
+            <paper-item data-src="demo-api-compact.json">Demo api - compact model</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
-
-        <paper-dropdown-menu label="Select endpoint's method">
-          <paper-listbox slot="dropdown-content" id="operationsList" on-selected-changed="_operationChanged">
-            <template is="dom-repeat" items="[[operations]]">
-              <paper-item>[[item]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
+        <div class="spacer"></div>
+        <div class="options">
+          <paper-toggle-button checked="{{readonly}}">Read only mode</paper-toggle-button>
+          <paper-toggle-button checked="{{autoSelect}}">Selected first method automatically</paper-toggle-button>
+        </div>
       </header>
 
-      <section role="main" class="vertical-section-container centered main">
-        <authorization-panel no-steps="[[noSteps]]" auto-select redirect-uri="[[redirectUri]]" on-selected-changed="_selectedChanged" auth-required="{{authRequired}}" auth-valid="{{authValid}}" secured-by="[[securedBy]]"></authorization-panel>
-        <oauth2-authorization></oauth2-authorization>
-        <oauth1-authorization></oauth1-authorization>
+      <section role="main" class="centered card">
+        <api-navigation amf-model="[[amfModel]]" endpoints-opened></api-navigation>
+        <authorization-panel
+          no-steps="[[noSteps]]"
+          readonly="[[readonly]]"
+          auto-select="[[autoSelect]]"
+          redirect-uri="[[redirectUri]]"
+          on-selected-changed="_selectedChanged"
+          auth-required="{{authRequired}}"
+          auth-valid="{{authValid}}"
+          secured-by="[[securedBy]]"
+          amf-model="[[amfModel]]"></authorization-panel>
       </section>
 
       <output class="vertical-section-container centered">
@@ -125,7 +155,7 @@
         <paper-input label="Header value" value="{{headerValue}}"></paper-input>
         <paper-button raised on-tap="sendHeaderEvent">Send event</paper-button>
       </fieldset>
-      </div>
+      <demo-element id="helper" amf-model="{{amfModel}}"></demo-element>
     </template>
   </dom-bind>
   <script>
@@ -133,64 +163,45 @@
     const ns = ApiElements.Amf.ns;
     app.redirectUri = location.href.replace(/authorization-panel\/demo\/(amf\.html)?/,
       'oauth-authorization/oauth-popup.html');
+
+    class DemoElement extends ApiElements.AmfHelperMixin(Polymer.Element) {}
+    window.customElements.define('demo-element', DemoElement);
+
+    app.autoSelect = true;
+
     app._load = function() {
-      fetch('./api-raml.json')
+      document.getElementById('apisList').selected = 0;
+    };
+
+    app._loadFile = function(file) {
+      fetch('./' + file)
       .then((response) => response.json())
       .then((data) => {
         app.amfModel = data;
-        app._setEndpointsList(data);
       });
     };
 
-    app._getAmfValue = function(model) {
-      if (!model || !(model instanceof Array) || !model[0]) {
-        return;
+    app._apiChanged = function(e) {
+      const file = e.target.selectedItem.dataset.src;
+      app._loadFile(file);
+    };
+
+    app._navChanged = function(e) {
+      const type = e.detail.type;
+      if (type === 'method') {
+        app.setData(e.detail.selected);
+        app.hasData = true;
+      } else {
+        app.hasData = false;
       }
-      return model[0]['@value'];
     };
 
-    app._setEndpointsList = function(data) {
-      data = data[0][ns.raml.vocabularies.document + 'encodes'][0];
-      const endpoints = data[ns.raml.vocabularies.http + 'endpoint'];
-      const list = endpoints.map((item) => {
-        return app._getAmfValue(item[ns.raml.vocabularies.http + 'path']);
-      });
-      app.endpoints = list;
-    };
-
-    app._endpointChanged = function(e) {
-      const index = e.detail.value;
-      app._computeOperations(index);
-    };
-
-    app._computeOperations = function(index) {
-      let data = app.amfModel[0][ns.raml.vocabularies.document + 'encodes'][0];
-      data = data[ns.raml.vocabularies.http + 'endpoint'][index];
-      const operations = data[ns.w3.hydra.supportedOperation];
-      const list = operations.map((item) => {
-        return app._getAmfValue(item[ns.w3.hydra.core + 'method']);
-      });
-      const selector = document.getElementById('operationsList');
-      selector.selected = -1;
-      app.operations = list;
-      selector.selected = 0;
-    };
-
-    app._operationChanged = function(e) {
-      const index = e.detail.value;
-      if (index === -1) {
-        return;
-      }
-      const selector = document.getElementById('enpointsList');
-      app.passAmf(selector.selected, index);
-    };
-
-    app.passAmf = function(enpointIndex, operationIndex) {
-      let data = app.amfModel[0][ns.raml.vocabularies.document + 'encodes'][0];
-      data = data[ns.raml.vocabularies.http + 'endpoint'][enpointIndex];
-      data = data[ns.w3.hydra.supportedOperation][operationIndex];
-      data = data[ns.raml.vocabularies.security + 'security'];
-      app.securedBy = data;
+    app.setData = function(selected) {
+      const webApi = app.$.helper._computeWebApi(app.amfModel);
+      const method = app.$.helper._computeMethodModel(webApi, selected);
+      const key = app.$.helper._getAmfKey(ns.raml.vocabularies.security + 'security');
+      const security = app.$.helper._ensureArray(method[key]);
+      app.securedBy = security;
     };
 
     app._selectedChanged = function(e) {
@@ -240,7 +251,8 @@
       var type = e.detail.type;
       app.state = 'Selected authorization method: ' + type;
     });
-    window.addEventListener('WebComponentsReady', () => app._load());
+    window.addEventListener('WebComponentsReady', app._load);
+    window.addEventListener('api-navigation-selection-changed', app._navChanged);
   })(document.getElementById('demo'));
   </script>
 </body>

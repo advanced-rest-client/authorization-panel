@@ -18,89 +18,101 @@
     <script>
     /* global AmfLoader */
     suite('Settings passing', function() {
-      let element;
-      let amf;
       const oauth1Type = 'OAuth 1.0';
       const oauth2Type = 'OAuth 2.0';
       const customType = 'x-custom';
-      suiteSetup(function() {
-        return AmfLoader.load(7)
-        .then((model) => {
-          amf = model;
-        });
-      });
 
-      suite('_computeAmfSettings()', function() {
-        setup(function(done) {
-          element = fixture('Basic');
-          element.securedBy = amf;
-          Polymer.RenderStatus.afterNextRender(this, function() {
-            flush(() => done());
+      [
+        ['Full data model', false],
+        ['Compact data model', true]
+      ].forEach((setupItem) => {
+        suite(setupItem[0], function() {
+          let amf;
+          let security;
+          let element;
+          suiteSetup(() => {
+            return AmfLoader.load(7, 0, setupItem[1])
+            .then((model) => {
+              amf = model[0];
+              security = model[1];
+            });
           });
-        });
 
-        test('Computes value for OAuth 1', function() {
-          const result = element._computeAmfSettings(oauth1Type, 'oauth1');
-          assert.typeOf(result, 'object');
-        });
+          suite('_computeAmfSettings()', function() {
+            setup(function(done) {
+              element = fixture('Basic');
+              element.amfModel = amf;
+              element.securedBy = security;
+              Polymer.RenderStatus.afterNextRender(this, function() {
+                flush(() => done());
+              });
+            });
 
-        test('Computes value for OAuth 2 #1', function() {
-          const result = element._computeAmfSettings(oauth2Type, oauth2Type);
-          assert.typeOf(result, 'object');
-        });
+            test('Computes value for OAuth 1', function() {
+              const result = element._computeAmfSettings(oauth1Type, 'oauth1');
+              assert.typeOf(result, 'object');
+            });
 
-        test('Computes value for OAuth 2 #2', function() {
-          const result = element._computeAmfSettings(oauth2Type, 'Normal OAuth 2.0 definition');
-          assert.typeOf(result, 'object');
-        });
+            test('Computes value for OAuth 2 #1', function() {
+              const result = element._computeAmfSettings(oauth2Type, oauth2Type);
+              assert.typeOf(result, 'object');
+            });
 
-        test('Computes value for custom #1', function() {
-          const result = element._computeAmfSettings(customType, 'custom1');
-          assert.typeOf(result, 'object');
-        });
+            test('Computes value for OAuth 2 #2', function() {
+              const result = element._computeAmfSettings(oauth2Type, 'Normal OAuth 2.0 definition');
+              assert.typeOf(result, 'object');
+            });
 
-        test('Computes value for custom #1', function() {
-          const result = element._computeAmfSettings(customType, 'Custom Method X (other)');
-          assert.typeOf(result, 'object');
-        });
-      });
+            test('Computes value for custom #1', function() {
+              const result = element._computeAmfSettings(customType, 'custom1');
+              assert.typeOf(result, 'object');
+            });
 
-      suite('Crearting panels', function() {
-        setup(function(done) {
-          element = fixture('Basic');
-          element.securedBy = amf;
-          Polymer.RenderStatus.afterNextRender(this, function() {
-            flush(() => done());
+            test('Computes value for custom #1', function() {
+              const result = element._computeAmfSettings(customType, 'Custom Method X (other)');
+              assert.typeOf(result, 'object');
+            });
           });
-        });
 
-        test('Passing AMF settings to OAuth 1 panel', function() {
-          const settings = {
-            type: oauth1Type
-          };
-          element.__createOauth1Auth(settings);
-          const panel = element.currentPanel;
-          assert.typeOf(panel.amfSettings, 'object');
-        });
+          suite('Crearting panels', function() {
+            setup(function(done) {
+              element = fixture('Basic');
+              element.amfModel = amf;
+              element.securedBy = security;
+              Polymer.RenderStatus.afterNextRender(this, function() {
+                flush(() => done());
+              });
+            });
 
-        test('Passing AMF settings to OAuth 2 panel', function() {
-          const settings = {
-            type: oauth2Type,
-            name: 'Normal OAuth 2.0 definition'
-          };
-          element.__createOauth2Auth(settings);
-          const panel = element.currentPanel;
-          assert.typeOf(panel.amfSettings, 'object');
-        });
+            test('Passing AMF settings to OAuth 1 panel', function() {
+              const settings = {
+                type: oauth1Type
+              };
+              element.__createOauth1Auth(settings);
+              const panel = element.currentPanel;
+              assert.typeOf(panel.amfSettings, 'object');
+            });
 
-        test('Passing AMF settings to custom panel', function() {
-          const settings = {
-            type: customType,
-            name: 'custom1'
-          };
-          element.__createCustomAuth(settings);
-          const panel = element.currentPanel;
-          assert.typeOf(panel.amfSettings, 'object');
+            test('Passing AMF settings to OAuth 2 panel', function() {
+              const settings = {
+                type: oauth2Type,
+                name: 'Normal OAuth 2.0 definition'
+              };
+              element.__createOauth2Auth(settings);
+              const panel = element.currentPanel;
+              assert.typeOf(panel.amfSettings, 'object');
+            });
+
+            test('Passing AMF settings to custom panel', function() {
+              const settings = {
+                type: customType,
+                name: 'custom1'
+              };
+              element.__createCustomAuth(settings);
+              const panel = element.currentPanel;
+              assert.typeOf(panel.amfSettings, 'object');
+            });
+          });
         });
       });
     });

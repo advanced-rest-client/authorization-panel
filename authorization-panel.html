@@ -285,8 +285,7 @@ the License.
          * property of an endpoint.
          */
         securedBy: {
-          type: Array,
-          observer: '_securedByChanged'
+          type: Array
         },
         /**
          * The OAuth2 redirect URL to be set in the OAuth2 form pane.
@@ -396,7 +395,9 @@ the License.
     static get observers() {
       return [
         '_authSettingsUpdated(settings.*)',
-        '_passEventsTarget(eventsTarget)'
+        '_passEventsTarget(eventsTarget)',
+        '_securedByChanged(securedBy, amfModel)',
+        '_amfModelChanged(amfModel)'
       ];
     }
     /**
@@ -597,6 +598,7 @@ the License.
       panel.noSteps = this.noSteps;
       panel.noink = this.noink;
       panel.readonly = this.readonly;
+      panel.amfModel = this.amfModel;
     }
     /**
      * Creates instance of Basic auth panel and adds it to local DOM.
@@ -693,14 +695,25 @@ the License.
       const secPrefix = this.ns.raml.vocabularies.security;
       for (let i = 0, len = model.length; i < len; i++) {
         const item = model[i];
-        const modelType = this._getAmfValue(item[secPrefix + 'type']);
+        const shKey = this._getAmfKey(secPrefix + 'scheme');
+        let scheme = item[shKey];
+        if (!scheme) {
+          continue;
+        }
+        if (scheme instanceof Array) {
+          scheme = scheme[0];
+        }
+        const modelType = this._getValue(scheme, secPrefix + 'type');
+        if (!modelType) {
+          continue;
+        }
         if (modelType === type) {
           if (!name) {
             return item;
           }
-          let modelName = this._getAmfValue(item[this.ns.schema.displayName]);
+          let modelName = this._getValue(scheme, this.ns.schema.displayName);
           if (!modelName) {
-            modelName = this._getAmfValue(item[secPrefix + 'name']);
+            modelName = this._getValue(item, secPrefix + 'name');
           }
           if (modelName === name) {
             return item;
@@ -799,6 +812,10 @@ the License.
         return;
       }
       this._changePanelValue('requestBody', body);
+    }
+
+    _amfModelChanged(amfModel) {
+      this._changePanelValue('amfModel', amfModel);
     }
     /**
      * Lists available authorization methods.
@@ -1079,6 +1096,28 @@ the License.
      * @param {Array<Object>} secured List of AMF security definitions
      */
     _securedByChanged(secured) {
+      if (!secured || !secured.length) {
+        this.selected = -1;
+        this.set('authRequired', false);
+        this.set('authMethods', this._listAuthMethods());
+        return;
+      }
+      if (this.__secChangeDebouncer) {
+        return;
+      }
+      this.__secChangeDebouncer = true;
+      Polymer.RenderStatus.afterNextRender(this, () => {
+        this.__secChangeDebouncer = false;
+        this.__securedByChanged(this.securedBy);
+      });
+    }
+    /**
+     * A handler called when the `securedBy` property changes.
+     * It sets up the list of available auth methods
+     *
+     * @param {Array<Object>} secured List of AMF security definitions
+     */
+    __securedByChanged(secured) {
       this.selected = -1;
       if (!secured || !secured.length) {
         this.set('authRequired', false);
@@ -1090,18 +1129,27 @@ the License.
       let hasNull = false;
       for (let i = 0, len = secured.length; i < len; i++) {
         const item = secured[i];
-        if (!this._modelHasType(item, secPrefix + 'SecurityScheme')) {
+        if (!this._hasType(item, secPrefix + 'ParametrizedSecurityScheme')) {
           continue;
         }
-        const type = this._getAmfValue(item[secPrefix + 'type']);
+        const shKey = this._getAmfKey(secPrefix + 'scheme');
+        let scheme = item[shKey];
+        if (!scheme) {
+          hasNull = true;
+          continue;
+        }
+        if (scheme instanceof Array) {
+          scheme = scheme[0];
+        }
+        const type = this._getValue(scheme, secPrefix + 'type');
         if (!type) {
           hasNull = true;
           continue;
         }
-        let name = this._getAmfValue(item[this.ns.schema.displayName]);
+        let name = this._getValue(scheme, this.ns.schema.displayName);
         if (!name) {
           if (type === 'x-custom') {
-            name = this._getAmfValue(item[secPrefix + 'name']);
+            name = this._getValue(item, secPrefix + 'name');
             if (!name) {
               name = 'Custom authorization';
             }
@@ -1138,28 +1186,6 @@ the License.
           this.selected = 0;
         });
       }
-    }
-    /**
-     * @param {Object} model Amf model
-     * @return {String|undefined} Value for the model.
-     */
-    _getAmfValue(model) {
-      if (!model || !(model instanceof Array)) {
-        return;
-      }
-      model = model[0];
-      return model['@value'];
-    }
-    /**
-     * Checks if a model has a type.
-     * @param {Object} model Model to test
-     * @param {String} type Type name
-     * @return {Boolean} True if model has a type.
-     */
-    _modelHasType(model, type) {
-      const types = model['@type'] || [];
-      const index = types.findIndex((item) => item === type);
-      return index !== -1;
     }
     // Computes value for `isSelected` property.
     _computeIsSelected(selected) {
