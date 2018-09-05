@@ -17,33 +17,45 @@
     </test-fixture>
     <script>
     /* global AmfLoader */
+
     suite('Single security scheme test', function() {
-      let element;
-      let amf;
-      suiteSetup(function() {
-        return AmfLoader.load(1, 0)
-        .then((model) => amf = model);
-      });
+      [
+        ['Full data model', false],
+        ['Compact data model', true]
+      ].forEach((setupItem) => {
+        suite(setupItem[0], function() {
+          let amf;
+          let security;
+          let element;
+          suiteSetup(() => {
+            return AmfLoader.load(1, 0, setupItem[1])
+            .then((model) => {
+              amf = model[0];
+              security = model[1];
+            });
+          });
+          setup((done) => {
+            element = fixture('Basic');
+            element.amfModel = amf;
+            element.securedBy = security;
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              flush(() => done());
+            });
+          });
 
-      setup((done) => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => done());
+          test('Computes hasAuthMethods property', () => {
+            assert.isTrue(element.hasAuthMethods);
+          });
+
+          test('authRequired is computed', () => {
+            assert.isTrue(element.authRequired);
+          });
+
+          test('`authMethods` contains one element for basic auth method', () => {
+            assert.equal(element.authMethods.length, 1);
+            assert.equal(element.authMethods[0].type, 'Basic Authentication');
+          });
         });
-      });
-
-      test('Computes hasAuthMethods property', () => {
-        assert.isTrue(element.hasAuthMethods);
-      });
-
-      test('authRequired is computed', () => {
-        assert.isTrue(element.authRequired);
-      });
-
-      test('`authMethods` contains one element for basic auth method', () => {
-        assert.equal(element.authMethods.length, 1);
-        assert.equal(element.authMethods[0].type, 'Basic Authentication');
       });
     });
     </script>

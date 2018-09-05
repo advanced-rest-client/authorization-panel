@@ -22,73 +22,90 @@
     </test-fixture>
     <script>
     /* global AmfLoader */
-    const API_ROOT = 'file://demo/api-raml/api-raml.raml#/web-api/end-points/';
     suite('Custom schemes', () => {
-      let element;
-      let amf;
-      suiteSetup(() => {
-        return AmfLoader.load(8)
-        .then((model) => {
-          amf = model;
-        });
-      });
+      [
+        ['Full data model', false],
+        ['Compact data model', true]
+      ].forEach((setupItem) => {
+        suite(setupItem[0], function() {
+          let amf;
+          let security;
+          let element;
+          suiteSetup(() => {
+            return AmfLoader.load(8, 0, setupItem[1])
+            .then((model) => {
+              amf = model[0];
+              security = model[1];
+            });
+          });
 
-      test('Computes schemes list', () => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        const methods = element.authMethods;
-        assert.typeOf(methods, 'array');
-        assert.lengthOf(methods, 2);
-        assert.equal(methods[0].name, 'custom1');
-        assert.equal(methods[1].name, 'Custom Method X (other)');
-        assert.equal(methods[0].type, 'x-custom');
-        assert.equal(methods[1].type, 'x-custom');
-      });
+          function setupElement(id, done) {
+            element = fixture(id);
+            element.amfModel = amf;
+            element.securedBy = security;
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              flush(() => done());
+            });
+          }
 
-      test('Creates custom scheme panel', (done) => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        element.selected = 0;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => {
-            const panel = element.currentPanel;
-            assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
-            done();
+          test('Computes schemes list', (done) => {
+            setupElement('Basic', () => {
+              const methods = element.authMethods;
+              assert.typeOf(methods, 'array');
+              assert.lengthOf(methods, 2);
+              assert.equal(methods[0].name, 'custom1');
+              assert.equal(methods[1].name, 'Custom Method X (other)');
+              assert.equal(methods[0].type, 'x-custom');
+              assert.equal(methods[1].type, 'x-custom');
+              done();
+            });
+          });
+
+          test('Creates custom scheme panel', (done) => {
+            setupElement('Basic', () => {
+              element.selected = 0;
+              Polymer.RenderStatus.afterNextRender(this, () => {
+                flush(() => {
+                  const panel = element.currentPanel;
+                  assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
+                  done();
+                });
+              });
+            });
+          });
+
+          test('Passes security detail', (done) => {
+            setupElement('Basic', () => {
+              element.selected = 1;
+              Polymer.RenderStatus.afterNextRender(this, () => {
+                flush(() => {
+                  const panel = element.currentPanel;
+                  assert.typeOf(panel.amfSettings, 'object');
+                  assert.equal(panel.amfSettings['@id'], 'amf://id#136');
+                  done();
+                });
+              });
+            });
+          });
+
+          test('AutoSelected first scheme', (done) => {
+            setupElement('AutoSelect', () => {
+              setTimeout(() => {
+                const panel = element.currentPanel;
+                assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
+                assert.equal(panel.amfSettings['@id'], 'amf://id#135');
+                done();
+              }, 50);
+            });
+          });
+
+          test('Auth is required', (done) => {
+            setupElement('Basic', () => {
+              assert.isTrue(element.authRequired);
+              done();
+            });
           });
         });
-      });
-
-      test('Passes security detail', (done) => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        element.selected = 1;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => {
-            const panel = element.currentPanel;
-            assert.typeOf(panel.amfSettings, 'object');
-            assert.equal(panel.amfSettings['@id'], API_ROOT + '%2Fcustom-only/get/custom2');
-            done();
-          });
-        });
-      });
-
-      test('AutoSelected first scheme', (done) => {
-        element = fixture('AutoSelect');
-        element.securedBy = amf;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => {
-            const panel = element.currentPanel;
-            assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
-            assert.equal(panel.amfSettings['@id'], API_ROOT + '%2Fcustom-only/get/custom1');
-            done();
-          });
-        });
-      });
-
-      test('Auth is required', () => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        assert.isTrue(element.authRequired);
       });
     });
     </script>

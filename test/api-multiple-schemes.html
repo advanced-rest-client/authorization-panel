@@ -18,45 +18,55 @@
     <script>
     /* global AmfLoader */
     suite('Multiple auth schemes', function() {
-      let element;
-      let amf;
-      suiteSetup(function() {
-        return AmfLoader.load(7)
-        .then((model) => {
-          amf = model;
-        });
-      });
+      [
+        ['Full data model', false],
+        ['Compact data model', true]
+      ].forEach((setupItem) => {
+        suite(setupItem[0], function() {
+          let amf;
+          let security;
+          let element;
+          suiteSetup(() => {
+            return AmfLoader.load(7, 0, setupItem[1])
+            .then((model) => {
+              amf = model[0];
+              security = model[1];
+            });
+          });
 
-      setup((done) => {
-        element = fixture('Basic');
-        element.securedBy = amf;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          flush(() => done());
-        });
-      });
+          setup((done) => {
+            element = fixture('Basic');
+            element.amfModel = amf;
+            element.securedBy = security;
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              flush(() => done());
+            });
+          });
 
-      test('Computes hasAuthMethods property', () => {
-        assert.isTrue(element.hasAuthMethods);
-      });
+          test('Computes hasAuthMethods property', () => {
+            assert.isTrue(element.hasAuthMethods);
+          });
 
-      test('authRequired is computed when null method exists', () => {
-        assert.isFalse(element.authRequired);
-      });
+          test('authRequired is computed when null method exists', () => {
+            assert.isFalse(element.authRequired);
+          });
 
-      test('`authMethods` contains one element for basic auth method', () => {
-        assert.equal(element.authMethods.length, 8);
-      });
+          test('`authMethods` contains one element for basic auth method', () => {
+            assert.equal(element.authMethods.length, 8);
+          });
 
-      test('No authorization is first selection', () => {
-        const scheme = element.authMethods[0];
-        assert.equal(scheme.type, 'none');
-      });
+          test('No authorization is first selection', () => {
+            const scheme = element.authMethods[0];
+            assert.equal(scheme.type, 'none');
+          });
 
-      test('Sets settings when No authorization is selected', (done) => {
-        element.selected = 0;
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          assert.isTrue(element.settings.valid);
-          done();
+          test('Sets settings when No authorization is selected', (done) => {
+            element.selected = 0;
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              assert.isTrue(element.settings.valid);
+              done();
+            });
+          });
         });
       });
     });
