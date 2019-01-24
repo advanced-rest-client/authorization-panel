@@ -1,11 +1,11 @@
 {
   "name": "@api-components/authorization-panel",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "license": "Apache-2.0",
   "description": "The authorization panel used in the request panel",
   "devDependencies": {
-    "@api-components/api-model-generator": "^0.1.1",
-    "@polymer/gen-typescript-declarations": "^1.5.1"
+    "@api-components/api-model-generator": "^0.1.8",
+    "@polymer/gen-typescript-declarations": "^1.6.0"
   },
   "private": false,
   "authors": [

@@ -43,7 +43,7 @@
             element = fixture(id);
             element.amfModel = amf;
             element.securedBy = security;
-            Polymer.RenderStatus.afterNextRender(this, () => {
+            Polymer.RenderStatus.afterNextRender(element, () => {
               flush(() => done());
             });
           }
@@ -64,7 +64,7 @@
           test('Creates custom scheme panel', (done) => {
             setupElement('Basic', () => {
               element.selected = 0;
-              Polymer.RenderStatus.afterNextRender(this, () => {
+              Polymer.RenderStatus.afterNextRender(element, () => {
                 flush(() => {
                   const panel = element.currentPanel;
                   assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
@@ -77,11 +77,13 @@
           test('Passes security detail', (done) => {
             setupElement('Basic', () => {
               element.selected = 1;
-              Polymer.RenderStatus.afterNextRender(this, () => {
+              Polymer.RenderStatus.afterNextRender(element, () => {
                 flush(() => {
                   const panel = element.currentPanel;
-                  assert.typeOf(panel.amfSettings, 'object');
-                  assert.equal(panel.amfSettings['@id'], 'amf://id#136');
+                  const settigs = panel.amfSettings;
+                  assert.typeOf(settigs, 'object');
+                  const name = element._getValue(settigs, element.ns.raml.vocabularies.security + 'name');
+                  assert.equal(name, 'custom2');
                   done();
                 });
               });
@@ -93,7 +95,9 @@
               setTimeout(() => {
                 const panel = element.currentPanel;
                 assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
-                assert.equal(panel.amfSettings['@id'], 'amf://id#135');
+                const settigs = panel.amfSettings;
+                const name = element._getValue(settigs, element.ns.raml.vocabularies.security + 'name');
+                assert.equal(name, 'custom1');
                 done();
               }, 50);
             });

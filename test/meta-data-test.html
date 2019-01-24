@@ -18,25 +18,32 @@
       </template>
     </test-fixture>
 
+    <test-fixture id="AllMethods">
+      <template>
+        <iron-meta key="auth-methods" value='[null, "digest", "oauth1", "oauth2", "ntlm", "basic"]'></iron-meta>
+        <authorization-panel></authorization-panel>
+      </template>
+    </test-fixture>
+
     <script>
-    let available = [{
-        'type': 'none',
-        'name': 'No authorization'
-      }, {
-        'type': 'Digest Authentication',
-        'name': 'Digest Authentication'
-      }, {
-        'type': 'OAuth 1.0',
-        'name': 'OAuth 1.0'
-      }, {
-        'type': 'OAuth 2.0',
-        'name': 'OAuth 2.0'
-      }];
     suite('Meta data with iron-meta element', () => {
+      const available = [{
+        type: 'none',
+        name: 'No authorization'
+      }, {
+        type: 'Digest Authentication',
+        name: 'Digest Authentication'
+      }, {
+        type: 'OAuth 1.0',
+        name: 'OAuth 1.0'
+      }, {
+        type: 'OAuth 2.0',
+        name: 'OAuth 2.0'
+      }];
       let element;
       setup((done) => {
         element = fixture('meta')[1];
-        Polymer.RenderStatus.afterNextRender(this, () => {
+        Polymer.RenderStatus.afterNextRender(element, () => {
           flush(() => done());
         });
       });
@@ -46,6 +53,43 @@
       });
 
       test('Has only defined methods', () => {
+        assert.deepEqual(element.authMethods, available);
+      });
+    });
+
+    suite('All data processing', () => {
+      const available = [{
+        type: 'none',
+        name: 'No authorization'
+      }, {
+        type: 'Digest Authentication',
+        name: 'Digest Authentication'
+      }, {
+        type: 'OAuth 1.0',
+        name: 'OAuth 1.0'
+      }, {
+        type: 'OAuth 2.0',
+        name: 'OAuth 2.0'
+      }, {
+        name: 'NTLM',
+        type: 'ntlm'
+      }, {
+        name: 'Basic Authentication',
+        type: 'Basic Authentication'
+      }];
+      let element;
+      setup((done) => {
+        element = fixture('AllMethods')[1];
+        Polymer.RenderStatus.afterNextRender(element, () => {
+          flush(() => done());
+        });
+      });
+
+      test('Computes auth methods', () => {
+        assert.lengthOf(element.authMethods, 6);
+      });
+
+      test('Has all defined methods', () => {
         assert.deepEqual(element.authMethods, available);
       });
     });

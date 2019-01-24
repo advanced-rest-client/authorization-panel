@@ -24,7 +24,7 @@
 
     <test-fixture id="PassedProperties">
       <template>
-        <authorization-panel no-steps noink></authorization-panel>
+        <authorization-panel no-steps noink no-docs></authorization-panel>
       </template>
     </test-fixture>
 
@@ -33,7 +33,7 @@
       let element;
       setup((done) => {
         element = fixture('basic');
-        Polymer.RenderStatus.afterNextRender(this, () => {
+        Polymer.RenderStatus.afterNextRender(element, () => {
           flush(() => done());
         });
       });
@@ -90,7 +90,7 @@
         let element;
         setup((done) => {
           element = fixture('PassedProperties');
-          Polymer.RenderStatus.afterNextRender(this, () => {
+          Polymer.RenderStatus.afterNextRender(element, () => {
             flush(() => done());
           });
         });
@@ -137,6 +137,12 @@
           assert.isTrue(panel.noink);
         });
 
+        test('noDocs is set', () => {
+          element[fnName](settings);
+          const panel = element.currentPanel;
+          assert.isTrue(panel.noDocs);
+        });
+
         test('__removeExistingPanel removes the panel from shadow DOM', () => {
           element[fnName](settings);
           element.__removeExistingPanel();
@@ -168,6 +174,149 @@
       });
     });
 
+    suite('"redirectUri" property', () => {
+      [
+        ['basic', false],
+        ['digest', false],
+        ['ntlm', false],
+        ['oauth1', true],
+        ['oauth2', true],
+        ['custom', false],
+      ].forEach((type) => {
+        const upperNameFirst = type[0][0].toLocaleUpperCase() + type[0].substr(1);
+        const upperName = type[0].toLocaleUpperCase();
+        const fnName = `__create${upperNameFirst}Auth`;
+        const settings = {
+          type: type,
+          name: type
+        };
+        test('Seeting value on ' + upperName + ' panel.', (done) => {
+          const element = fixture('basic');
+          Polymer.RenderStatus.afterNextRender(element, () => {
+            flush(() => {
+              element[fnName](settings);
+              element.redirectUri = 'https://domain.com';
+              const panel = element.currentPanel;
+              if (type[1]) {
+                assert.equal(panel.redirectUri, element.redirectUri);
+              } else {
+                assert.isUndefined(panel.redirectUri);
+              }
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    suite('"httpMethod" property', () => {
+      [
+        ['basic', false],
+        ['digest', true],
+        ['ntlm', false],
+        ['oauth1', false],
+        ['oauth2', false],
+        ['custom', false],
+      ].forEach((type) => {
+        const upperNameFirst = type[0][0].toLocaleUpperCase() + type[0].substr(1);
+        const upperName = type[0].toLocaleUpperCase();
+        const fnName = `__create${upperNameFirst}Auth`;
+        const settings = {
+          type: type,
+          name: type
+        };
+        const method = 'CUSTOM';
+        test('Seeting value on ' + upperName + ' panel.', (done) => {
+          const element = fixture('basic');
+          Polymer.RenderStatus.afterNextRender(element, () => {
+            flush(() => {
+              element[fnName](settings);
+              element.httpMethod = method;
+              const panel = element.currentPanel;
+              if (type[1]) {
+                assert.equal(panel.httpMethod, method);
+              } else {
+                assert.isUndefined(panel.httpMethod);
+              }
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    suite('"requestUrl" property', () => {
+      [
+        ['basic', false],
+        ['digest', true],
+        ['ntlm', false],
+        ['oauth1', false],
+        ['oauth2', false],
+        ['custom', false],
+      ].forEach((type) => {
+        const upperNameFirst = type[0][0].toLocaleUpperCase() + type[0].substr(1);
+        const upperName = type[0].toLocaleUpperCase();
+        const fnName = `__create${upperNameFirst}Auth`;
+        const settings = {
+          type: type,
+          name: type
+        };
+        const requestUrl = 'https://api.domain.com';
+        test('Seeting value on ' + upperName + ' panel.', (done) => {
+          const element = fixture('basic');
+          Polymer.RenderStatus.afterNextRender(element, () => {
+            flush(() => {
+              element[fnName](settings);
+              element.requestUrl = requestUrl;
+              const panel = element.currentPanel;
+              if (type[1]) {
+                assert.equal(panel.requestUrl, requestUrl);
+              } else {
+                assert.isUndefined(panel.requestUrl);
+              }
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    suite('"requestBody" property', () => {
+      [
+        ['basic', false],
+        ['digest', true],
+        ['ntlm', false],
+        ['oauth1', false],
+        ['oauth2', false],
+        ['custom', false],
+      ].forEach((type) => {
+        const upperNameFirst = type[0][0].toLocaleUpperCase() + type[0].substr(1);
+        const upperName = type[0].toLocaleUpperCase();
+        const fnName = `__create${upperNameFirst}Auth`;
+        const settings = {
+          type: type,
+          name: type
+        };
+        const requestBody = 'Test body';
+        test('Seeting value on ' + upperName + ' panel.', (done) => {
+          const element = fixture('basic');
+          Polymer.RenderStatus.afterNextRender(element, () => {
+            flush(() => {
+              element[fnName](settings);
+              element.requestBody = requestBody;
+              const panel = element.currentPanel;
+              if (type[1]) {
+                assert.equal(panel.requestBody, requestBody);
+              } else {
+                assert.isUndefined(panel.requestBody);
+              }
+              done();
+            });
+          });
+        });
+      });
+    });
+
     suite('Unsupported method selected', () => {
       const settings = {
         type: 'test message'
@@ -177,7 +326,7 @@
       let element;
       setup((done) => {
         element = fixture('PassedProperties');
-        Polymer.RenderStatus.afterNextRender(this, () => {
+        Polymer.RenderStatus.afterNextRender(element, () => {
           flush(() => done());
         });
       });
