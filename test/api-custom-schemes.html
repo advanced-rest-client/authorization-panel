@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../authorization-panel.html">
-    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
-    <script src="amf-loader.js"></script>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
     <test-fixture id="Basic">
@@ -20,8 +22,10 @@
         <authorization-panel auto-select></authorization-panel>
       </template>
     </test-fixture>
-    <script>
-    /* global AmfLoader */
+    <script type="module">
+    import '../authorization-panel.js';
+    import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
+    import {AmfLoader} from './amf-loader.js';
     suite('Custom schemes', () => {
       [
         ['Full data model', false],
@@ -43,7 +47,7 @@
             element = fixture(id);
             element.amfModel = amf;
             element.securedBy = security;
-            Polymer.RenderStatus.afterNextRender(element, () => {
+            afterNextRender(element, () => {
               flush(() => done());
             });
           }
@@ -64,7 +68,7 @@
           test('Creates custom scheme panel', (done) => {
             setupElement('Basic', () => {
               element.selected = 0;
-              Polymer.RenderStatus.afterNextRender(element, () => {
+              afterNextRender(element, () => {
                 flush(() => {
                   const panel = element.currentPanel;
                   assert.equal(panel.nodeName, 'AUTH-METHOD-CUSTOM');
@@ -77,7 +81,7 @@
           test('Passes security detail', (done) => {
             setupElement('Basic', () => {
               element.selected = 1;
-              Polymer.RenderStatus.afterNextRender(element, () => {
+              afterNextRender(element, () => {
                 flush(() => {
                   const panel = element.currentPanel;
                   const settigs = panel.amfSettings;

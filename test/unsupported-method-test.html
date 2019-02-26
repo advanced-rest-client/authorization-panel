@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../authorization-panel.html">
-    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
     <test-fixture id="Basic">
@@ -15,7 +18,9 @@
       </template>
     </test-fixture>
 
-    <script>
+    <script type="module">
+    import '../authorization-panel.js';
+    import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
     suite('Unsupported method panel', () => {
       let element;
       setup((done) => {
@@ -24,7 +29,7 @@
           type: 'unsupported'
         });
         element.selected = element.authMethods.length - 1;
-        Polymer.RenderStatus.afterNextRender(element, () => {
+        afterNextRender(element, () => {
           flush(() => done());
         });
       });

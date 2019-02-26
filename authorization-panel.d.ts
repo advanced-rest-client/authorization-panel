@@ -5,25 +5,22 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   authorization-panel.html
+ *   authorization-panel.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/elements/dom-if.d.ts" />
-/// <reference path="../polymer/types/lib/utils/render-status.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../iron-meta/iron-meta.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu.d.ts" />
-/// <reference path="../paper-item/paper-item.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../auth-methods/auth-methods.d.ts" />
-/// <reference path="../events-target-behavior/events-target-behavior.d.ts" />
-/// <reference path="../auth-methods/auth-method-step.d.ts" />
-/// <reference path="../amf-helper-mixin/amf-helper-mixin.d.ts" />
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
+
+import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
+
+import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+
+import {AmfHelperMixin} from '@api-components/amf-helper-mixin/amf-helper-mixin.js';
+
+import {html} from '@polymer/polymer/lib/utils/html-tag.js';
 
 declare namespace UiElements {
 
@@ -170,8 +167,8 @@ declare namespace UiElements {
    * `authorization-settings-changed` event instead.
    */
   class AuthorizationPanel extends
-    ArcBehaviors.EventsTargetBehavior(
-    ApiElements.AmfHelperMixin(
+    EventsTargetMixin(
+    AmfHelperMixin(
     Object)) {
 
     /**
@@ -218,6 +215,21 @@ declare namespace UiElements {
      * This status can be cancelled by setting `authRequired` to false.
      */
     readonly authValid: boolean|null|undefined;
+
+    /**
+     * Computed value of validation state.
+     * To be used with CSS selectors to style the element when the authorization
+     * form is onvalid.
+     *
+     * Example:
+     *
+     * ```css
+     * authorization-panel[invalid] {
+     *  border: 1px red solid;
+     * }
+     * ```
+     */
+    readonly invalid: boolean|null|undefined;
 
     /**
      * Current settings of selected auth type.
@@ -560,9 +572,17 @@ declare namespace UiElements {
      * @param label Event label
      */
     _analyticsEvent(category: String|null, action: String|null, label: String|null): void;
+
+    /**
+     * Computes value for `invalid` property.
+     */
+    _computeInvalid(authValid: Boolean|null): Boolean|null;
   }
 }
 
-interface HTMLElementTagNameMap {
-  "authorization-panel": UiElements.AuthorizationPanel;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "authorization-panel": UiElements.AuthorizationPanel;
+  }
 }

@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../authorization-panel.html">
-    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
     <test-fixture id="basic">
@@ -14,12 +17,14 @@
         <authorization-panel></authorization-panel>
       </template>
     </test-fixture>
-    <script>
+    <script type="module">
+    import '../authorization-panel.js';
+    import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
     suite('Events test', () => {
       let element;
       setup((done) => {
         element = fixture('basic');
-        Polymer.RenderStatus.afterNextRender(this, () => {
+        afterNextRender(window, () => {
           flush(() => done());
         });
       });
@@ -55,7 +60,6 @@
           assert.typeOf(e.detail.settings, 'object');
           done();
         });
-
       });
 
       test('Does not fires `authorization-settings-changed` when selection is canceled', () => {
@@ -74,6 +78,5 @@
       });
     });
     </script>
-
   </body>
 </html>
