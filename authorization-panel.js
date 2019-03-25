@@ -11,19 +11,19 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
-import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
-import {AmfHelperMixin} from '@api-components/amf-helper-mixin/amf-helper-mixin.js';
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
-import '@polymer/polymer/lib/elements/dom-if.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-meta/iron-meta.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '@polymer/paper-item/paper-item.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@advanced-rest-client/auth-methods/auth-methods.js';
-import '@advanced-rest-client/auth-methods/auth-method-step.js';
+import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
+import {afterNextRender} from '../../@polymer/polymer/lib/utils/render-status.js';
+import {EventsTargetMixin} from '../../@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+import {AmfHelperMixin} from '../../@api-components/amf-helper-mixin/amf-helper-mixin.js';
+import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
+import '../../@polymer/polymer/lib/elements/dom-if.js';
+import '../../@polymer/iron-flex-layout/iron-flex-layout.js';
+import '../../@polymer/iron-meta/iron-meta.js';
+import '../../@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import '../../@polymer/paper-item/paper-item.js';
+import '../../@polymer/paper-listbox/paper-listbox.js';
+import '../../@advanced-rest-client/auth-methods/auth-methods.js';
+import '../../@advanced-rest-client/auth-methods/auth-method-step.js';
 /**
  * Authorization panel used in the request panel to get user authorization information.
  *
