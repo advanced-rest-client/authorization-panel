@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git://github.com/advanced-rest-client/authorization-panel.git"
   },
-  "name": "@api-components/authorization-panel",
+  "name": "@advanced-rest-client/authorization-panel",
   "version": "3.0.0-preview.1",
   "license": "Apache-2.0",
   "devDependencies": {
