@@ -5,21 +5,35 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>authorization-panel demo</title>
-  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-  <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
-  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <link rel="import" href="../../marked-element/marked-element.html">
-  <link rel="import" href="../../paper-styles/typography.html">
-  <link rel="import" href="../../oauth-authorization/oauth2-authorization.html">
-  <link rel="import" href="../../oauth-authorization/oauth1-authorization.html">
-  <link rel="import" href="../../paper-toggle-button/paper-toggle-button.html">
-  <link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
-  <link rel="import" href="../../paper-item/paper-item.html">
-  <link rel="import" href="../../paper-listbox/paper-listbox.html">
-  <link rel="import" href="../../cryptojs-lib/cryptojs-lib.html">
-  <link rel="import" href="../../neon-animation/web-animations.html">
-  <link rel="import" href="../../iron-meta/iron-meta.html">
-  <link rel="import" href="../authorization-panel.html">
+
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../../web-animations-js/web-animations-next.min.js"></script>
+
+  <script type="module">
+    import '@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
+    import '@polymer/iron-demo-helpers/demo-snippet.js';
+    import '@polymer/polymer/lib/elements/dom-bind.js';
+    import '@polymer/paper-toggle-button/paper-toggle-button.js';
+    import '@polymer/paper-styles/shadow.js';
+    import '@polymer/paper-styles/typography.js';
+    import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+    import '@polymer/paper-item/paper-item.js';
+    import '@polymer/paper-listbox/paper-listbox.js';
+    import '@polymer/iron-meta/iron-meta.js';
+    import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
+    import '@advanced-rest-client/oauth-authorization/oauth1-authorization.js';
+    import '@advanced-rest-client/arc-electron-default-theme/arc-electron-default-theme.js';
+    import '@api-components/api-navigation/api-navigation.js';
+    import '../authorization-panel.js';
+  </script>
+
+  <script src="../../../cryptojslib/components/core.js"></script>
+  <script src="../../../cryptojslib/rollups/sha1.js"></script>
+  <script src="../../../cryptojslib/components/enc-base64-min.js"></script>
+  <script src="../../../cryptojslib/rollups/md5.js"></script>
+  <script src="../../../cryptojslib/rollups/hmac-sha1.js"></script>
+  <script src="../../../jsrsasign/lib/jsrsasign-rsa-min.js"></script>
+
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
     :root {
@@ -75,9 +89,8 @@
     </style>
   </custom-style>
 </head>
-
 <body unresolved>
-  <iron-meta key="auth-methods" value='[null, "digest", "oauth1", "oauth2"]'></iron-meta>
+  <iron-meta key="auth-methods" value="[null, &quot;digest&quot;, &quot;oauth1&quot;, &quot;oauth2&quot;]"></iron-meta>
   <dom-bind id="demo">
     <template is="dom-bind">
       <header>
@@ -126,16 +139,15 @@
         <legend>Events based API</legend>
         <paper-input label="Header name" value="{{headerName}}"></paper-input>
         <paper-input label="Header value" value="{{headerValue}}"></paper-input>
-        <paper-button raised on-tap="sendHeaderEvent">Send event</paper-button>
+        <paper-button raised="" on-tap="sendHeaderEvent">Send event</paper-button>
       </fieldset>
-      </div>
+
     </template>
   </dom-bind>
   <script>
+  import {ns} from '@advanced-rest-client/amf-helper-mixin/amf-helper-mixin.js';
   (function(app) {
-    const ns = ApiElements.Amf.ns;
-    app.redirectUri = location.href.replace(/authorization-panel\/demo\/(raml\.html)?/,
-      'oauth-authorization/oauth-popup.html');
+    app.redirectUri = location.origin + '/components/@advanced-rest-client/oauth-authorization/oauth-popup.html';
     app._load = function() {
       fetch('./api-raml.json')
       .then((response) => response.json())
@@ -236,18 +248,18 @@
     };
 
     window.addEventListener('authorization-settings-changed', function(e) {
-      var data = e.detail;
+      const data = e.detail;
       if (!data.settings) {
         app.settings = '';
       } else {
-        var txt = 'Authorization type: ' + data.type + '\n\n';
+        let txt = 'Authorization type: ' + data.type + '\n\n';
         txt += JSON.stringify(data.settings, null, 1);
         app.settings = txt;
       }
     });
 
     window.addEventListener('authorization-type-changed', function(e) {
-      var type = e.detail.type;
+      const type = e.detail.type;
       app.state = 'Selected authorization method: ' + type;
     });
     window.addEventListener('WebComponentsReady', () => app._load());
