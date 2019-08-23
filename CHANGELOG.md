@@ -698,3 +698,12 @@
 
 
 
+# [3.0.0](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...3.0.0) (2019-08-23)
+
+
+### Bug Fixes
+
+* fixing travis config file ([fd6909d](https://github.com/advanced-rest-client/authorization-panel/commit/fd6909d))
+
+
+
