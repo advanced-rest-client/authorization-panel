@@ -25,12 +25,15 @@ class ComponentDemo extends ApiDemoPageBase {
       'disabled',
       'authSettings',
       'authSettingsValue',
-      'security'
+      'security',
+      'httpHeaders'
     ]);
     this.demoStates = ['Filled', 'Outlined', 'Legacy'];
+    this.httpHeaders = '';
     this._demoStateHandler = this._demoStateHandler.bind(this);
     this._toggleMainOption = this._toggleMainOption.bind(this);
     this._authSettingsChanged = this._authSettingsChanged.bind(this);
+    this._headerChanged = this._headerChanged.bind(this);
     this.redirectUri = location.origin +
       '/node_modules/@advanced-rest-client/oauth-authorization/oauth-popup.html';
   }
@@ -89,10 +92,21 @@ class ComponentDemo extends ApiDemoPageBase {
     this.security = helper._ensureArray(method[key]);
   }
 
+  _headerChanged(e) {
+    const { name, value } = e.detail;
+    this.httpHeaders = `${name}: ${value}`;
+  }
+
   _apiListTemplate() {
-    return html`
-    <paper-item data-src="demo-api.json">Demo api</paper-item>
-    <paper-item data-src="demo-api-compact.json">Demo api - compact model</paper-item>`;
+    return [
+      ['demo-api', 'Demo API'],
+      ['SE-12042', 'Default values issue (SE-12042)'],
+      ['SE-12224', 'Scope is not an array issues (SE-12224)'],
+      ['APIC-168', 'Custom scheme support (APIC-168)']
+    ].map(([file, label]) => html`
+      <paper-item data-src="${file}-compact.json">${label} - compact model</paper-item>
+      <paper-item data-src="${file}.json">${label}</paper-item>
+      `);
   }
 
   _demoTemplate() {
@@ -134,7 +148,9 @@ class ComponentDemo extends ApiDemoPageBase {
               ?readOnly="${readOnly}"
               ?disabled="${disabled}"
               .redirectUri="${redirectUri}"
-              @auth-settings-changed="${this._authSettingsChanged}"></authorization-panel>
+              @authorization-settings-changed="${this._authSettingsChanged}"
+              @request-header-deleted="${this._headerDeleted}"
+              @request-header-changed="${this._headerChanged}"></authorization-panel>
 
             <label slot="options" id="mainOptionsLabel">Options</label>
             <anypoint-checkbox
@@ -174,6 +190,14 @@ class ComponentDemo extends ApiDemoPageBase {
         </p>
 
         <output>${this.authSettingsValue ? this.authSettingsValue : 'Model not ready'}</output>
+
+        <h3>Handling headers state</h3>
+        <p>
+          The element dispatches events that controls headers state. It iupdates <code>authorization</code>
+          header when required by selected method.
+        </p>
+
+        <output>${this.httpHeaders ? this.httpHeaders : 'Headers not set'}</output>
       </section>
     `;
   }
@@ -190,9 +214,6 @@ class ComponentDemo extends ApiDemoPageBase {
             <b>Legacy</b> - To provide compatibility with legacy Anypoint design
           </li>
         </ul>
-
-        <h3>Without AMF model</h3>
-        <auth-method-oauth2 .redirectUri="${this.redirectUri}"></auth-method-oauth2>
       </section>`;
   }
 

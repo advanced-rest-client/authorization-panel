@@ -32,7 +32,7 @@
   }
 
   body.styled.dark output {
-    background-color: #263238;
+    background-color: #3a3a3a;
   }
 
   body.styled.dark {
@@ -52,7 +52,7 @@
     --anypoint-input-legacy-focus-border-color: #178bea;
     --anypoint-input-info-message-color: #fff;
 
-    --inline-documentation-background-color: #263238;
+    --inline-documentation-background-color: #3a3a3a;
 
     --anypoint-dropdown-menu-background-color: #494949;
     --anypoint-dropdown-menu-label-background-color: var(--primary-background-color);
@@ -63,10 +63,20 @@
     --anypoint-item-hover-background-color: #9E9E9E;
     --anypoiont-autocomplete-background-color: #494949;
     --anypoint-icon-button-emphasis-low-color: #fff;
+
+    --auth-method-oauth2-redirect-info-color: #fff;
+    --from-row-action-icon-color: #fff;
+    --inline-documentation-color: #fff;
   }
 
-  auth-method-oauth2 {
+  authorization-panel {
     width: 600px;
+    margin: 12px;
+    padding: 12px;
+  }
+
+  authorization-panel[invalid] {
+    border: 1px red solid;
   }
   </style>
 </head>

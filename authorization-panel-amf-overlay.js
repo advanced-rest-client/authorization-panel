@@ -80,7 +80,7 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
   }
 
   get amf() {
-    return this._securedBy;
+    return this._amf;
   }
 
   set amf(value) {
@@ -139,6 +139,9 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     if (this._amfDebouncer) {
       return;
     }
+    // See https://github.com/anypoint-web-components/anypoint-selector/issues/1
+    this.selected = -1;
+    this.authMethods = undefined;
     this._amfDebouncer = true;
     setTimeout(() => {
       this._amfDebouncer = false;
@@ -148,14 +151,10 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
 
   _processAmfModel() {
     const secured = this.securedBy;
-
     if (!secured || !secured.length) {
-      this.selected = -1;
       this._authRequired = false;
       this.authMethods = this._listAuthMethods();
-      return;
-    }
-    if (this.__secChangeDebouncer) {
+      this.selected = 0;
       return;
     }
     const supported = [];
@@ -205,25 +204,10 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       });
     }
     this.authMethods = supported;
-    if (supported.length !== 0) {
-      if (this.selected === 0) {
-        this.selected = -1;
-      }
-      this.selected = 0;
-    }
-    // this._updateValidationState();
     const isRequired = !!(supported && supported.length) && !hasNull;
     this._authRequired = isRequired;
     this._analyticsEvent('authorization-panel', 'usage-amf', 'loaded');
-    if (this.__latestSelected !== undefined) {
-      if (supported.length > this.__latestSelected) {
-        this.selected = this.__latestSelected;
-      }
-    } else if (isRequired) {
-      setTimeout(() => {
-        this.selected = 0;
-      });
-    }
+    this.selected = 0;
   }
 
   /**
