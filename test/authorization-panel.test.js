@@ -1,5 +1,5 @@
 import { fixture, assert, nextFrame, aTimeout } from '@open-wc/testing';
-import sinon from 'sinon/pkg/sinon-esm.js';
+import * as sinon from 'sinon/pkg/sinon-esm.js';
 import { IronMeta } from '@polymer/iron-meta/iron-meta.js';
 import '../authorization-panel.js';
 
@@ -414,9 +414,44 @@ describe('<authorization-panel>', function() {
     });
   });
 
+  describe('Single method view', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element.authMethods = [{
+        name: 'Basic Authentication',
+        type: 'Basic Authentication'
+      }];
+      await nextFrame();
+    });
+
+    it('renders selected method name', () => {
+      const node = element.shadowRoot.querySelector('.auth-title-single');
+      assert.ok(node);
+      assert.equal(node.textContent.trim(), 'Basic Authentication');
+    });
+
+    it('method selector is hidden', () => {
+      const node = element.shadowRoot.querySelector('[name="selected"]');
+      const result = getComputedStyle(node).display;
+      assert.equal(result, 'none');
+    });
+  });
+
   describe('a11y', () => {
     it('is accessible when empty', async () => {
       const element = await basicFixture();
+      await assert.isAccessible(element);
+    });
+
+    it('is accessible when single method', async () => {
+      const element = await basicFixture();
+      element.authMethods = [{
+        name: 'Basic Authentication',
+        type: 'Basic Authentication'
+      }];
+      element.selected = 0;
+      await nextFrame();
       await assert.isAccessible(element);
     });
   });

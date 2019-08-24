@@ -47,6 +47,17 @@ class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTargetMixin(
       font-style: var(--no-info-message-font-style, italic);
       font-size: var(--no-info-message-font-size, 16px);
       color: var(--no-info-message-color, rgba(0, 0, 0, 0.74));
+      margin: 12px 8px;
+    }
+
+    [hidden] {
+      display: none;
+    }
+
+    .auth-title-single {
+      font-size: 1.28rem;
+      margin: 12px 8px;
+      font-weight: 200;
     }`;
   }
 
@@ -573,8 +584,11 @@ class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTargetMixin(
       selected
     } = this;
     const items = this.authMethods || [];
+    const isSingle = items.length === 1;
     return html`
+    ${isSingle ? html`<div role="heading" aria-level="3" class="auth-title-single">${items[0].name}</div>` : ''}
     <anypoint-dropdown-menu
+      ?hidden="${isSingle}"
       name="selected"
       .outlined="${outlined}"
       .legacy="${legacy}"
