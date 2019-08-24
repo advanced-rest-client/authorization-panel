@@ -148,13 +148,21 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       this._processAmfModel();
     });
   }
+  /**
+   * Restores component to it's initial state.
+   * @return {Promise}
+   */
+  async restoreDefaults() {
+    this._authRequired = false;
+    this.authMethods = this._listAuthMethods();
+    await this.updateComplete;
+    this.selected = 0;
+  }
 
-  _processAmfModel() {
+  async _processAmfModel() {
     const secured = this.securedBy;
     if (!secured || !secured.length) {
-      this._authRequired = false;
-      this.authMethods = this._listAuthMethods();
-      this.selected = 0;
+      await this.restoreDefaults();
       return;
     }
     const supported = [];
@@ -207,6 +215,7 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     const isRequired = !!(supported && supported.length) && !hasNull;
     this._authRequired = isRequired;
     this._analyticsEvent('authorization-panel', 'usage-amf', 'loaded');
+    await this.updateComplete;
     this.selected = 0;
   }
 
