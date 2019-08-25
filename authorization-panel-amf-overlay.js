@@ -78,16 +78,6 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       this._securedByChanged();
     }
   }
-
-  get amf() {
-    return this._amf;
-  }
-
-  set amf(value) {
-    if (this._sop('amf', value)) {
-      this._securedByChanged();
-    }
-  }
   /**
    * Sets Observable Property.
    * @param {String} prop Property name to set
@@ -104,6 +94,12 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     this[key] = value;
     this.requestUpdate(prop, old);
     return true;
+  }
+  /**
+   * Overrides `AmfHelperMixin.__amfChanged`
+   */
+  __amfChanged() {
+    this._securedByChanged();
   }
   /**
    * Validates current settings received from currently selected authorization
