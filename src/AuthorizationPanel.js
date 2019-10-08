@@ -99,9 +99,9 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       // Current request body. Passed to digest method.
       requestBody: { type: String },
       /**
-       * Enables Anypoint legacy styling
+       * Enables compatibility with Anypoint styling
        */
-      legacy: { type: Boolean, reflect: true },
+      compatibility: { type: Boolean, reflect: true },
       /**
        * Enables Material Design outlined style
        */
@@ -578,7 +578,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
   _selectorTemplate() {
     const {
       outlined,
-      legacy,
+      compatibility,
       readOnly,
       disabled,
       selected
@@ -591,7 +591,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       ?hidden="${isSingle}"
       name="selected"
       .outlined="${outlined}"
-      .legacy="${legacy}"
+      .compatibility="${compatibility}"
       .readOnly="${readOnly}"
       .disabled="${disabled}"
     >
@@ -601,10 +601,10 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
         .selected="${selected}"
         @selected-changed="${this._selectionHandler}"
         .outlined="${outlined}"
-        .legacy="${legacy}"
+        .compatibility="${compatibility}"
         .readOnly="${readOnly}"
         .disabled="${disabled}">
-        ${items.map((item) => html`<anypoint-item .legacy="${legacy}">${item.name}</anypoint-item>`)}
+        ${items.map((item) => html`<anypoint-item .compatibility="${compatibility}">${item.name}</anypoint-item>`)}
       </anypoint-listbox>
     </anypoint-dropdown-menu>`;
   }
@@ -632,7 +632,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined
     } = this;
 
@@ -641,7 +641,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
     ></auth-method-basic>`;
   }
 
@@ -650,7 +650,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined,
       narrow,
       requestUrl,
@@ -664,7 +664,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .disabled="${disabled}"
       ?narrow="${narrow}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
       .requestUrl="${requestUrl}"
       .httpMethod="${httpMethod}"
       .requestBody="${requestBody}"
@@ -676,7 +676,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined
     } = this;
 
@@ -685,7 +685,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
     ></auth-method-ntlm>`;
   }
 
@@ -694,7 +694,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined,
       noDocs,
       redirectUri,
@@ -708,7 +708,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
       .noDocs="${noDocs}"
       .redirectUri="${redirectUri}"
       .amf="${amf}"
@@ -721,7 +721,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined,
       noDocs,
       redirectUri,
@@ -735,7 +735,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
       .noDocs="${noDocs}"
       .redirectUri="${redirectUri}"
       .amf="${amf}"
@@ -752,7 +752,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       eventsTarget,
       readOnly,
       disabled,
-      legacy,
+      compatibility,
       outlined,
       noDocs,
       redirectUri,
@@ -764,7 +764,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       ?outlined="${outlined}"
-      ?legacy="${legacy}"
+      ?compatibility="${compatibility}"
       .noDocs="${noDocs}"
       .redirectUri="${redirectUri}"
       .amf="${amf}"
