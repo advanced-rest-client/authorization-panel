@@ -162,15 +162,15 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       return;
     }
     const supported = [];
-    const secPrefix = this.ns.raml.vocabularies.security;
+    const secPrefix = this.ns.aml.vocabularies.security;
     let hasNull = false;
     for (let i = 0, len = secured.length; i < len; i++) {
       const item = secured[i];
-      if (!this._hasType(item, secPrefix + 'ParametrizedSecurityScheme') &&
-        !this._hasType(item, secPrefix + 'SecurityScheme')) {
+      if (!this._hasType(item, secPrefix.ParametrizedSecurityScheme) &&
+        !this._hasType(item, secPrefix.SecurityScheme)) {
         continue;
       }
-      const shKey = this._getAmfKey(secPrefix + 'scheme');
+      const shKey = this._getAmfKey(secPrefix.scheme);
       let scheme = item[shKey];
       if (!scheme) {
         hasNull = true;
@@ -179,15 +179,15 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       if (scheme instanceof Array) {
         scheme = scheme[0];
       }
-      const type = this._getValue(scheme, secPrefix + 'type');
+      const type = this._getValue(scheme, secPrefix.type);
       if (!type) {
         hasNull = true;
         continue;
       }
-      let name = this._getValue(scheme, this.ns.schema.displayName);
+      let name = this._getValue(scheme, this.ns.aml.vocabularies.core.displayName);
       if (!name) {
         if (type === 'x-custom') {
-          name = this._getValue(item, secPrefix + 'name');
+          name = this._getValue(scheme, this.ns.aml.vocabularies.core.name);
           if (!name) {
             name = 'Custom authorization';
           }
@@ -230,10 +230,10 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     if (name === type) {
       name = undefined;
     }
-    const secPrefix = this.ns.raml.vocabularies.security;
+    const secPrefix = this.ns.aml.vocabularies.security;
     for (let i = 0, len = model.length; i < len; i++) {
       const item = model[i];
-      const shKey = this._getAmfKey(secPrefix + 'scheme');
+      const shKey = this._getAmfKey(secPrefix.scheme);
       let scheme = item[shKey];
       if (!scheme) {
         continue;
@@ -241,7 +241,7 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       if (scheme instanceof Array) {
         scheme = scheme[0];
       }
-      const modelType = this._getValue(scheme, secPrefix + 'type');
+      const modelType = this._getValue(scheme, secPrefix.type);
       if (!modelType) {
         continue;
       }
@@ -249,10 +249,11 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
         if (!name) {
           return item;
         }
-        let modelName = this._getValue(scheme, this.ns.schema.displayName);
-        if (!modelName) {
-          modelName = this._getValue(item, secPrefix + 'name');
+        let modelName = this._getValue(scheme, this.ns.aml.vocabularies.core.displayName);
+        if (modelName !== name) {
+          modelName = this._getValue(scheme, this.ns.aml.vocabularies.core.name);
         }
+        // modelName = this._getValue(item, secPrefix.name);
         if (modelName === name) {
           return item;
         }

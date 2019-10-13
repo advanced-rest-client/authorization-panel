@@ -40,21 +40,21 @@ AmfLoader.lookupOperation = function(model, endpoint, operation) {
   helper.amf = model;
   const webApi = helper._computeWebApi(model);
   const endPoint = helper._computeEndpointByPath(webApi, endpoint);
-  const opKey = helper._getAmfKey(helper.ns.w3.hydra.supportedOperation);
+  const opKey = helper._getAmfKey(helper.ns.aml.vocabularies.apiContract.supportedOperation);
   const ops = helper._ensureArray(endPoint[opKey]);
-  return ops.find((item) => helper._getValue(item, helper.ns.w3.hydra.core + 'method') === operation);
+  return ops.find((item) => helper._getValue(item, helper.ns.aml.vocabularies.apiContract.method) === operation);
 };
 
 AmfLoader.lookupSecurity = function(model, endpoint, operation) {
   const method = AmfLoader.lookupOperation(model, endpoint, operation);
-  const secKey = helper._getAmfKey(helper.ns.raml.vocabularies.security + 'security');
+  const secKey = helper._getAmfKey(helper.ns.aml.vocabularies.security.security);
   return method[secKey];
 };
 
 AmfLoader.lookupSecurityScheme = function(model, endpoint, operation) {
   const schemes = AmfLoader.lookupSecurity(model, endpoint, operation);
   const security = schemes instanceof Array ? schemes[0] : schemes;
-  const shKey = helper._getAmfKey(helper.ns.raml.vocabularies.security + 'scheme');
+  const shKey = helper._getAmfKey(helper.ns.aml.vocabularies.security.scheme);
   let scheme = security[shKey];
   if (scheme instanceof Array) {
     scheme = scheme[0];
@@ -64,7 +64,7 @@ AmfLoader.lookupSecurityScheme = function(model, endpoint, operation) {
 
 AmfLoader.lookupSecuritySettings = function(model, endpoint, operation) {
   const security = AmfLoader.lookupSecurityScheme(model, endpoint, operation);
-  const key = helper._getAmfKey(helper.ns.raml.vocabularies.security + 'settings');
+  const key = helper._getAmfKey(helper.ns.aml.vocabularies.security.settings);
   let settings = security[key];
   if (settings instanceof Array) {
     settings = settings[0];

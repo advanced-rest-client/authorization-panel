@@ -8,6 +8,11 @@ Accessible forms to provide authorization data for various authorization methods
 
 The forms used in the panel are coming from [auth-methods](https://github.com/advanced-rest-client/auth-methods) element.
 
+## Version compatibility
+
+This version only works with AMF model version 2 (AMF parser >= 4.0.0).
+For compatibility with previous model version use `3.x.x` version of the component.
+
 ## Usage
 
 ### Installation

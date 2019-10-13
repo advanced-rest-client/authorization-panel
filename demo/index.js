@@ -76,7 +76,7 @@ class ComponentDemo extends ApiDemoPageBase {
     const helper = this.helper;
     const webApi = helper._computeWebApi(this.amf);
     const method = helper._computeMethodModel(webApi, selected);
-    const key = helper._getAmfKey(helper.ns.raml.vocabularies.security + 'security');
+    const key = helper._getAmfKey(helper.ns.aml.vocabularies.security.security);
     this.security = helper._ensureArray(method[key]);
   }
 
