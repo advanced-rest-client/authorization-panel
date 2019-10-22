@@ -8,6 +8,8 @@ import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@api-components/api-navigation/api-navigation.js';
 import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
 import '@advanced-rest-client/oauth-authorization/oauth1-authorization.js';
+import '@advanced-rest-client/arc-models/client-certificate-model.js';
+import { DataGenerator } from '@advanced-rest-client/arc-data-generator/arc-data-generator.js';
 import '../authorization-panel.js';
 
 class DemoElement extends AmfHelperMixin(LitElement) {}
@@ -34,6 +36,8 @@ class ComponentDemo extends ApiDemoPageBase {
     this._toggleMainOption = this._toggleMainOption.bind(this);
     this._authSettingsChanged = this._authSettingsChanged.bind(this);
     this._headerChanged = this._headerChanged.bind(this);
+    this.generateData = this.generateData.bind(this);
+    this.deleteData = this.deleteData.bind(this);
     this.redirectUri = location.origin +
       '/node_modules/@advanced-rest-client/oauth-authorization/oauth-popup.html';
   }
@@ -97,6 +101,24 @@ class ComponentDemo extends ApiDemoPageBase {
       `);
   }
 
+  async generateData() {
+    await DataGenerator.insertCertificatesData();
+    const e = new CustomEvent('data-imported', {
+      bubbles: true
+    });
+    document.body.dispatchEvent(e);
+  }
+
+  async deleteData() {
+    const e = new CustomEvent('destroy-model', {
+      detail: {
+        models: ['client-certificates']
+      },
+      bubbles: true
+    });
+    document.body.dispatchEvent(e);
+  }
+
   _demoTemplate() {
     const {
       demoStates,
@@ -156,6 +178,13 @@ class ComponentDemo extends ApiDemoPageBase {
               >Disabled</anypoint-checkbox
             >
           </arc-interactive-demo>
+
+          <div class="data-options">
+            <h3>Data options</h3>
+
+            <anypoint-button @click="${this.generateData}">Generate data</anypoint-button>
+            <anypoint-button @click="${this.deleteData}">Clear data</anypoint-button>
+          </div>
         </div>
       </section>
     </section>`;
@@ -212,6 +241,7 @@ class ComponentDemo extends ApiDemoPageBase {
 
       <demo-element id="helper" .amf="${amf}"></demo-element>
       <oauth2-authorization></oauth2-authorization>
+      <client-certificate-model></client-certificate-model>
 
         ${this._demoTemplate()}
         ${this._introductionTemplate()}

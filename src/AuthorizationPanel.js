@@ -178,6 +178,9 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
     }, {
       'type': 'OAuth 1.0',
       'name': 'OAuth 1.0'
+    }, {
+      'type': 'client-certificate',
+      'name': 'Client certificate'
     }];
   }
   /**
@@ -317,6 +320,10 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
           name = 'Digest Authentication';
           key = name;
           break;
+        case 'client-certificate':
+          name = 'Client certificate';
+          key = name;
+          break;
         case 'oauth1':
           name = 'OAuth 1.0';
           key = name;
@@ -408,7 +415,11 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       if (isBlank) {
         valid = true;
       } else if (settings) {
-        valid = settings.valid || false;
+        if (type === 'client-certificate') {
+          valid = true;
+        } else {
+          valid = settings.valid || false;
+        }
       } else if (this.authVaid) {
         valid = true;
       }
@@ -442,6 +453,9 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
    * @param {Object} settings Current settings.
    */
   _processPanelSettings(settings) {
+    if (!settings) {
+      return;
+    }
     switch (settings.type) {
       case 'oauth2': this._handleOauth2Settings(settings); break;
       case 'digest': this._handleDigestSettings(settings); break;
@@ -620,6 +634,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       case 'Basic Authentication': return this._basicTemplate();
       case 'Digest Authentication': return this._digestTemplate();
       case 'ntlm': return this._ntlmTemplate();
+      case 'client-certificate': return this._clientCertificateTemplate();
       case 'Pass Through': return this._passThroughTemplate();
       case 'OAuth 2.0': return this._oauth2Template(item.type, item.name);
       case 'OAuth 1.0': return this._oauth1Template(item.type, item.name);
@@ -687,6 +702,24 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
       ?outlined="${outlined}"
       ?compatibility="${compatibility}"
     ></auth-method-ntlm>`;
+  }
+
+  _clientCertificateTemplate() {
+    const {
+      eventsTarget,
+      readOnly,
+      disabled,
+      compatibility,
+      outlined
+    } = this;
+
+    return html`<auth-method-certificate
+      .eventsTarget="${eventsTarget}"
+      .readOnly="${readOnly}"
+      .disabled="${disabled}"
+      ?outlined="${outlined}"
+      ?compatibility="${compatibility}"
+    ></auth-method-certificate>`;
   }
 
   _oauth2Template(type, name) {
