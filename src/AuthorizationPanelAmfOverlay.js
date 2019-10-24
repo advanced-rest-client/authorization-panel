@@ -286,6 +286,9 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
       case 'oauth2':
       case 'OAuth 2.0':
         return 'OAuth 2.0';
+      case 'client-certificate':
+      case 'Client certificate':
+        return 'Client certificate';
     }
   }
 };

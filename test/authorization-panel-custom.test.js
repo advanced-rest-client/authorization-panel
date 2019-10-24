@@ -33,9 +33,7 @@ describe('RAML custom scheme authentication', function() {
         it('has panels settings', async () => {
           const security = AmfLoader.lookupSecurity(amf, '/custom-only', 'get');
           const element = await modelFixture(amf, security);
-          await aTimeout();
-          await aTimeout();
-          await aTimeout();
+          await aTimeout(100);
           assert.typeOf(element.settings, 'object');
           assert.equal(element.settings.type, 'x-custom');
         });
@@ -43,14 +41,14 @@ describe('RAML custom scheme authentication', function() {
         it('panel is invalid', async () => {
           const security = AmfLoader.lookupSecurity(amf, '/custom-only', 'get');
           const element = await modelFixture(amf, security);
-          await aTimeout();
+          await aTimeout(100);
           assert.isTrue(element.invalid);
         });
 
         it('is accessible with the panel', async () => {
           const security = AmfLoader.lookupSecurity(amf, '/custom-only', 'get');
           const element = await modelFixture(amf, security);
-          await aTimeout();
+          await aTimeout(100);
           await assert.isAccessible(element);
         });
       });
@@ -66,9 +64,7 @@ describe('RAML custom scheme authentication', function() {
     it('panel is valid and has default data', async () => {
       const security = AmfLoader.lookupSecurity(amf, '/check/api-status', 'get');
       const element = await modelFixture(amf, security);
-      await aTimeout();
-      await aTimeout();
-      await aTimeout();
+      await aTimeout(100);
       const settings = element.settings;
       assert.equal(settings.type, 'x-custom');
       assert.isTrue(settings.valid);

@@ -5,10 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   authorization-panel.js
+ *   src/AuthorizationPanelAmfOverlay.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
-import {AuthorizationPanel} from './src/AuthorizationPanel.js';
+import {AmfHelperMixin} from '@api-components/amf-helper-mixin/amf-helper-mixin.js';
+
+export {AuthorizationPanelAmfOverlay};
