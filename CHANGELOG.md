@@ -755,3 +755,20 @@
 
 
 
+## [4.0.1](https://github.com/advanced-rest-client/authorization-panel/compare/2.0.0-preview...4.0.1) (2019-10-24)
+
+
+### Bug Fixes
+
+* fixing karma config for Edge ([74907c8](https://github.com/advanced-rest-client/authorization-panel/commit/74907c866aa6b1553b5ed5000cb273bd8c31990d))
+* fixing travis config file ([fd6909d](https://github.com/advanced-rest-client/authorization-panel/commit/fd6909d2108dc1641afd1cc2982b4d1fc920f43c))
+
+
+### Features
+
+* adding a function to restore default state ([15f951d](https://github.com/advanced-rest-client/authorization-panel/commit/15f951db3367da5cfbb7468c8ca156805ec979df))
+* adding client cerftificates support ([d11780e](https://github.com/advanced-rest-client/authorization-panel/commit/d11780e2554ed9b26bb9388ba9e9764ffe77d024))
+* method selector os not hidden when a single method available ([0db05ba](https://github.com/advanced-rest-client/authorization-panel/commit/0db05ba19d01d102f21bd67a955491c13a273fbd))
+
+
+
