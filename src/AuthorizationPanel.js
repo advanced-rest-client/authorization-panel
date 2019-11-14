@@ -32,7 +32,7 @@ import '@advanced-rest-client/auth-methods/auth-methods.js';
  * @demo demo/amf-meta.html RAML or OAS data from AMF model and IronMeta
  */
 export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTargetMixin(LitElement)) {
-  static get styles() {
+  get styles() {
     return css`
     :host {
       display: block;
@@ -814,7 +814,7 @@ export class AuthorizationPanel extends AuthorizationPanelAmfOverlay(EventsTarge
 
   render() {
     const { authMethods } = this;
-    return html`
+    return html`<style>${this.styles}</style>
     <div class="auth-container">
       ${authMethods && authMethods.length ?
         html`
