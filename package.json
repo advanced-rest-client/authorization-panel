@@ -1,7 +1,7 @@
 {
   "name": "@advanced-rest-client/authorization-panel",
   "description": "The authorization panel used in the request panel",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "license": "Apache-2.0",
   "main": "authorization-panel.js",
   "keywords": [
@@ -34,7 +34,7 @@
     "@anypoint-web-components/anypoint-dropdown-menu": "^0.1.12",
     "@anypoint-web-components/anypoint-item": "^1.0.4",
     "@anypoint-web-components/anypoint-listbox": "^1.0.3",
-    "@api-components/amf-helper-mixin": "^4.0.14",
+    "@api-components/amf-helper-mixin": "^4.0.17",
     "@polymer/iron-meta": "^3.0.0",
     "cryptojslib": "^3.1.2",
     "jsrsasign": "^8.0.12",

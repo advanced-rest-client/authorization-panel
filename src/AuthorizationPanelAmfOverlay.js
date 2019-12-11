@@ -166,7 +166,9 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     let hasNull = false;
     for (let i = 0, len = secured.length; i < len; i++) {
       // TODO temporarily retrieve first item of security:schemes due to AMF 4 model change
-      const item = (this._getValueArray(secured[i], secPrefix.schemes) || [])[0];
+      const item = this._hasType(secured[i], secPrefix.securityRequirement)
+        ? (this._getValueArray(secured[i], secPrefix.schemes) || [])[0]
+        : secured[i];
       if (!item || (!this._hasType(item, secPrefix.ParametrizedSecurityScheme) &&
         !this._hasType(item, secPrefix.SecurityScheme))) {
         continue;
@@ -234,7 +236,9 @@ export const AuthorizationPanelAmfOverlay = (base) => class extends AmfHelperMix
     const secPrefix = this.ns.aml.vocabularies.security;
     for (let i = 0, len = model.length; i < len; i++) {
       // TODO temporarily retrieve first item of security:schemes due to AMF 4 model change
-      const item = (this._getValueArray(model[i], secPrefix.schemes) || [])[0];
+      const item = this._hasType(model[i], secPrefix.securityRequirement)
+        ? (this._getValueArray(model[i], secPrefix.schemes) || [])[0]
+        : model[i];
       if (!item) {
         continue;
       }
